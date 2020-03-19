@@ -3,8 +3,8 @@
 
 #include "Particle.hh"
 #include <map>
-#include <string>
 #include <random>
+#include <string>
 
 typedef Particle *(*ParticleConstructor)(const Vector3<double> &,
                                          const Vector3<double> &, double,
@@ -46,12 +46,11 @@ class ParticleFactory {
     }
 
     ParticleFactory();
-    ParticleFactory(const std::string &_className = "LeapfrogParticle",
-                    double _mass = 1., double _charge = -1.,
-                    double _radius = 0., double _length = 0.,
-                    double _kinetic_energy = 0., double _energy_spread = 0.,
-                    double _angular_divergence = 0., double _polar_angle = 0.,
-                    double _azimuthal_angle = 0.);
+    ParticleFactory(const std::string &_className, double _mass = 1.,
+                    double _charge = -1., double _radius = 0.,
+                    double _length = 0., double _kinetic_energy = 0.,
+                    double _energy_spread = 0., double _angular_divergence = 0.,
+                    double _polar_angle = 0., double _azimuthal_angle = 0.);
     Particle *createObject();
 };
 
