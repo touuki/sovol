@@ -35,5 +35,5 @@ Vector3<double> Utils::lorentzForce(double charge,
 };
 
 double Utils::kineticEnergy(const Vector3<double> &momentum, double mass) {
-    return (gamma(momentum, mass) - 1.) * mass;
+    return sqrt(pow(mass, 2) + momentum.square()) - mass;
 };

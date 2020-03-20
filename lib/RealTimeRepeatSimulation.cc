@@ -7,7 +7,7 @@
 RealTimeRepeatSimulation::RealTimeRepeatSimulation()
     : RealTimeRepeatSimulation(
           FieldFactory::createObject(Config::getString(
-              SOVOL_CONFIG_KEY(REALTIMEREPEATSIMULATION_FIELDCLASSNAME))),
+              SOVOL_CONFIG_KEY(FIELD_CLASSNAME))),
           new ParticleFactory(),
           Config::getDouble(
               SOVOL_CONFIG_KEY(REALTIMEREPEATSIMULATION_TIMESTEP)),
@@ -78,6 +78,7 @@ SimulationStatus RealTimeRepeatSimulation::run(long timeLimitMilliseconds) {
         // next Particle
         setParticle(particleFactory->createObject());
         currentTime = 0.;
+        nextDataTime = 0.;
     }
 
     long startClock = clock();
@@ -95,7 +96,7 @@ SimulationStatus RealTimeRepeatSimulation::run(long timeLimitMilliseconds) {
 
     if (currentTime >= endTime) {
         remainingNumber--;
-        return SimulationStatus::ENDTIME_EXCEED;
+        return SimulationStatus::ENDTIME_REACHED;
     }
 
     if (currentTime < nextDataTime) {

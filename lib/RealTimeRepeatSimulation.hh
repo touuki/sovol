@@ -8,7 +8,7 @@
 enum SimulationStatus {
   DATA_OUTPUT,
   TIME_LIMIT_EXCEED,
-  ENDTIME_EXCEED,
+  ENDTIME_REACHED,
   FINISHED
 };
 

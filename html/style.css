@@ -1,0 +1,87 @@
+html {
+    font-size: 18px;
+}
+
+table {
+    width: 100%;
+    table-layout: auto;
+}
+
+td {
+    padding: 4px 10px;
+}
+
+.input-div {
+    padding: 10px 0;
+    margin: 10px 0;
+    width: 100%;
+    border-radius: 5px;
+    background-color: #f2f2f2;
+    box-sizing: border-box;
+}
+
+.table-title {
+    text-align: center;
+    font-weight: bold;
+    font-size: 120%;
+}
+
+input,
+select {
+    -webkit-appearance: none;
+}
+
+input[type=text],
+input[type=number],
+select {
+    font-size: 80%;
+    width: 100%;
+    padding: 6px 6px;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    background-color: white;
+}
+
+button {
+    font-size: 80%;
+    width: 100%;
+    padding: 6px 6px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.red-button {
+    color: white;
+    background-color: #d81c1c;
+}
+
+.red-button:hover {
+    background-color: #be1616;
+}
+
+.yellow-button {
+    color: black;
+    background-color: #ecde1b;
+}
+
+.yellow-button:hover {
+    background-color: #d3be04;
+}
+
+.green-button {
+    color: white;
+    background-color: #4CAF50;
+}
+
+.green-button:hover {
+    background-color: #45a049;
+}
+
+.figure {
+    padding: 5px 15px;
+    height: 360px;
+}

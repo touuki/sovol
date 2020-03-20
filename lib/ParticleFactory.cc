@@ -27,7 +27,7 @@ ParticleFactory::ParticleFactory(const std::string &_className, double _mass,
       azimuthal_angle(_azimuthal_angle),
       random_engine(std::default_random_engine(time(NULL))),
       kinetic_energy_dist(std::normal_distribution(
-          kinetic_energy, 0.5 * M_SQRT1_2 * energy_spread * kinetic_energy)),
+          kinetic_energy, 0.5 * M_SQRT1_2 / 100. * energy_spread * kinetic_energy)),
       position_r_dist(std::normal_distribution(0., radius * M_SQRT1_2)),
       position_z_dist(std::uniform_real_distribution(-length, 0.)),
       position_phi_dist(std::uniform_real_distribution(0., 2 * M_PI)),

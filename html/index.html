@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <script type="text/javascript" src="/sovol/wasm/libsovol-wasm.js"></script>
+    <script type="text/javascript" src="/js/jquery-3.4.1.min.js"></script>
+    <script type="text/javascript" src="/js/echarts.min.js"></script>
+    <script type="text/javascript" src="/js/echarts-gl.min.js"></script>
+    <script type="text/javascript" src="/js/ecStat.min.js"></script>
+    <script type="text/javascript" src="/js/dataTool.min.js"></script>
+    <script type="text/javascript" src="script.js"></script>
+</head>
+
+<body>
+    <div class="input-div simulation-input">
+        <div class="table-title">Particles Bunch</div>
+        <table class="input-table">
+            <tr>
+                <td>
+                    <label for="PARTICLES_MASS">Mass [m<sub>e</sub>]</label>
+                </td>
+                <td>
+                    <label for="PARTICLES_CHARGE">Charge [e]</label>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input class="eval" type="text" name="PARTICLES_MASS" id="PARTICLES_MASS" value="1">
+                </td>
+                <td>
+                    <input class="eval" type="text" name="PARTICLES_CHARGE" id="PARTICLES_CHARGE" value="-1">
+                </td>
+            </tr>
+        </table>
+        <table class="input-table">
+            <tr>
+                <td>
+                    <label for="PARTICLES_RADIUS">Radius [c/ω]</label>
+                </td>
+                <td>
+                    <label for="PARTICLES_LENGTH">Length [c/ω]</label>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input class="eval" type="text" name="PARTICLES_RADIUS" id="PARTICLES_RADIUS" value="0">
+                </td>
+                <td>
+                    <input class="eval" type="text" name="PARTICLES_LENGTH" id="PARTICLES_LENGTH" value="0">
+                </td>
+            </tr>
+        </table>
+        <table class="input-table">
+            <tr>
+                <td>
+                    <label for="PARTICLES_KINETIC_ENERGY">Kinetic Energy [m<sub>e</sub>c<sup>2</sup>]</label>
+                </td>
+                <td>
+                    <label for="PARTICLES_ENERGY_SPREAD">Energy Spread [%]</label>
+                </td>
+                <td>
+                    <label for="PARTICLES_ANGULAR_DIVERGENCE">Angular Divergence [rad]</label>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input class="eval" type="text" name="PARTICLES_KINETIC_ENERGY" id="PARTICLES_KINETIC_ENERGY"
+                        value="0">
+                </td>
+                <td>
+                    <input class="eval" type="text" name="PARTICLES_ENERGY_SPREAD" id="PARTICLES_ENERGY_SPREAD"
+                        value="0">
+                </td>
+                <td>
+                    <input class="eval" type="text" name="PARTICLES_ANGULAR_DIVERGENCE"
+                        id="PARTICLES_ANGULAR_DIVERGENCE" value="0">
+                </td>
+            </tr>
+        </table>
+        <table class="input-table">
+            <tr>
+                <td>
+                    <label for="PARTICLES_POLAR_ANGLE">Polar angle [rad]</label>
+                </td>
+                <td>
+                    <label for="PARTICLES_AZIMUTHAL_ANGLE">Azimuthal angle [rad]</label>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input class="eval" type="text" name="PARTICLES_POLAR_ANGLE" id="PARTICLES_POLAR_ANGLE" value="0">
+                </td>
+                <td>
+                    <input class="eval" type="text" name="PARTICLES_AZIMUTHAL_ANGLE" id="PARTICLES_AZIMUTHAL_ANGLE"
+                        value="0">
+                </td>
+            </tr>
+        </table>
+        <table class="input-table">
+            <tr>
+                <td>
+                    <label for="PARTICLES_CLASSNAME">Particle Class</label>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <select name="PARTICLES_CLASSNAME" id="PARTICLES_CLASSNAME">
+                        <option value="LeapfrogParticle">LeapfrogParticle</option>
+                        <option value="RungeKuttaParticle">RungeKuttaParticle</option>
+                    </select>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="input-div simulation-input">
+        <div class="table-title">Field</div>
+        <table class="input-table">
+            <tr>
+                <td>
+                    <label for="FIELD_CLASSNAME">Type</label>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <select name="FIELD_CLASSNAME" id="FIELD_CLASSNAME">
+                        <option value="CustomField">CustomField</option>
+                    </select>
+                </td>
+            </tr>
+        </table>
+        <div class="field-args" id="CustomField_args_div" style="display: none;">
+            <table class="input-table">
+                <tr>
+                    <td>
+                        <label for="CUSTOMFIELD_EX">E<sub>x</sub> [m<sub>e</sub>cω/e]</label>
+                    </td>
+                    <td>
+                        <label for="CUSTOMFIELD_EY">E<sub>y</sub> [m<sub>e</sub>cω/e]</label>
+                    </td>
+                    <td>
+                        <label for="CUSTOMFIELD_EZ">E<sub>z</sub> [m<sub>e</sub>cω/e]</label>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="text" name="CUSTOMFIELD_EX" id="CUSTOMFIELD_EX" value="return 0;">
+                    </td>
+                    <td>
+                        <input type="text" name="CUSTOMFIELD_EY" id="CUSTOMFIELD_EY" value="return 0;">
+                    </td>
+                    <td>
+                        <input type="text" name="CUSTOMFIELD_EZ" id="CUSTOMFIELD_EZ" value="return 0;">
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="CUSTOMFIELD_BX">B<sub>x</sub> [m<sub>e</sub>ω/e]</label>
+                    </td>
+                    <td>
+                        <label for="CUSTOMFIELD_BY">B<sub>y</sub> [m<sub>e</sub>ω/e]</label>
+                    </td>
+                    <td>
+                        <label for="CUSTOMFIELD_BZ">B<sub>z</sub> [m<sub>e</sub>ω/e]</label>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="text" name="CUSTOMFIELD_BX" id="CUSTOMFIELD_BX" value="return 1;">
+                    </td>
+                    <td>
+                        <input type="text" name="CUSTOMFIELD_BY" id="CUSTOMFIELD_BY" value="return 0;">
+                    </td>
+                    <td>
+                        <input type="text" name="CUSTOMFIELD_BZ" id="CUSTOMFIELD_BZ" value="return 0;">
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="input-div" id="particles_plots_input">
+        <div class="table-title">Particles Plots</div>
+        <table class="input-table">
+            <tr>
+                <td>
+                    <label for="xaxis">x-axis</label>
+                </td>
+                <td>
+                    <label for="yaxis">y-axis</label>
+                </td>
+                <td>
+                    <label for="zaxis">z-axis</label>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <select name="xaxis" id="xaxis">
+                    </select>
+                </td>
+                <td>
+                    <select name="yaxis" id="yaxis">
+                    </select>
+                </td>
+                <td>
+                    <select name="zaxis" id="zaxis">
+                        <option value="">(Blank)</option>
+                    </select>
+                </td>
+            </tr>
+        </table>
+        <table class="input-table">
+            <tr>
+                <td>
+                    <button id="add_particles_plot" class="green-button">Add</button>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div id="particles_plots"></div>
+    <div class="input-div simulation-input">
+        <div class="table-title">Simulation Control</div>
+        <table class="input-table">
+            <tr>
+                <td>
+                    <label for="REALTIMEREPEATSIMULATION_TIMESTEP">Time step [1/ω]</label>
+                </td>
+                <td>
+                    <label for="REALTIMEREPEATSIMULATION_ENDTIME">End time [1/ω]</label>
+                </td>
+
+            </tr>
+            <tr>
+                <td>
+                    <input class="eval" type="text" name="REALTIMEREPEATSIMULATION_TIMESTEP"
+                        id="REALTIMEREPEATSIMULATION_TIMESTEP" value="0.001 * 2 * Math.PI">
+                </td>
+                <td>
+                    <input class="eval" type="text" name="REALTIMEREPEATSIMULATION_ENDTIME"
+                        id="REALTIMEREPEATSIMULATION_ENDTIME" value="100 * 2 * Math.PI">
+                </td>
+
+            </tr>
+            <tr>
+                <td>
+                    <label for="REALTIMEREPEATSIMULATION_DATASTARTTIME">Output start [1/ω]</label>
+                </td>
+                <td>
+                    <label for="REALTIMEREPEATSIMULATION_DATAINTERVAL">Data interval [1/ω]</label>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input class="eval" type="text" name="REALTIMEREPEATSIMULATION_DATASTARTTIME"
+                        id="REALTIMEREPEATSIMULATION_DATASTARTTIME" value="35 * 2 * Math.PI">
+                </td>
+                <td>
+                    <input class="eval" type="text" name="REALTIMEREPEATSIMULATION_DATAINTERVAL"
+                        id="REALTIMEREPEATSIMULATION_DATAINTERVAL" value="0.01 * 2 * Math.PI">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="REALTIMEREPEATSIMULATION_REMAININGNUMBER">Particles Number</label>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input class="eval" type="text" name="REALTIMEREPEATSIMULATION_REMAININGNUMBER"
+                        id="REALTIMEREPEATSIMULATION_REMAININGNUMBER" value="1">
+                </td>
+            </tr>
+        </table>
+        <table class="input-table" style="table-layout: fixed;">
+            <tr>
+                <td>
+                    <button id="start" disabled class="green-button">Start</button>
+                </td>
+                <td>
+                    <button id="stop" class="red-button">Stop</button>
+                </td>
+            </tr>
+        </table>
+    </div>
+</body>
+
+</html>
