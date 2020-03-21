@@ -12,10 +12,11 @@
     <script type="text/javascript" src="/js/ecStat.min.js"></script>
     <script type="text/javascript" src="/js/dataTool.min.js"></script>
     <script type="text/javascript" src="script.js"></script>
+    <title>Sovol - A Wasm/CLI Program of Relativistic Particle Tracking in EM Field</title>
 </head>
 
 <body>
-    <div class="input-div simulation-input">
+    <div class="input-div">
         <div class="table-title">Particles Beam</div>
         <table class="input-table">
             <tr>
@@ -28,10 +29,10 @@
             </tr>
             <tr>
                 <td>
-                    <input class="eval" type="text" name="PARTICLES_MASS" id="PARTICLES_MASS" value="1">
+                    <input class="eval simulation-input" type="text" name="PARTICLES_MASS" id="PARTICLES_MASS" value="1">
                 </td>
                 <td>
-                    <input class="eval" type="text" name="PARTICLES_CHARGE" id="PARTICLES_CHARGE" value="-1">
+                    <input class="eval simulation-input" type="text" name="PARTICLES_CHARGE" id="PARTICLES_CHARGE" value="-1">
                 </td>
             </tr>
         </table>
@@ -49,13 +50,13 @@
             </tr>
             <tr>
                 <td>
-                    <input class="eval" type="text" name="PARTICLES_WIDTH" id="PARTICLES_WIDTH" value="0">
+                    <input class="eval simulation-input" type="text" name="PARTICLES_WIDTH" id="PARTICLES_WIDTH" value="0">
                 </td>
                 <td>
-                    <input class="eval" type="text" name="PARTICLES_LENGTH" id="PARTICLES_LENGTH" value="0">
+                    <input class="eval simulation-input" type="text" name="PARTICLES_LENGTH" id="PARTICLES_LENGTH" value="0">
                 </td>
                 <td>
-                    <input class="eval" type="text" name="REALTIMEREPEATSIMULATION_REMAININGNUMBER"
+                    <input class="eval simulation-input" type="text" name="REALTIMEREPEATSIMULATION_REMAININGNUMBER"
                         id="REALTIMEREPEATSIMULATION_REMAININGNUMBER" value="1">
                 </td>
             </tr>
@@ -74,15 +75,15 @@
             </tr>
             <tr>
                 <td>
-                    <input class="eval" type="text" name="PARTICLES_KINETIC_ENERGY" id="PARTICLES_KINETIC_ENERGY"
+                    <input class="eval simulation-input" type="text" name="PARTICLES_KINETIC_ENERGY" id="PARTICLES_KINETIC_ENERGY"
                         value="0">
                 </td>
                 <td>
-                    <input class="eval" type="text" name="PARTICLES_ENERGY_SPREAD" id="PARTICLES_ENERGY_SPREAD"
+                    <input class="eval simulation-input" type="text" name="PARTICLES_ENERGY_SPREAD" id="PARTICLES_ENERGY_SPREAD"
                         value="0">
                 </td>
                 <td>
-                    <input class="eval" type="text" name="PARTICLES_ANGULAR_DIVERGENCE"
+                    <input class="eval simulation-input" type="text" name="PARTICLES_ANGULAR_DIVERGENCE"
                         id="PARTICLES_ANGULAR_DIVERGENCE" value="0">
                 </td>
             </tr>
@@ -98,10 +99,10 @@
             </tr>
             <tr>
                 <td>
-                    <input class="eval" type="text" name="PARTICLES_POLAR_ANGLE" id="PARTICLES_POLAR_ANGLE" value="0">
+                    <input class="eval simulation-input" type="text" name="PARTICLES_POLAR_ANGLE" id="PARTICLES_POLAR_ANGLE" value="0">
                 </td>
                 <td>
-                    <input class="eval" type="text" name="PARTICLES_AZIMUTHAL_ANGLE" id="PARTICLES_AZIMUTHAL_ANGLE"
+                    <input class="eval simulation-input" type="text" name="PARTICLES_AZIMUTHAL_ANGLE" id="PARTICLES_AZIMUTHAL_ANGLE"
                         value="0">
                 </td>
             </tr>
@@ -120,15 +121,15 @@
             </tr>
             <tr>
                 <td>
-                    <input class="eval" type="text" name="PARTICLES_TRANSLATION_X" id="PARTICLES_TRANSLATION_X"
+                    <input class="eval simulation-input" type="text" name="PARTICLES_TRANSLATION_X" id="PARTICLES_TRANSLATION_X"
                         value="0">
                 </td>
                 <td>
-                    <input class="eval" type="text" name="PARTICLES_TRANSLATION_Y" id="PARTICLES_TRANSLATION_Y"
+                    <input class="eval simulation-input" type="text" name="PARTICLES_TRANSLATION_Y" id="PARTICLES_TRANSLATION_Y"
                         value="0">
                 </td>
                 <td>
-                    <input class="eval" type="text" name="PARTICLES_TRANSLATION_Z" id="PARTICLES_TRANSLATION_Z"
+                    <input class="eval simulation-input" type="text" name="PARTICLES_TRANSLATION_Z" id="PARTICLES_TRANSLATION_Z"
                         value="0">
                 </td>
             </tr>
@@ -141,7 +142,7 @@
             </tr>
             <tr>
                 <td>
-                    <select name="PARTICLES_CLASSNAME" id="PARTICLES_CLASSNAME">
+                    <select class="simulation-input" name="PARTICLES_CLASSNAME" id="PARTICLES_CLASSNAME">
                         <option value="LeapfrogParticle">LeapfrogParticle</option>
                         <option value="RungeKuttaParticle">RungeKuttaParticle</option>
                     </select>
@@ -150,7 +151,7 @@
         </table>
     </div>
 
-    <div class="input-div simulation-input">
+    <div class="input-div">
         <div class="table-title">Field</div>
         <table class="input-table">
             <tr>
@@ -160,7 +161,7 @@
             </tr>
             <tr>
                 <td>
-                    <select name="FIELD_CLASSNAME" id="FIELD_CLASSNAME">
+                    <select class="simulation-input" name="FIELD_CLASSNAME" id="FIELD_CLASSNAME">
                         <option value="CustomField">CustomField</option>
                         <option value="LaguerreGaussianPulseField">LaguerreGaussianPulseField</option>
                     </select>
@@ -168,6 +169,18 @@
             </tr>
         </table>
         <div class="field-args" id="CustomField_args_div" style="display: none;">
+            <div class="input-div2">
+                <table class="input-table">
+                    <tr>
+                        <td>Constants Table</td>
+                        <td>
+                            <button id="add_customfield_constant" class="green-button">Add</button>
+                        </td>
+                    </tr>
+                </table>
+                <table class="input-table" id="constants_table">
+                </table>
+            </div>
             <table class="input-table">
                 <tr>
                     <td>
@@ -182,13 +195,13 @@
                 </tr>
                 <tr>
                     <td>
-                        <input type="text" name="CUSTOMFIELD_EX" id="CUSTOMFIELD_EX" value="return 0;">
+                        <textarea class="customfield-func" rows="10" name="CUSTOMFIELD_EX" id="CUSTOMFIELD_EX">return 0;</textarea>
                     </td>
                     <td>
-                        <input type="text" name="CUSTOMFIELD_EY" id="CUSTOMFIELD_EY" value="return 0;">
+                        <textarea class="customfield-func" rows="10" name="CUSTOMFIELD_EY" id="CUSTOMFIELD_EY">return 0;</textarea>
                     </td>
                     <td>
-                        <input type="text" name="CUSTOMFIELD_EZ" id="CUSTOMFIELD_EZ" value="return 0;">
+                        <textarea class="customfield-func" rows="10" name="CUSTOMFIELD_EZ" id="CUSTOMFIELD_EZ">return 0;</textarea>
                     </td>
                 </tr>
                 <tr>
@@ -204,13 +217,13 @@
                 </tr>
                 <tr>
                     <td>
-                        <input type="text" name="CUSTOMFIELD_BX" id="CUSTOMFIELD_BX" value="return 1;">
+                        <textarea class="customfield-func" rows="10" name="CUSTOMFIELD_BX" id="CUSTOMFIELD_BX">return 0;</textarea>
                     </td>
                     <td>
-                        <input type="text" name="CUSTOMFIELD_BY" id="CUSTOMFIELD_BY" value="return 0;">
+                        <textarea class="customfield-func" rows="10" name="CUSTOMFIELD_BY" id="CUSTOMFIELD_BY">return 0;</textarea>
                     </td>
                     <td>
-                        <input type="text" name="CUSTOMFIELD_BZ" id="CUSTOMFIELD_BZ" value="return 0;">
+                        <textarea class="customfield-func" rows="10" name="CUSTOMFIELD_BZ" id="CUSTOMFIELD_BZ">return 0;</textarea>
                     </td>
                 </tr>
             </table>
@@ -230,15 +243,15 @@
                 </tr>
                 <tr>
                     <td>
-                        <input class="eval" type="text" name="LAGUERREGAUSSIANPULSEFIELD_TAU"
+                        <input class="eval simulation-input" type="text" name="LAGUERREGAUSSIANPULSEFIELD_TAU"
                             id="LAGUERREGAUSSIANPULSEFIELD_TAU" value="5 * 2 * Math.PI">
                     </td>
                     <td>
-                        <input class="eval" type="text" name="LAGUERREGAUSSIANPULSEFIELD_A0"
+                        <input class="eval simulation-input" type="text" name="LAGUERREGAUSSIANPULSEFIELD_A0"
                             id="LAGUERREGAUSSIANPULSEFIELD_A0" value="5">
                     </td>
                     <td>
-                        <input class="eval" type="text" name="LAGUERREGAUSSIANPULSEFIELD_W0"
+                        <input class="eval simulation-input" type="text" name="LAGUERREGAUSSIANPULSEFIELD_W0"
                             id="LAGUERREGAUSSIANPULSEFIELD_W0" value="5 * 2 * Math.PI">
                     </td>
                 </tr>
@@ -255,15 +268,15 @@
                 </tr>
                 <tr>
                     <td>
-                        <input class="eval" type="text" name="LAGUERREGAUSSIANPULSEFIELD_EY"
+                        <input class="eval simulation-input" type="text" name="LAGUERREGAUSSIANPULSEFIELD_EY"
                             id="LAGUERREGAUSSIANPULSEFIELD_EY" value="0">
                     </td>
                     <td>
-                        <input class="eval" type="text" name="LAGUERREGAUSSIANPULSEFIELD_DELAY"
+                        <input class="eval simulation-input" type="text" name="LAGUERREGAUSSIANPULSEFIELD_DELAY"
                             id="LAGUERREGAUSSIANPULSEFIELD_DELAY" value="50 * 2 * Math.PI">
                     </td>
                     <td>
-                        <input class="eval" type="text" name="LAGUERREGAUSSIANPULSEFIELD_IPHASE"
+                        <input class="eval simulation-input" type="text" name="LAGUERREGAUSSIANPULSEFIELD_IPHASE"
                             id="LAGUERREGAUSSIANPULSEFIELD_IPHASE" value="0">
                     </td>
                 </tr>
@@ -282,15 +295,15 @@
                 </tr>
                 <tr>
                     <td>
-                        <input class="eval" type="text" name="LAGUERREGAUSSIANPULSEFIELD_P"
+                        <input class="eval simulation-input" type="text" name="LAGUERREGAUSSIANPULSEFIELD_P"
                             id="LAGUERREGAUSSIANPULSEFIELD_P" value="0">
                     </td>
                     <td>
-                        <input class="eval" type="text" name="LAGUERREGAUSSIANPULSEFIELD_L"
+                        <input class="eval simulation-input" type="text" name="LAGUERREGAUSSIANPULSEFIELD_L"
                             id="LAGUERREGAUSSIANPULSEFIELD_L" value="0">
                     </td>
                     <td>
-                        <input class="eval" type="text" name="LAGUERREGAUSSIANPULSEFIELD_H"
+                        <input class="eval simulation-input" type="text" name="LAGUERREGAUSSIANPULSEFIELD_H"
                             id="LAGUERREGAUSSIANPULSEFIELD_H" value="0.1 * 2 * Math.PI">
                     </td>
                 </tr>
@@ -337,27 +350,6 @@
     </div>
     <div id="particles_plots"></div>
     <div class="input-div">
-        <div class="table-title">Rate Control</div>
-        <table class="input-table">
-            <tr>
-                <td>
-                    <label for="rateControl_dpf">Data per Frame</label>
-                </td>
-                <td>
-                    <label for="rateControl_fps">Frames per Second</label>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <input type="number" name="rateControl_dpf" id="rateControl_dpf" value="30" pattern="\d*">
-                </td>
-                <td>
-                    <input type="number" name="rateControl_fps" id="rateControl_fps" value="25" pattern="\d*">
-                </td>
-            </tr>
-        </table>
-    </div>
-    <div class="input-div simulation-input">
         <div class="table-title">Simulation Control</div>
         <table class="input-table">
             <tr>
@@ -371,11 +363,11 @@
             </tr>
             <tr>
                 <td>
-                    <input class="eval" type="text" name="REALTIMEREPEATSIMULATION_TIMESTEP"
+                    <input class="eval simulation-input" type="text" name="REALTIMEREPEATSIMULATION_TIMESTEP"
                         id="REALTIMEREPEATSIMULATION_TIMESTEP" value="0.001 * 2 * Math.PI">
                 </td>
                 <td>
-                    <input class="eval" type="text" name="REALTIMEREPEATSIMULATION_ENDTIME"
+                    <input class="eval simulation-input" type="text" name="REALTIMEREPEATSIMULATION_ENDTIME"
                         id="REALTIMEREPEATSIMULATION_ENDTIME" value="100 * 2 * Math.PI">
                 </td>
 
@@ -390,12 +382,28 @@
             </tr>
             <tr>
                 <td>
-                    <input class="eval" type="text" name="REALTIMEREPEATSIMULATION_DATASTARTTIME"
+                    <input class="eval simulation-input" type="text" name="REALTIMEREPEATSIMULATION_DATASTARTTIME"
                         id="REALTIMEREPEATSIMULATION_DATASTARTTIME" value="35 * 2 * Math.PI">
                 </td>
                 <td>
-                    <input class="eval" type="text" name="REALTIMEREPEATSIMULATION_DATAINTERVAL"
+                    <input class="eval simulation-input" type="text" name="REALTIMEREPEATSIMULATION_DATAINTERVAL"
                         id="REALTIMEREPEATSIMULATION_DATAINTERVAL" value="0.01 * 2 * Math.PI">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="rateControl_dpf">Data per Frame</label>
+                </td>
+                <td>
+                    <label for="rateControl_fps">Frames per Second</label>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input type="number" name="rateControl_dpf" id="rateControl_dpf" value="30" pattern="\d*">
+                </td>
+                <td>
+                    <input type="number" name="rateControl_fps" id="rateControl_fps" value="25" pattern="\d*">
                 </td>
             </tr>
         </table>

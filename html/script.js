@@ -20,23 +20,28 @@ $(function () {
             sim_start = true;
             let key_perfix = 'SC_';
             let obj = {};
-            $('.simulation-input').find('input, select').filter(':visible').each((i, e) => {
-                let value;
-                if (e.name.startsWith('CUSTOMFIELD_')) {
+            $('.simulation-input').filter(':visible').each((i, e) => {
+                if ($(e).hasClass('eval')) {
+                    obj[key_perfix + e.name] = eval(e.value).toString();
+                } else {
+                    obj[key_perfix + e.name] = e.value.toString();
+                }
+            });
+            if (obj[key_perfix + 'FIELD_CLASSNAME'] == 'CustomField') {
+                let constants_string = $('#constants_table').children().map(function (i, e) {
+                    let je = $(e);
+                    return 'var ' + je.find('.customfield-constant-key').val()
+                        + '=' + je.find('.customfield-constant-value').val();
+                }).get().join(';');
+                $('.customfield-func').each((i, e) => {
                     if (custom_function[e.name]) {
                         removeFunction(custom_function[e.name]);
                     }
-                    custom_function[e.name] = addFunction(new Function('x', 'y', 'z', 't', e.value), 'ddddd');
-                    value = custom_function[e.name].toString();
-                } else {
-                    if ($(e).hasClass('eval')) {
-                        value = eval(e.value).toString();
-                    } else {
-                        value = e.value.toString();
-                    }
-                };
-                obj[key_perfix + e.name] = value
-            });
+                    custom_function[e.name] = addFunction(new Function('x', 'y', 'z', 't', constants_string + ';' + e.value), 'ddddd');
+                    obj[key_perfix + e.name] = custom_function[e.name].toString();
+                });
+            }
+
             rateControl = {
                 fps: $('#rateControl_fps').val(),
                 dpf: $('#rateControl_dpf').val(),
@@ -50,6 +55,7 @@ $(function () {
         for (let i = 0; i < rateControl.dpf && sim_start && id == sim_id;) {
             let data = Module.runAndGetData(sim);
             if (data.finished) {
+                updateFrame();
                 sim_start = false;
                 delete sim;
                 break;
@@ -263,6 +269,26 @@ $(function () {
         echarts.dispose(figure.plot);
         delete figures[this.dataset.figureid];
         $(this).parents('.input-div').remove();
+    });
+
+    $('#add_customfield_constant').click(function () {
+        $('#constants_table').prepend(
+            '<tr>\
+                <td>\
+                    <input class="customfield-constant-key" type="text">\
+                </td>\
+                <td style="padding: 0;">=</td>\
+                <td>\
+                    <input class="customfield-constant-value" type="text">\
+                </td>\
+                <td>\
+                    <button class="remove-button red-button">Remove</button>\
+                </td>\
+            </tr>');
+    });
+
+    $('#constants_table').on('click', '.remove-button', function () {
+        $(this).parents('tr').remove();
     });
 
     function addData(data, isEndTime) {
