@@ -32,7 +32,7 @@ val getData(RealTimeRepeatSimulation *simulation) {
 };
 
 val runAndGetData(RealTimeRepeatSimulation *simulation) {
-    SimulationStatus status = simulation->run(100);
+    SimulationStatus status = simulation->run();
     val result = val::object();
     switch (status) {
     case SimulationStatus::DATA_OUTPUT:
@@ -45,7 +45,7 @@ val runAndGetData(RealTimeRepeatSimulation *simulation) {
     case SimulationStatus::FINISHED:
         result.set("finished", true);
         break;
-    case SimulationStatus::TIME_LIMIT_EXCEED:
+    case SimulationStatus::MAX_ITERATION_TIMES_REACHED:
         break;
     default:
         break;

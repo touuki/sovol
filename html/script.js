@@ -37,18 +37,22 @@ $(function () {
                 };
                 obj[key_perfix + e.name] = value
             });
-            nextData(Module.initSimulation(obj), ++sim_id);
+            rateControl = {
+                fps: $('#rateControl_fps').val(),
+                dpf: $('#rateControl_dpf').val(),
+            };
+            nextFrame(Module.initSimulation(obj), ++sim_id, rateControl);
         }
     });
 
-    function nextData(sim, id) {
-        if (!sim_start || id < sim_id) {
-            delete sim;
-        } else {
+    function nextFrame(sim, id, rateControl) {
+        let updatetime = new Date().getTime() + 1000 / rateControl.fps;
+        for (let i = 0; i < rateControl.dpf && sim_start && id == sim_id;) {
             let data = Module.runAndGetData(sim);
             if (data.finished) {
                 sim_start = false;
                 delete sim;
+                break;
             } else {
                 if (data.data) {
                     if (data.isEndTime) {
@@ -56,11 +60,23 @@ $(function () {
                     } else {
                         addData(data.data);
                     }
+                    i++;
                 }
-                setTimeout(nextData, 0, sim, id);
             }
         }
-    }
+        if (sim_start && id == sim_id) {
+            updateFrame();
+            let nowtime = new Date().getTime();
+            if (nowtime > updatetime) {
+                setTimeout(nextFrame, 0, sim, id, rateControl);
+            } else {
+                setTimeout(nextFrame, updatetime - nowtime, sim, id, rateControl);
+            }
+        } else {
+            delete sim;
+        }
+
+    };
 
     $('#stop').click(() => {
         sim_start = false;
@@ -144,9 +160,19 @@ $(function () {
         figure.plot = plot;
         figure.id = id;
         figure.initSeries = function () {
-            this.series = [];
-            this.addSeries();
+            this.series = [this.getSeriesElement()];
         };
+        figure.updateFrame = function () {
+            this.plot.setOption({ series: this.series })
+        };
+        figure.clear = function () {
+            for (let i = 0; i < this.series.length; i++) {
+                this.series[i] = this.getSeriesElement();
+            }
+            this.updateFrame();
+            this.initSeries();
+        };
+
         if (inp.zaxis) {
             plot.setOption({
                 tooltip: {},
@@ -170,18 +196,17 @@ $(function () {
                 }
             });
 
-            figure.type = 'line3D';
             figure.x = variables[inp.xaxis];
             figure.y = variables[inp.yaxis];
             figure.z = variables[inp.zaxis];
-            figure.addSeries = function () {
-                this.series.push({
+            figure.getSeriesElement = function () {
+                return {
                     type: 'line3D',
                     data: [],
                     lineStyle: {
                         width: 2
                     }
-                });
+                };
             }
             figure.addData = function (data, isEndTime) {
                 let x = this.x.processData(data);
@@ -189,7 +214,7 @@ $(function () {
                 let z = this.z.processData(data);
                 this.series[this.series.length - 1].data.push([x, y, z]);
                 if (isEndTime) {
-                    this.addSeries();
+                    this.series.push(this.getSeriesElement());
                 }
             };
         } else {
@@ -206,41 +231,30 @@ $(function () {
                 }
             });
 
-            figure.type = 'line';
             figure.x = variables[inp.xaxis];
             figure.y = variables[inp.yaxis];
-            figure.series = [];
-            figure.series.push({
-                type: 'line',
-                symbol: 'none',
-                data: [],
-                lineStyle: {
-                    width: 2
-                }
-            });
-            figure.addSeries = function () {
-                this.series.push({
+            figure.getSeriesElement = function () {
+                return {
                     type: 'line',
                     symbol: 'none',
                     data: [],
                     lineStyle: {
                         width: 2
                     }
-                });
-            }
+                };
+            };
             figure.addData = function (data, isEndTime) {
                 let x = this.x.processData(data);
                 let y = this.y.processData(data);
                 this.series[this.series.length - 1].data.push([x, y]);
                 if (isEndTime) {
-                    this.addSeries();
+                    this.series.push(this.getSeriesElement());
                 }
             };
-        }
-        figure.updateFrame = function () {
-            this.plot.setOption({ series: this.series })
-        };
 
+        }
+
+        figure.initSeries();
         figures[id] = figure;
     });
 
@@ -261,13 +275,11 @@ $(function () {
         for (const key in figures) {
             figures[key].updateFrame();
         };
-        setTimeout(updateFrame, 100);
     };
-    updateFrame();
 
     function clearFigures() {
         for (const key in figures) {
-            // TODO
+            figures[key].clear();
         }
     };
 

@@ -7,7 +7,7 @@
 
 enum SimulationStatus {
   DATA_OUTPUT,
-  TIME_LIMIT_EXCEED,
+  MAX_ITERATION_TIMES_REACHED,
   ENDTIME_REACHED,
   FINISHED
 };
@@ -39,7 +39,7 @@ class RealTimeRepeatSimulation {
     ~RealTimeRepeatSimulation();
     Particle *getParticle() const;
     double getCurrentTime() const;
-    SimulationStatus run(long timeLimitMilliseconds = 0);
+    SimulationStatus run(int32_t maxIterationTimes = -1);
 };
 
 #endif

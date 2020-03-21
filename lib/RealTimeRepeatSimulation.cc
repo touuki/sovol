@@ -6,8 +6,8 @@
 
 RealTimeRepeatSimulation::RealTimeRepeatSimulation()
     : RealTimeRepeatSimulation(
-          FieldFactory::createObject(Config::getString(
-              SOVOL_CONFIG_KEY(FIELD_CLASSNAME))),
+          FieldFactory::createObject(
+              Config::getString(SOVOL_CONFIG_KEY(FIELD_CLASSNAME))),
           new ParticleFactory(),
           Config::getDouble(
               SOVOL_CONFIG_KEY(REALTIMEREPEATSIMULATION_TIMESTEP)),
@@ -68,30 +68,27 @@ Particle *RealTimeRepeatSimulation::getParticle() const {
 
 double RealTimeRepeatSimulation::getCurrentTime() const { return currentTime; };
 
-SimulationStatus RealTimeRepeatSimulation::run(long timeLimitMilliseconds) {
+SimulationStatus RealTimeRepeatSimulation::run(int32_t maxIterationTimes) {
     if (remainingNumber <= 0) {
-        // simulation is over
         return SimulationStatus::FINISHED;
     }
 
     if (currentTime >= endTime) {
-        // next Particle
         setParticle(particleFactory->createObject());
         currentTime = 0.;
         nextDataTime = 0.;
     }
 
-    long startClock = clock();
+    if (maxIterationTimes < 0)
+    {
+        maxIterationTimes = INT32_MAX;
+    }
+    
     nextDataTime = calculateNextDataTime();
 
-    for (int i = 1; currentTime < nextDataTime; i++) {
+    for (int32_t i = 0; currentTime < nextDataTime && i < maxIterationTimes; i++) {
         currentParticle->nextStep(*field, currentTime, timeStep);
         currentTime += timeStep;
-        if (i % 1000 == 0 && timeLimitMilliseconds > 0 &&
-            1000 / CLOCKS_PER_SEC * (clock() - startClock) >
-                timeLimitMilliseconds) {
-            break;
-        }
     }
 
     if (currentTime >= endTime) {
@@ -100,7 +97,7 @@ SimulationStatus RealTimeRepeatSimulation::run(long timeLimitMilliseconds) {
     }
 
     if (currentTime < nextDataTime) {
-        return SimulationStatus::TIME_LIMIT_EXCEED;
+        return SimulationStatus::MAX_ITERATION_TIMES_REACHED;
     }
 
     return SimulationStatus::DATA_OUTPUT;

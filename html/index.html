@@ -43,6 +43,9 @@
                 <td>
                     <label for="PARTICLES_LENGTH">Length [c/ω]</label>
                 </td>
+                <td>
+                    <label for="REALTIMEREPEATSIMULATION_REMAININGNUMBER">Particles Number</label>
+                </td>
             </tr>
             <tr>
                 <td>
@@ -50,6 +53,10 @@
                 </td>
                 <td>
                     <input class="eval" type="text" name="PARTICLES_LENGTH" id="PARTICLES_LENGTH" value="0">
+                </td>
+                <td>
+                    <input class="eval" type="text" name="REALTIMEREPEATSIMULATION_REMAININGNUMBER"
+                        id="REALTIMEREPEATSIMULATION_REMAININGNUMBER" value="1">
                 </td>
             </tr>
         </table>
@@ -220,6 +227,27 @@
         </table>
     </div>
     <div id="particles_plots"></div>
+    <div class="input-div">
+        <div class="table-title">Rate Control</div>
+        <table class="input-table">
+            <tr>
+                <td>
+                    <label for="rateControl_dpf">Data per Frame</label>
+                </td>
+                <td>
+                    <label for="rateControl_fps">Frames per Second</label>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input type="number" name="rateControl_dpf" id="rateControl_dpf" value="30" pattern="\d*">
+                </td>
+                <td>
+                    <input type="number" name="rateControl_fps" id="rateControl_fps" value="25" pattern="\d*">
+                </td>
+            </tr>
+        </table>
+    </div>
     <div class="input-div simulation-input">
         <div class="table-title">Simulation Control</div>
         <table class="input-table">
@@ -259,17 +287,6 @@
                 <td>
                     <input class="eval" type="text" name="REALTIMEREPEATSIMULATION_DATAINTERVAL"
                         id="REALTIMEREPEATSIMULATION_DATAINTERVAL" value="0.01 * 2 * Math.PI">
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <label for="REALTIMEREPEATSIMULATION_REMAININGNUMBER">Particles Number</label>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <input class="eval" type="text" name="REALTIMEREPEATSIMULATION_REMAININGNUMBER"
-                        id="REALTIMEREPEATSIMULATION_REMAININGNUMBER" value="1">
                 </td>
             </tr>
         </table>
