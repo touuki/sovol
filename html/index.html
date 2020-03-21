@@ -16,7 +16,7 @@
 
 <body>
     <div class="input-div simulation-input">
-        <div class="table-title">Particles Bunch</div>
+        <div class="table-title">Particles Beam</div>
         <table class="input-table">
             <tr>
                 <td>
@@ -38,7 +38,7 @@
         <table class="input-table">
             <tr>
                 <td>
-                    <label for="PARTICLES_RADIUS">Radius [c/ω]</label>
+                    <label for="PARTICLES_WIDTH">Width [c/ω]</label>
                 </td>
                 <td>
                     <label for="PARTICLES_LENGTH">Length [c/ω]</label>
@@ -49,7 +49,7 @@
             </tr>
             <tr>
                 <td>
-                    <input class="eval" type="text" name="PARTICLES_RADIUS" id="PARTICLES_RADIUS" value="0">
+                    <input class="eval" type="text" name="PARTICLES_WIDTH" id="PARTICLES_WIDTH" value="0">
                 </td>
                 <td>
                     <input class="eval" type="text" name="PARTICLES_LENGTH" id="PARTICLES_LENGTH" value="0">
@@ -109,6 +109,33 @@
         <table class="input-table">
             <tr>
                 <td>
+                    <label for="PARTICLES_TRANSLATION_X">Translation x [c/ω]</label>
+                </td>
+                <td>
+                    <label for="PARTICLES_TRANSLATION_Y">Translation y [c/ω]</label>
+                </td>
+                <td>
+                    <label for="PARTICLES_TRANSLATION_Z">Translation z [c/ω]</label>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input class="eval" type="text" name="PARTICLES_TRANSLATION_X" id="PARTICLES_TRANSLATION_X"
+                        value="0">
+                </td>
+                <td>
+                    <input class="eval" type="text" name="PARTICLES_TRANSLATION_Y" id="PARTICLES_TRANSLATION_Y"
+                        value="0">
+                </td>
+                <td>
+                    <input class="eval" type="text" name="PARTICLES_TRANSLATION_Z" id="PARTICLES_TRANSLATION_Z"
+                        value="0">
+                </td>
+            </tr>
+        </table>
+        <table class="input-table">
+            <tr>
+                <td>
                     <label for="PARTICLES_CLASSNAME">Particle Class</label>
                 </td>
             </tr>
@@ -128,13 +155,14 @@
         <table class="input-table">
             <tr>
                 <td>
-                    <label for="FIELD_CLASSNAME">Type</label>
+                    <label for="FIELD_CLASSNAME">Field Class</label>
                 </td>
             </tr>
             <tr>
                 <td>
                     <select name="FIELD_CLASSNAME" id="FIELD_CLASSNAME">
                         <option value="CustomField">CustomField</option>
+                        <option value="LaguerreGaussianPulseField">LaguerreGaussianPulseField</option>
                     </select>
                 </td>
             </tr>
@@ -183,6 +211,87 @@
                     </td>
                     <td>
                         <input type="text" name="CUSTOMFIELD_BZ" id="CUSTOMFIELD_BZ" value="return 0;">
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="field-args" style="display: none;" id="LaguerreGaussianPulseField_args_div">
+            <table class="input-table">
+                <tr>
+                    <td>
+                        <label for="LAGUERREGAUSSIANPULSEFIELD_TAU">τ<sub>FWHM</sub> [1/ω]</label>
+                    </td>
+                    <td>
+                        <label for="LAGUERREGAUSSIANPULSEFIELD_A0">a<sub>0</sub> [m<sub>e</sub>c/e]</label>
+                    </td>
+                    <td>
+                        <label for="LAGUERREGAUSSIANPULSEFIELD_W0">w<sub>0</sub> [c/ω]</label>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input class="eval" type="text" name="LAGUERREGAUSSIANPULSEFIELD_TAU"
+                            id="LAGUERREGAUSSIANPULSEFIELD_TAU" value="5 * 2 * Math.PI">
+                    </td>
+                    <td>
+                        <input class="eval" type="text" name="LAGUERREGAUSSIANPULSEFIELD_A0"
+                            id="LAGUERREGAUSSIANPULSEFIELD_A0" value="5">
+                    </td>
+                    <td>
+                        <input class="eval" type="text" name="LAGUERREGAUSSIANPULSEFIELD_W0"
+                            id="LAGUERREGAUSSIANPULSEFIELD_W0" value="5 * 2 * Math.PI">
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="LAGUERREGAUSSIANPULSEFIELD_EY">Polar y</label>
+                    </td>
+                    <td>
+                        <label for="LAGUERREGAUSSIANPULSEFIELD_DELAY">Time delay [1/ω]</label>
+                    </td>
+                    <td>
+                        <label for="LAGUERREGAUSSIANPULSEFIELD_IPHASE">Initial phase [rad]</label>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input class="eval" type="text" name="LAGUERREGAUSSIANPULSEFIELD_EY"
+                            id="LAGUERREGAUSSIANPULSEFIELD_EY" value="0">
+                    </td>
+                    <td>
+                        <input class="eval" type="text" name="LAGUERREGAUSSIANPULSEFIELD_DELAY"
+                            id="LAGUERREGAUSSIANPULSEFIELD_DELAY" value="50 * 2 * Math.PI">
+                    </td>
+                    <td>
+                        <input class="eval" type="text" name="LAGUERREGAUSSIANPULSEFIELD_IPHASE"
+                            id="LAGUERREGAUSSIANPULSEFIELD_IPHASE" value="0">
+                    </td>
+                </tr>
+            </table>
+            <table class="input-table">
+                <tr>
+                    <td>
+                        <label for="LAGUERREGAUSSIANPULSEFIELD_P">p - Radial index</label>
+                    </td>
+                    <td>
+                        <label for="LAGUERREGAUSSIANPULSEFIELD_L">l - Azimuthal index</label>
+                    </td>
+                    <td>
+                        <label for="LAGUERREGAUSSIANPULSEFIELD_H">Length step [c/ω]</label>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input class="eval" type="text" name="LAGUERREGAUSSIANPULSEFIELD_P"
+                            id="LAGUERREGAUSSIANPULSEFIELD_P" value="0">
+                    </td>
+                    <td>
+                        <input class="eval" type="text" name="LAGUERREGAUSSIANPULSEFIELD_L"
+                            id="LAGUERREGAUSSIANPULSEFIELD_L" value="0">
+                    </td>
+                    <td>
+                        <input class="eval" type="text" name="LAGUERREGAUSSIANPULSEFIELD_H"
+                            id="LAGUERREGAUSSIANPULSEFIELD_H" value="0.1 * 2 * Math.PI">
                     </td>
                 </tr>
             </table>

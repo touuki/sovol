@@ -16,6 +16,7 @@ class Particle {
              double _charge, double _mass);
     virtual void nextStep(const Field &, double time, double dt) = 0;
     void rotate(double polar_angle, double azimuthal_angle);
+    void translate(const Vector3<double> &translation);
 };
 
 class RungeKuttaParticle : public Particle {

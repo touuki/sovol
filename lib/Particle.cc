@@ -17,9 +17,15 @@ void Particle::rotate(double beta, double alpha) {
     Vector3<double> rotateY(sin(alpha) * cos(beta), cos(alpha),
                             sin(alpha) * sin(beta));
     Vector3<double> rotateZ(-sin(beta), 0., cos(beta));
-    position = Vector3(rotateX.dot(position), rotateY.dot(position), rotateZ.dot(position));
-    momentum = Vector3(rotateX.dot(momentum), rotateY.dot(momentum), rotateZ.dot(momentum));
+    position = Vector3(rotateX.dot(position), rotateY.dot(position),
+                       rotateZ.dot(position));
+    momentum = Vector3(rotateX.dot(momentum), rotateY.dot(momentum),
+                       rotateZ.dot(momentum));
 };
+
+void Particle::translate(const Vector3<double> &translation) {
+    position += translation;
+}
 
 REGISTER_PARTICLE(RungeKuttaParticle)
 

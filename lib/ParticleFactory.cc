@@ -7,33 +7,41 @@ ParticleFactory::ParticleFactory()
           Config::getString(SOVOL_CONFIG_KEY(PARTICLES_CLASSNAME)),
           Config::getDouble(SOVOL_CONFIG_KEY(PARTICLES_MASS), 1.),
           Config::getDouble(SOVOL_CONFIG_KEY(PARTICLES_CHARGE), -1.),
-          Config::getDouble(SOVOL_CONFIG_KEY(PARTICLES_RADIUS)),
+          Config::getDouble(SOVOL_CONFIG_KEY(PARTICLES_WIDTH)),
           Config::getDouble(SOVOL_CONFIG_KEY(PARTICLES_LENGTH)),
           Config::getDouble(SOVOL_CONFIG_KEY(PARTICLES_KINETIC_ENERGY)),
           Config::getDouble(SOVOL_CONFIG_KEY(PARTICLES_ENERGY_SPREAD)),
           Config::getDouble(SOVOL_CONFIG_KEY(PARTICLES_ANGULAR_DIVERGENCE)),
           Config::getDouble(SOVOL_CONFIG_KEY(PARTICLES_POLAR_ANGLE)),
-          Config::getDouble(SOVOL_CONFIG_KEY(PARTICLES_AZIMUTHAL_ANGLE))){};
+          Config::getDouble(SOVOL_CONFIG_KEY(PARTICLES_AZIMUTHAL_ANGLE)),
+          Config::getDouble(SOVOL_CONFIG_KEY(PARTICLES_TRANSLATION_X)),
+          Config::getDouble(SOVOL_CONFIG_KEY(PARTICLES_TRANSLATION_Y)),
+          Config::getDouble(SOVOL_CONFIG_KEY(PARTICLES_TRANSLATION_Z))){};
 
 ParticleFactory::ParticleFactory(const std::string &_className, double _mass,
-                                 double _charge, double _radius, double _length,
+                                 double _charge, double _width, double _length,
                                  double _kinetic_energy, double _energy_spread,
                                  double _angular_divergence,
-                                 double _polar_angle, double _azimuthal_angle)
+                                 double _polar_angle, double _azimuthal_angle,
+                                 double _translation_x, double _translation_y,
+                                 double _translation_z)
     : className(_className), mass(abs(_mass)), charge(_charge),
-      radius(abs(_radius)), length(abs(_length)),
+      width(abs(_width)), length(abs(_length)),
       kinetic_energy(abs(_kinetic_energy)), energy_spread(abs(_energy_spread)),
       angular_divergence(abs(_angular_divergence)), polar_angle(_polar_angle),
       azimuthal_angle(_azimuthal_angle),
+      translation(Vector3(_translation_x, _translation_y, _translation_z)),
       random_engine(std::default_random_engine(time(NULL))),
       kinetic_energy_dist(std::normal_distribution(
-          kinetic_energy, 0.5 * M_SQRT1_2 / 100. * energy_spread * kinetic_energy)),
-      position_r_dist(std::normal_distribution(0., radius * M_SQRT1_2)),
+          kinetic_energy,
+          kinetic_energy * energy_spread / (100. * 2. * sqrt(2. * M_LN2)))),
+      position_x_dist(std::normal_distribution(0., width * 0.25)),
+      position_y_dist(std::normal_distribution(0., width * 0.25)),
       position_z_dist(std::uniform_real_distribution(-length, 0.)),
-      position_phi_dist(std::uniform_real_distribution(0., 2 * M_PI)),
-      momentum_theta_dist(
-          std::normal_distribution(0., 0.5 * M_SQRT1_2 * angular_divergence)),
-      momentum_phi_dist(std::uniform_real_distribution(0., 2 * M_PI)){};
+      momentum_theta_x_dist(
+          std::normal_distribution(0., angular_divergence * 0.25)),
+      momentum_theta_y_dist(
+          std::normal_distribution(0., angular_divergence * 0.25)){};
 
 Particle *ParticleFactory::createObject() {
     ParticleConstructor constructor = nullptr;
@@ -52,16 +60,18 @@ Particle *ParticleFactory::createObject() {
         Ek = kinetic_energy_dist(random_engine);
 
     double p = sqrt(pow(Ek + mass, 2) - pow(mass, 2));
-    double phi = momentum_phi_dist(random_engine);
-    double theta = momentum_theta_dist(random_engine);
+    double theta_x = momentum_theta_x_dist(random_engine);
+    double theta_y = momentum_theta_y_dist(random_engine);
+    double theta = sqrt(pow(theta_x, 2) + pow(theta_y, 2));
+    double phi = atan2(theta_y, theta_x);
     Vector3<double> momentum(p * sin(theta) * cos(phi),
                              p * sin(theta) * sin(phi), p * cos(theta));
-    double position_phi = position_phi_dist(random_engine);
-    double r = position_r_dist(random_engine);
-    Vector3<double> position(r * cos(position_phi), r * sin(position_phi),
+    Vector3<double> position(position_x_dist(random_engine),
+                             position_y_dist(random_engine),
                              position_z_dist(random_engine));
 
     Particle *particle = (*constructor)(position, momentum, charge, mass);
     particle->rotate(polar_angle, azimuthal_angle);
+    particle->translate(translation);
     return particle;
 };
