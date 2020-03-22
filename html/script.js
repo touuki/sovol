@@ -5,6 +5,18 @@ $(function () {
     figures = {};
     sim_start = false;
     sim_id = 0;
+    sim_data = null;
+    function getDataObject(){
+        return {
+            x:[],
+            y:[],
+            z:[],
+            px:[],
+            py:[],
+            pz:[],
+            t:[]
+        };
+    }
 
     function checkReady() {
         if (!Module)
@@ -13,11 +25,22 @@ $(function () {
     };
     setTimeout(checkReady, 1000);
 
+    function funDownload(content, filename) {
+        var eleLink = document.createElement('a');
+        eleLink.download = filename;
+        eleLink.style.display = 'none';
+        var blob = new Blob([content]);
+        eleLink.href = URL.createObjectURL(blob);
+        document.body.appendChild(eleLink);
+        eleLink.click();
+        document.body.removeChild(eleLink);
+    };
+
     $('#start').click(function () {
         if (sim_start) {
             return;
         } else {
-            clearFigures();
+            clearSimulation();
             sim_start = true;
             let key_perfix = 'SC_';
             let obj = {};
@@ -57,6 +80,7 @@ $(function () {
             let data = Module.runAndGetData(sim);
             if (data.finished) {
                 updateFrame();
+                sim_data.pop();
                 sim_start = false;
                 delete sim;
                 break;
@@ -296,6 +320,17 @@ $(function () {
     });
 
     function addData(data, isEndTime) {
+        let obj = sim_data[sim_data.length - 1];
+        obj.x.push(data.x);
+        obj.y.push(data.y);
+        obj.z.push(data.z);
+        obj.px.push(data.px);
+        obj.py.push(data.py);
+        obj.pz.push(data.pz);
+        obj.t.push(data.t);
+        if(isEndTime){
+            sim_data.push(getDataObject());
+        }
         for (const key in figures) {
             figures[key].addData(data, isEndTime);
         }
@@ -307,11 +342,16 @@ $(function () {
         };
     };
 
-    function clearFigures() {
+    function clearSimulation() {
+        sim_data = [getDataObject()];
         for (const key in figures) {
             figures[key].clear();
         }
     };
+
+    $('#export_data').click(function () {
+        funDownload(JSON.stringify({version:version,data:sim_data}), 'sovol_data.json');
+    });
 
     $('#export_args').click(function () {
         var obj = {};
@@ -336,17 +376,7 @@ $(function () {
                 zAxis: e.dataset.zAxis
             };
         }).get();
-        var funDownload = function (content, filename) {
-            var eleLink = document.createElement('a');
-            eleLink.download = filename;
-            eleLink.style.display = 'none';
-            var blob = new Blob([content]);
-            eleLink.href = URL.createObjectURL(blob);
-            document.body.appendChild(eleLink);
-            eleLink.click();
-            document.body.removeChild(eleLink);
-        };
-        funDownload(JSON.stringify(obj), 'sovol.json');
+        funDownload(JSON.stringify(obj), 'sovol_args.json');
     });
 
     $('#import_args').click(() => $('#import_args_file').click());
