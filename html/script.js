@@ -1,5 +1,6 @@
 $(function () {
 
+    version = "1.0"
     custom_function = {};
     figures = {};
     sim_start = false;
@@ -28,16 +29,16 @@ $(function () {
                 }
             });
             if (obj[key_perfix + 'FIELD_CLASSNAME'] == 'CustomField') {
-                let constants_string = $('#constants_table').children().map(function (i, e) {
+                let arguments_string = $('#arguments_table').children().map(function (i, e) {
                     let je = $(e);
-                    return 'var ' + je.find('.customfield-constant-key').val()
-                        + '=' + je.find('.customfield-constant-value').val();
+                    return 'var ' + je.find('.customfield-argument-key').val()
+                        + '=' + je.find('.customfield-argument-value').val();
                 }).get().join(';');
                 $('.customfield-func').each((i, e) => {
                     if (custom_function[e.name]) {
                         removeFunction(custom_function[e.name]);
                     }
-                    custom_function[e.name] = addFunction(new Function('x', 'y', 'z', 't', constants_string + ';' + e.value), 'ddddd');
+                    custom_function[e.name] = addFunction(new Function('x', 'y', 'z', 't', arguments_string + ';' + e.value), 'ddddd');
                     obj[key_perfix + e.name] = custom_function[e.name].toString();
                 });
             }
@@ -88,14 +89,13 @@ $(function () {
         sim_start = false;
     });
 
-    function changeFieldType() {
+    $('#FIELD_CLASSNAME').change(function () {
         let name = $('#FIELD_CLASSNAME > option:selected').val();
         $('.field-args').css("display", "none");
         $('#' + name + '_args_div').css("display", "");
-    }
+    });
 
-    changeFieldType();
-    $('#FIELD_CLASSNAME').change(changeFieldType);
+    $('#FIELD_CLASSNAME').change();
 
     variables = {
         x: {
@@ -140,19 +140,17 @@ $(function () {
         }
     });
 
-    $('#add_particles_plot').click(function () {
+    function addParticlesPlot(xAxis, yAxis, zAxis){
         let figure = {};
-        let inp = {};
-        $('#particles_plots_input').find('input, select').each((i, e) => inp[e.name] = e.value);
         let id = 'particles_plot_' + Math.random().toString().substr(-8);
-        let title = inp.xaxis + '-' + inp.yaxis;
-        if (inp.zaxis) {
-            title += '-' + inp.zaxis;
+        let title = xAxis + '-' + yAxis;
+        if (zAxis) {
+            title += '-' + zAxis;
         }
         $('#particles_plots').prepend(
             '<div class="input-div">\
                 <div class="table-title">' + title + '</div>\
-                <div class="figure" id="'+ id + '">\
+                <div class="figure" id="'+ id + '" data-x-axis="' + xAxis + '" data-y-axis="' + yAxis + '" data-z-axis="' + zAxis + '">\
                 </div>\
                 <table class="input-table">\
                     <tr>\
@@ -179,21 +177,21 @@ $(function () {
             this.initSeries();
         };
 
-        if (inp.zaxis) {
+        if (zAxis) {
             plot.setOption({
                 tooltip: {},
                 backgroundColor: '#fff',
                 xAxis3D: {
                     type: 'value',
-                    name: inp.xaxis + ' [' + variables[inp.xaxis].unit + ']',
+                    name: xAxis + ' [' + variables[xAxis].unit + ']',
                 },
                 yAxis3D: {
                     type: 'value',
-                    name: inp.yaxis + ' [' + variables[inp.yaxis].unit + ']',
+                    name: yAxis + ' [' + variables[yAxis].unit + ']',
                 },
                 zAxis3D: {
                     type: 'value',
-                    name: inp.zaxis + ' [' + variables[inp.zaxis].unit + ']',
+                    name: zAxis + ' [' + variables[zAxis].unit + ']',
                 },
                 grid3D: {
                     viewControl: {
@@ -202,9 +200,9 @@ $(function () {
                 }
             });
 
-            figure.x = variables[inp.xaxis];
-            figure.y = variables[inp.yaxis];
-            figure.z = variables[inp.zaxis];
+            figure.x = variables[xAxis];
+            figure.y = variables[yAxis];
+            figure.z = variables[zAxis];
             figure.getSeriesElement = function () {
                 return {
                     type: 'line3D',
@@ -229,16 +227,16 @@ $(function () {
                 backgroundColor: '#fff',
                 xAxis: {
                     type: 'value',
-                    name: inp.xaxis + ' [' + variables[inp.xaxis].unit + ']',
+                    name: xAxis + ' [' + variables[xAxis].unit + ']',
                 },
                 yAxis: {
                     type: 'value',
-                    name: inp.yaxis + ' [' + variables[inp.yaxis].unit + ']',
+                    name: yAxis + ' [' + variables[yAxis].unit + ']',
                 }
             });
 
-            figure.x = variables[inp.xaxis];
-            figure.y = variables[inp.yaxis];
+            figure.x = variables[xAxis];
+            figure.y = variables[yAxis];
             figure.getSeriesElement = function () {
                 return {
                     type: 'line',
@@ -262,6 +260,12 @@ $(function () {
 
         figure.initSeries();
         figures[id] = figure;
+    };
+
+    $('#add_particles_plot').click(function () {
+        let inp = {};
+        $('#particles_plots_input').find('input, select').each((i, e) => inp[e.name] = e.value);
+        addParticlesPlot(inp.xAxis, inp.yAxis, inp.zAxis);
     });
 
     $('#particles_plots').on('click', '.remove-button', function () {
@@ -271,15 +275,15 @@ $(function () {
         $(this).parents('.input-div').remove();
     });
 
-    $('#add_customfield_constant').click(function () {
-        $('#constants_table').prepend(
+    $('#add_customfield_argument').click(function () {
+        $('#arguments_table').prepend(
             '<tr>\
                 <td>\
-                    <input class="customfield-constant-key" type="text">\
+                    <input class="customfield-argument-key" type="text">\
                 </td>\
                 <td style="padding: 0;">=</td>\
                 <td>\
-                    <input class="customfield-constant-value" type="text">\
+                    <input class="customfield-argument-value" type="text">\
                 </td>\
                 <td>\
                     <button class="remove-button red-button">Remove</button>\
@@ -287,7 +291,7 @@ $(function () {
             </tr>');
     });
 
-    $('#constants_table').on('click', '.remove-button', function () {
+    $('#arguments_table').on('click', '.remove-button', function () {
         $(this).parents('tr').remove();
     });
 
@@ -308,5 +312,80 @@ $(function () {
             figures[key].clear();
         }
     };
+
+    $('#export_args').click(function () {
+        var obj = {};
+        obj.version = version;
+        obj.static_inputs = $('.static-input').map(function (i, e) {
+            return {
+                key: e.id,
+                value: e.value
+            };
+        }).get();
+        obj.customfield_arguments = $('#arguments_table').children().map(function (i, e) {
+            let je = $(e);
+            return {
+                key: je.find('.customfield-argument-key').val(),
+                value: je.find('.customfield-argument-value').val()
+            };
+        }).get();
+        obj.plot_figures = $('.figure').map(function (i, e) {
+            return {
+                xAxis: e.dataset.xAxis,
+                yAxis: e.dataset.yAxis,
+                zAxis: e.dataset.zAxis
+            };
+        }).get();
+        var funDownload = function (content, filename) {
+            var eleLink = document.createElement('a');
+            eleLink.download = filename;
+            eleLink.style.display = 'none';
+            var blob = new Blob([content]);
+            eleLink.href = URL.createObjectURL(blob);
+            document.body.appendChild(eleLink);
+            eleLink.click();
+            document.body.removeChild(eleLink);
+        };
+        funDownload(JSON.stringify(obj), 'sovol.json');
+    });
+
+    $('#import_args').click(() => $('#import_args_file').click());
+
+    $('#import_args_file').on('change', function () {
+        if (this.value === '') {
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            const obj = JSON.parse(e.target.result);
+            if(obj.static_inputs instanceof Array){
+                for (let i = 0; i < obj.static_inputs.length; i++) {
+                    const element = obj.static_inputs[i];
+                    if($('#' + element.key)){
+                        $('#' + element.key).val(element.value);
+                    }
+                }
+            }
+            $('#FIELD_CLASSNAME').change();
+            $('#arguments_table').find('.remove-button').click();
+            if(obj.customfield_arguments instanceof Array){
+                for (let i = obj.customfield_arguments.length - 1; i >= 0; i--) {
+                    $('#add_customfield_argument').click();
+                    const element = obj.customfield_arguments[i];
+                    const je = $('#arguments_table').children(':first');
+                    je.find('.customfield-argument-key').val(element.key);
+                    je.find('.customfield-argument-value').val(element.value);
+                }
+            }
+            $('#particles_plots').find('.remove-button').click();
+            if(obj.plot_figures instanceof Array){
+                for (let i = obj.plot_figures.length - 1; i >= 0; i--) {
+                    const element = obj.plot_figures[i];
+                    addParticlesPlot(element.xAxis, element.yAxis, element.zAxis);
+                }
+            }
+        };
+        reader.readAsText(this.files[0]);
+    });
 
 });
