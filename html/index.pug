@@ -1,0 +1,294 @@
+-var test = false
+
+doctype html
+html
+  head
+    meta(charset="utf-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0")
+    if test
+      link(rel="stylesheet" href="style.css")
+      link(rel="stylesheet", href="/fontawesome/css/all.css")
+      script(type="text/javascript" src="/sovol/wasm/libsovol-wasm.js")
+    else
+      link(rel="stylesheet" href="/css/style.css")
+      link(rel="stylesheet", href="https://static.touuki.com/fontawesome/css/all.css")
+      script(type="text/javascript" src="/js/libsovol-wasm.js")
+    script(type="text/javascript" src="https://static.touuki.com/js/jquery-3.4.1.min.js")
+    script(type="text/javascript" src="https://static.touuki.com/js/echarts.min.js")
+    script(type="text/javascript" src="https://static.touuki.com/js/echarts-gl.min.js")
+    script(type="text/javascript" src="https://static.touuki.com/js/ecStat.min.js")
+    script(type="text/javascript" src="https://static.touuki.com/js/dataTool.min.js")
+    title Sovol - A Wasm/CLI Program of Relativistic Particle Tracking in EM Field
+  body
+    .buttons
+      a.button.is-blue(href="https://github.com/touuki/sovol/blob/master/USAGE.md" target="_blank", rel="noopener noreferrer")
+        span.icon
+          i.fas.fa-book
+        span Usage
+      a.button.is-dark(href="https://github.com/touuki/sovol" target="_blank", rel="noopener noreferrer")
+        span.icon
+          i.fab.fa-github
+        span GitHub
+      input#import_args_file(style="display: none;" accept=".json" type="file")
+      button#import_args.button.is-green 
+        span.icon
+          i.fas.fa-file-import
+        span Import Args
+      button#export_args.button.is-pink 
+        span.icon
+          i.fas.fa-file-export
+        span Export Args
+    .input-div
+      .table-title Particles Beam
+      table.input-table
+        tr
+          td
+            label(for="PARTICLES_MASS") Mass [m<sub>e</sub>]
+          td
+            label(for="PARTICLES_CHARGE") Charge [e]
+        tr
+          td
+            input#PARTICLES_MASS.eval.simulation-input.static-input(type="text", value="1")
+          td
+            input#PARTICLES_CHARGE.eval.simulation-input.static-input(type="text", value="-1")
+      table.input-table
+        tr
+          td
+            label(for="PARTICLES_WIDTH") Width [c/ω]
+          td
+            label(for="PARTICLES_LENGTH") Length [c/ω]
+          td
+            label(for="REALTIMEREPEATSIMULATION_REMAININGNUMBER") Particles Number
+        tr
+          td
+            input#PARTICLES_WIDTH.eval.simulation-input.static-input(type="text", value="0")
+          td
+            input#PARTICLES_LENGTH.eval.simulation-input.static-input(type="text", value="0")
+          td
+            input#REALTIMEREPEATSIMULATION_REMAININGNUMBER.eval.simulation-input.static-input(type="text", value="1")
+      table.input-table
+        tr
+          td
+            label(for="PARTICLES_KINETIC_ENERGY") Kinetic Energy [m<sub>e</sub>c<sup>2</sup>]
+          td
+            label(for="PARTICLES_ENERGY_SPREAD") Energy Spread [%]
+          td
+            label(for="PARTICLES_ANGULAR_DIVERGENCE") Angular Divergence [rad]
+        tr
+          td
+            input#PARTICLES_KINETIC_ENERGY.eval.simulation-input.static-input(type="text", value="0")
+          td
+            input#PARTICLES_ENERGY_SPREAD.eval.simulation-input.static-input(type="text", value="0")
+          td
+            input#PARTICLES_ANGULAR_DIVERGENCE.eval.simulation-input.static-input(type="text", value="0")
+      table.input-table
+        tr
+          td
+            label(for="PARTICLES_POLAR_ANGLE") Polar angle [rad]
+          td
+            label(for="PARTICLES_AZIMUTHAL_ANGLE") Azimuthal angle [rad]
+        tr
+          td
+            input#PARTICLES_POLAR_ANGLE.eval.simulation-input.static-input(type="text", value="0")
+          td
+            input#PARTICLES_AZIMUTHAL_ANGLE.eval.simulation-input.static-input(type="text", value="0")
+      table.input-table
+        tr
+          td
+            label(for="PARTICLES_TRANSLATION_X") Translation x [c/ω]
+          td
+            label(for="PARTICLES_TRANSLATION_Y") Translation y [c/ω]
+          td
+            label(for="PARTICLES_TRANSLATION_Z") Translation z [c/ω]
+        tr
+          td
+            input#PARTICLES_TRANSLATION_X.eval.simulation-input.static-input(type="text", value="0")
+          td
+            input#PARTICLES_TRANSLATION_Y.eval.simulation-input.static-input(type="text", value="0")
+          td
+            input#PARTICLES_TRANSLATION_Z.eval.simulation-input.static-input(type="text", value="0")
+      table.input-table
+        tr
+          td
+            label(for="PARTICLES_CLASSNAME") Particle Class
+        tr
+          td
+            select#PARTICLES_CLASSNAME.simulation-input.static-input
+              option(value="LeapfrogParticle") LeapfrogParticle
+              option(value="RungeKuttaParticle") RungeKuttaParticle
+    .input-div
+      .table-title Field
+      table.input-table
+        tr
+          td
+            label(for="FIELD_CLASSNAME") Field Class
+        tr
+          td
+            select#FIELD_CLASSNAME.simulation-input.static-input
+              option(value="CustomField") CustomField
+              option(value="LaguerreGaussianPulseField") LaguerreGaussianPulseField
+      #CustomField_args_div.field-args(style="display: none;")
+        .input-div2
+          table.input-table
+            tr
+              td Arguments Table
+              td
+                button#add_customfield_argument.button.is-green.is-fullwidth
+                  span.icon
+                    i.fas.fa-plus
+                  span Add
+          table#arguments_table.input-table
+        table.input-table
+          tr
+            td
+              label(for="CUSTOMFIELD_EX") E<sub>x</sub> [m<sub>e</sub>cω/e]
+            td
+              label(for="CUSTOMFIELD_EY") E<sub>y</sub> [m<sub>e</sub>cω/e]
+            td
+              label(for="CUSTOMFIELD_EZ") E<sub>z</sub> [m<sub>e</sub>cω/e]
+          tr
+            td
+              textarea#CUSTOMFIELD_EX.customfield-func.static-input(rows="10") return 0;
+            td
+              textarea#CUSTOMFIELD_EY.customfield-func.static-input(rows="10") return 0;
+            td
+              textarea#CUSTOMFIELD_EZ.customfield-func.static-input(rows="10") return 0;
+          tr
+            td
+              label(for="CUSTOMFIELD_BX") B<sub>x</sub> [m<sub>e</sub>ω/e]
+            td
+              label(for="CUSTOMFIELD_BY") B<sub>y</sub> [m<sub>e</sub>ω/e]
+            td
+              label(for="CUSTOMFIELD_BZ") B<sub>z</sub> [m<sub>e</sub>ω/e]
+          tr
+            td
+              textarea#CUSTOMFIELD_BX.customfield-func.static-input(rows="10") return 0;
+            td
+              textarea#CUSTOMFIELD_BY.customfield-func.static-input(rows="10") return 0;
+            td
+              textarea#CUSTOMFIELD_BZ.customfield-func.static-input(rows="10") return 0;
+      #LaguerreGaussianPulseField_args_div.field-args(style="display: none;")
+        table.input-table
+          tr
+            td
+              label(for="LAGUERREGAUSSIANPULSEFIELD_TAU") τ<sub>FWHM</sub> [1/ω]
+            td
+              label(for="LAGUERREGAUSSIANPULSEFIELD_A0") a<sub>0</sub> [m<sub>e</sub>c/e]
+            td
+              label(for="LAGUERREGAUSSIANPULSEFIELD_W0") w<sub>0</sub> [c/ω]
+          tr
+            td
+              input#LAGUERREGAUSSIANPULSEFIELD_TAU.eval.simulation-input.static-input(type="text", value="5 * 2 * Math.PI")
+            td
+              input#LAGUERREGAUSSIANPULSEFIELD_A0.eval.simulation-input.static-input(type="text", value="5")
+            td
+              input#LAGUERREGAUSSIANPULSEFIELD_W0.eval.simulation-input.static-input(type="text", value="5 * 2 * Math.PI")
+          tr
+            td
+              label(for="LAGUERREGAUSSIANPULSEFIELD_EY") Polar y
+            td
+              label(for="LAGUERREGAUSSIANPULSEFIELD_DELAY") Time delay [1/ω]
+            td
+              label(for="LAGUERREGAUSSIANPULSEFIELD_IPHASE") Initial phase [rad]
+          tr
+            td
+              input#LAGUERREGAUSSIANPULSEFIELD_EY.eval.simulation-input.static-input(type="text", value="0")
+            td
+              input#LAGUERREGAUSSIANPULSEFIELD_DELAY.eval.simulation-input.static-input(type="text", value="50 * 2 * Math.PI")
+            td
+              input#LAGUERREGAUSSIANPULSEFIELD_IPHASE.eval.simulation-input.static-input(type="text", value="0")
+        table.input-table
+          tr
+            td
+              label(for="LAGUERREGAUSSIANPULSEFIELD_P") p - Radial index
+            td
+              label(for="LAGUERREGAUSSIANPULSEFIELD_L") l - Azimuthal index
+            td
+              label(for="LAGUERREGAUSSIANPULSEFIELD_H") Length step [c/ω]
+          tr
+            td
+              input#LAGUERREGAUSSIANPULSEFIELD_P.eval.simulation-input.static-input(type="text", value="0")
+            td
+              input#LAGUERREGAUSSIANPULSEFIELD_L.eval.simulation-input.static-input(type="text", value="0")
+            td
+              input#LAGUERREGAUSSIANPULSEFIELD_H.eval.simulation-input.static-input(type="text", value="0.1 * 2 * Math.PI")
+    #particles_plots_input.input-div
+      .table-title Particles Plots
+      table.input-table
+        tr
+          td
+            label(for="xAxis") x-axis
+          td
+            label(for="yAxis") y-axis
+          td
+            label(for="zAxis") z-axis
+        tr
+          td
+            select#xAxis
+          td
+            select#yAxis
+          td
+            select#zAxis
+              option(value="") (Blank)
+      table.input-table
+        tr
+          td
+            button#add_particles_plot.button.is-green.is-fullwidth 
+              span.icon
+                i.fas.fa-plus
+              span Add
+    #particles_plots
+    .input-div
+      .table-title Simulation Control
+      table.input-table
+        tr
+          td
+            label(for="REALTIMEREPEATSIMULATION_TIMESTEP") Time step [1/ω]
+          td
+            label(for="REALTIMEREPEATSIMULATION_ENDTIME") End time [1/ω]
+        tr
+          td
+            input#REALTIMEREPEATSIMULATION_TIMESTEP.eval.simulation-input.static-input(type="text", value="0.001 * 2 * Math.PI")
+          td
+            input#REALTIMEREPEATSIMULATION_ENDTIME.eval.simulation-input.static-input(type="text", value="100 * 2 * Math.PI")
+        tr
+          td
+            label(for="REALTIMEREPEATSIMULATION_DATASTARTTIME") Output start [1/ω]
+          td
+            label(for="REALTIMEREPEATSIMULATION_DATAINTERVAL") Data interval [1/ω]
+        tr
+          td
+            input#REALTIMEREPEATSIMULATION_DATASTARTTIME.eval.simulation-input.static-input(type="text", value="35 * 2 * Math.PI")
+          td
+            input#REALTIMEREPEATSIMULATION_DATAINTERVAL.eval.simulation-input.static-input(type="text", value="0.01 * 2 * Math.PI")
+        tr
+          td
+            label(for="rateControl_dpf") Data per Frame
+          td
+            label(for="rateControl_fps") Frames per Second
+        tr
+          td
+            input#rateControl_dpf.static-input(type="number", value="30" pattern="\d*")
+          td
+            input#rateControl_fps.static-input(type="number", value="25" pattern="\d*")
+      table.input-table(style="table-layout: fixed;")
+        tr
+          td
+            button#start.button.is-green.is-fullwidth(disabled)
+              span.icon
+                i.fas.fa-play
+              span Start
+          td
+            button#stop.button.is-red.is-fullwidth
+              span.icon
+                i.fas.fa-stop
+              span Stop
+          td
+            button#export_data.button.is-blue.is-fullwidth
+              span.icon
+                i.fas.fa-download
+              span Export Data
+    if test
+      script(type="text/javascript" src="script.js")
+    else
+      script(type="text/javascript" src="/js/script.js")

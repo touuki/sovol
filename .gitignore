@@ -28,4 +28,6 @@ Makefile
 #VSCode
 .vscode
 
+dist/
+
 /cli/sovol-cli

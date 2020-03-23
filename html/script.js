@@ -46,9 +46,9 @@ $(function () {
             let obj = {};
             $('.simulation-input').filter(':visible').each((i, e) => {
                 if ($(e).hasClass('eval')) {
-                    obj[key_perfix + e.name] = eval(e.value).toString();
+                    obj[key_perfix + e.id] = eval(e.value).toString();
                 } else {
-                    obj[key_perfix + e.name] = e.value.toString();
+                    obj[key_perfix + e.id] = e.value.toString();
                 }
             });
             if (obj[key_perfix + 'FIELD_CLASSNAME'] == 'CustomField') {
@@ -58,11 +58,11 @@ $(function () {
                         + '=' + je.find('.customfield-argument-value').val();
                 }).get().join(';');
                 $('.customfield-func').each((i, e) => {
-                    if (custom_function[e.name]) {
-                        removeFunction(custom_function[e.name]);
+                    if (custom_function[e.id]) {
+                        removeFunction(custom_function[e.id]);
                     }
-                    custom_function[e.name] = addFunction(new Function('x', 'y', 'z', 't', arguments_string + ';' + e.value), 'ddddd');
-                    obj[key_perfix + e.name] = custom_function[e.name].toString();
+                    custom_function[e.id] = addFunction(new Function('x', 'y', 'z', 't', arguments_string + ';' + e.value), 'ddddd');
+                    obj[key_perfix + e.id] = custom_function[e.id].toString();
                 });
             }
 
@@ -179,7 +179,9 @@ $(function () {
                 <table class="input-table">\
                     <tr>\
                         <td>\
-                            <button class="remove-button red-button" data-figureid="'+ id + '">Remove</button>\
+                            <button class="remove-button button is-red is-fullwidth" data-figureid="'+ id + '">\
+                                <span class="icon"><i class="fas fa-minus"></i></span><span>Remove</span>\
+                            </button>\
                         </td>\
                     </tr>\
                 </table>\
@@ -288,7 +290,7 @@ $(function () {
 
     $('#add_particles_plot').click(function () {
         let inp = {};
-        $('#particles_plots_input').find('input, select').each((i, e) => inp[e.name] = e.value);
+        $('#particles_plots_input').find('input, select').each((i, e) => inp[e.id] = e.value);
         addParticlesPlot(inp.xAxis, inp.yAxis, inp.zAxis);
     });
 
@@ -310,7 +312,9 @@ $(function () {
                     <input class="customfield-argument-value" type="text">\
                 </td>\
                 <td>\
-                    <button class="remove-button red-button">Remove</button>\
+                    <button class="remove-button button is-red is-fullwidth">\
+                        <span class="icon"><i class="fas fa-minus"></i></span><span>Remove</span>\
+                    </button>\
                 </td>\
             </tr>');
     });
