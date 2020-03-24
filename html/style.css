@@ -44,11 +44,21 @@ a {
     text-decoration: none;
 }
 
+.masonry {
+    margin: 0 auto;
+}
+
+.masonry-item {
+    margin-bottom: 10px;
+    width: 480px;
+}
+
 .buttons {
     align-items: center;
     display: flex;
     flex-wrap: wrap;
     justify-content: flex-start;
+    margin-bottom: 0;
 }
 
 .button {
@@ -87,9 +97,6 @@ a {
 }
 .buttons .button:not(:last-child):not(.is-fullwidth) {
     margin-right: .5rem;
-}
-.buttons:last-child {
-    margin-bottom: -.5rem;
 }
 
 .button.is-fullwidth {
@@ -140,16 +147,14 @@ a {
     margin-right: .25em;
 }
 
-.input-div {
-    padding: 10px 0;
-    margin-bottom: 12px;
-    width: 100%;
+.light-background {
+    padding: 10px;
     border-radius: 5px;
     background-color: #f2f2f2;
     box-sizing: border-box;
 }
 
-.input-div2 {
+.deep-background {
     margin: 0 12px;
     border-radius: 5px;
     background-color: #e2e2e2;
@@ -166,3 +171,23 @@ a {
     padding: 5px 15px;
     height: 360px;
 }
+
+@media (max-width: 480px) {
+    .overflow-wrapper {
+        overflow-x: hidden;
+    }
+
+    body{
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    .buttons {
+        margin-left: .5em;
+    }
+
+    .masonry-item {
+        width: 100vw;
+    }
+}
+

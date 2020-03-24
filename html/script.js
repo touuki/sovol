@@ -1,20 +1,26 @@
 $(function () {
-
+    $grid = $('.masonry').masonry({
+        columnWidth: 480,
+        itemSelector: '.masonry-item',
+        gutter: 10,
+        fitWidth: true,
+        transitionDuration: 0
+    });
     version = "1.0"
     custom_function = {};
     figures = {};
     sim_start = false;
     sim_id = 0;
     sim_data = null;
-    function getDataObject(){
+    function getDataObject() {
         return {
-            x:[],
-            y:[],
-            z:[],
-            px:[],
-            py:[],
-            pz:[],
-            t:[]
+            x: [],
+            y: [],
+            z: [],
+            px: [],
+            py: [],
+            pz: [],
+            t: []
         };
     }
 
@@ -117,6 +123,7 @@ $(function () {
         let name = $('#FIELD_CLASSNAME > option:selected').val();
         $('.field-args').css("display", "none");
         $('#' + name + '_args_div').css("display", "");
+        $grid.masonry();
     });
 
     $('#FIELD_CLASSNAME').change();
@@ -164,28 +171,29 @@ $(function () {
         }
     });
 
-    function addParticlesPlot(xAxis, yAxis, zAxis){
+    function addParticlesPlot(xAxis, yAxis, zAxis) {
         let figure = {};
         let id = 'particles_plot_' + Math.random().toString().substr(-8);
         let title = xAxis + '-' + yAxis;
         if (zAxis) {
             title += '-' + zAxis;
         }
-        $('#particles_plots').prepend(
-            '<div class="input-div">\
+        let element = $(
+            '<div class="masonry-item light-background">\
                 <div class="table-title">' + title + '</div>\
                 <div class="figure" id="'+ id + '" data-x-axis="' + xAxis + '" data-y-axis="' + yAxis + '" data-z-axis="' + zAxis + '">\
                 </div>\
                 <table class="input-table">\
                     <tr>\
                         <td>\
-                            <button class="remove-button button is-red is-fullwidth" data-figureid="'+ id + '">\
+                            <button class="remove-figure button is-red is-fullwidth" data-figureid="'+ id + '">\
                                 <span class="icon"><i class="fas fa-minus"></i></span><span>Remove</span>\
                             </button>\
                         </td>\
                     </tr>\
                 </table>\
             </div>');
+        $grid.append(element).masonry('appended', element);
         let plot = echarts.init($('#' + id)[0]);
         figure.plot = plot;
         figure.id = id;
@@ -294,11 +302,12 @@ $(function () {
         addParticlesPlot(inp.xAxis, inp.yAxis, inp.zAxis);
     });
 
-    $('#particles_plots').on('click', '.remove-button', function () {
+    $('body').on('click', '.remove-figure', function () {
         let figure = figures[this.dataset.figureid];
         echarts.dispose(figure.plot);
         delete figures[this.dataset.figureid];
-        $(this).parents('.input-div').remove();
+        $grid.masonry('remove', $(this).parents('.light-background'));
+        $grid.masonry();
     });
 
     $('#add_customfield_argument').click(function () {
@@ -317,10 +326,12 @@ $(function () {
                     </button>\
                 </td>\
             </tr>');
+        $grid.masonry();
     });
 
     $('#arguments_table').on('click', '.remove-button', function () {
         $(this).parents('tr').remove();
+        $grid.masonry();
     });
 
     function addData(data, isEndTime) {
@@ -332,7 +343,7 @@ $(function () {
         obj.py.push(data.py);
         obj.pz.push(data.pz);
         obj.t.push(data.t);
-        if(isEndTime){
+        if (isEndTime) {
             sim_data.push(getDataObject());
         }
         for (const key in figures) {
@@ -354,7 +365,7 @@ $(function () {
     };
 
     $('#export_data').click(function () {
-        funDownload(JSON.stringify({version:version,data:sim_data}), 'sovol_data.json');
+        funDownload(JSON.stringify({ version: version, data: sim_data }), 'sovol_data.json');
     });
 
     $('#export_args').click(function () {
@@ -392,17 +403,17 @@ $(function () {
         const reader = new FileReader();
         reader.onload = function (e) {
             const obj = JSON.parse(e.target.result);
-            if(obj.static_inputs instanceof Array){
+            if (obj.static_inputs instanceof Array) {
                 for (let i = 0; i < obj.static_inputs.length; i++) {
                     const element = obj.static_inputs[i];
-                    if($('#' + element.key)){
+                    if ($('#' + element.key)) {
                         $('#' + element.key).val(element.value);
                     }
                 }
             }
             $('#FIELD_CLASSNAME').change();
             $('#arguments_table').find('.remove-button').click();
-            if(obj.customfield_arguments instanceof Array){
+            if (obj.customfield_arguments instanceof Array) {
                 for (let i = obj.customfield_arguments.length - 1; i >= 0; i--) {
                     $('#add_customfield_argument').click();
                     const element = obj.customfield_arguments[i];
@@ -411,8 +422,8 @@ $(function () {
                     je.find('.customfield-argument-value').val(element.value);
                 }
             }
-            $('#particles_plots').find('.remove-button').click();
-            if(obj.plot_figures instanceof Array){
+            $('.remove-figure').click();
+            if (obj.plot_figures instanceof Array) {
                 for (let i = obj.plot_figures.length - 1; i >= 0; i--) {
                     const element = obj.plot_figures[i];
                     addParticlesPlot(element.xAxis, element.yAxis, element.zAxis);
