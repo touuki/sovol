@@ -1,21 +1,23 @@
 #ifndef _SOVOL_REALTIMEREPEATSIMULATION_HH
 #define _SOVOL_REALTIMEREPEATSIMULATION_HH 1
 
+#include "AlgorithmFactory.hh"
 #include "Field.hh"
 #include "ParticleFactory.hh"
 #include <vector>
 
 enum SimulationStatus {
-  DATA_OUTPUT,
-  MAX_ITERATION_TIMES_REACHED,
-  ENDTIME_REACHED,
-  FINISHED
+    DATA_OUTPUT,
+    MAX_ITERATION_TIMES_REACHED,
+    ENDTIME_REACHED,
+    FINISHED
 };
 
 class RealTimeRepeatSimulation {
   private:
     Field *field;
     ParticleFactory *particleFactory;
+    Algorithm *algorithm;
     double timeStep;
     double endTime;
     int remainingNumber;
@@ -32,8 +34,8 @@ class RealTimeRepeatSimulation {
   public:
     RealTimeRepeatSimulation();
     RealTimeRepeatSimulation(Field *_field, ParticleFactory *_particleFactory,
-                             double _timeStep, double _endTime,
-                             int _remainingNumber = 1,
+                             Algorithm *_algorithm, double _timeStep,
+                             double _endTime, int _remainingNumber = 1,
                              double _dataInterval = 0.,
                              double _dataStartTime = 0.);
     ~RealTimeRepeatSimulation();

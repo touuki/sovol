@@ -2,13 +2,15 @@
 #define _SOVOL_PARTICLEFACTORY_HH 1
 
 #include "Particle.hh"
+#include "Vector3.hh"
 #include <map>
 #include <random>
 #include <string>
 
-typedef Particle *(*ParticleConstructor)(const Vector3<double> &,
-                                         const Vector3<double> &, double,
-                                         double);
+class Particle;
+class ParticleFactory;
+
+typedef Particle *(*ParticleConstructor)(ParticleFactory *);
 
 class ParticleFactory {
   private:
@@ -45,6 +47,7 @@ class ParticleFactory {
                               ParticleConstructor constructor) {
         constructors()[_className] = constructor;
     }
+    friend class Particle;
 
     ParticleFactory();
     ParticleFactory(const std::string &_className, double _mass = 1.,
@@ -64,10 +67,8 @@ class ParticleFactory {
             ParticleFactory::registerClass(#class_name,                        \
                                            class_name##Helper::creatObjFunc);  \
         }                                                                      \
-        static Particle *creatObjFunc(const Vector3<double> &position,         \
-                                      const Vector3<double> &momentum,         \
-                                      double charge, double mass) {            \
-            return new class_name(position, momentum, charge, mass);           \
+        static Particle *creatObjFunc(ParticleFactory *particleFactory) {      \
+            return new class_name(particleFactory);                            \
         }                                                                      \
     };                                                                         \
     class_name##Helper class_name##helper;

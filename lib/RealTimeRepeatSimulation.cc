@@ -9,6 +9,8 @@ RealTimeRepeatSimulation::RealTimeRepeatSimulation()
           FieldFactory::createObject(
               Config::getString(SOVOL_CONFIG_KEY(FIELD_CLASSNAME))),
           new ParticleFactory(),
+          AlgorithmFactory::getAlgorithm(
+              Config::getString(SOVOL_CONFIG_KEY(ALGORITHM_CLASSNAME))),
           Config::getDouble(
               SOVOL_CONFIG_KEY(REALTIMEREPEATSIMULATION_TIMESTEP)),
           Config::getDouble(SOVOL_CONFIG_KEY(REALTIMEREPEATSIMULATION_ENDTIME)),
@@ -20,10 +22,10 @@ RealTimeRepeatSimulation::RealTimeRepeatSimulation()
               SOVOL_CONFIG_KEY(REALTIMEREPEATSIMULATION_DATASTARTTIME))){};
 
 RealTimeRepeatSimulation::RealTimeRepeatSimulation(
-    Field *_field, ParticleFactory *_particleFactory, double _timeStep,
-    double _endTime, int _remainingNumber, double _dataInterval,
-    double _dataStartTime)
-    : field(_field), particleFactory(_particleFactory),
+    Field *_field, ParticleFactory *_particleFactory, Algorithm *_algorithm,
+    double _timeStep, double _endTime, int _remainingNumber,
+    double _dataInterval, double _dataStartTime)
+    : field(_field), particleFactory(_particleFactory), algorithm(_algorithm),
       timeStep(abs(_timeStep)), endTime(abs(_endTime)),
       remainingNumber(_remainingNumber > 1 ? _remainingNumber : 1),
       dataInterval(abs(_dataInterval)),
@@ -79,15 +81,15 @@ SimulationStatus RealTimeRepeatSimulation::run(int32_t maxIterationTimes) {
         nextDataTime = 0.;
     }
 
-    if (maxIterationTimes < 0)
-    {
+    if (maxIterationTimes < 0) {
         maxIterationTimes = INT32_MAX;
     }
-    
+
     nextDataTime = calculateNextDataTime();
 
-    for (int32_t i = 0; currentTime < nextDataTime && i < maxIterationTimes; i++) {
-        currentParticle->nextStep(*field, currentTime, timeStep);
+    for (int32_t i = 0; currentTime < nextDataTime && i < maxIterationTimes;
+         i++) {
+        (*algorithm)(currentParticle, field, currentTime, timeStep);
         currentTime += timeStep;
     }
 

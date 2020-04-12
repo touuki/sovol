@@ -1,5 +1,6 @@
 #include "ParticleFactory.hh"
 #include "Config.hh"
+#include "Vector3.hh"
 #include <ctime>
 
 ParticleFactory::ParticleFactory()
@@ -55,23 +56,5 @@ Particle *ParticleFactory::createObject() {
         return nullptr;
     }
 
-    double Ek = kinetic_energy_dist(random_engine);
-    while (Ek < 0.)
-        Ek = kinetic_energy_dist(random_engine);
-
-    double p = sqrt(pow(Ek + mass, 2) - pow(mass, 2));
-    double theta_x = momentum_theta_x_dist(random_engine);
-    double theta_y = momentum_theta_y_dist(random_engine);
-    double theta = sqrt(pow(theta_x, 2) + pow(theta_y, 2));
-    double phi = atan2(theta_y, theta_x);
-    Vector3<double> momentum(p * sin(theta) * cos(phi),
-                             p * sin(theta) * sin(phi), p * cos(theta));
-    Vector3<double> position(position_x_dist(random_engine),
-                             position_y_dist(random_engine),
-                             position_z_dist(random_engine));
-
-    Particle *particle = (*constructor)(position, momentum, charge, mass);
-    particle->rotate(polar_angle, azimuthal_angle);
-    particle->translate(translation);
-    return particle;
+    return (*constructor)(this);
 };
