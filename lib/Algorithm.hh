@@ -8,16 +8,16 @@
 class Algorithm {
   public:
     virtual ~Algorithm();
-    virtual void operator()(Particle *, const Field *, double time, double dt) = 0;
+    virtual void operator()(Particle *, const Field *, double time, double dt) const = 0;
 };
 
 class RungeKuttaAlgorithm : public Algorithm {
   public:
-    void operator()(Particle *, const Field *, double time, double dt) override;
+    void operator()(Particle *, const Field *, double time, double dt) const override;
 };
 
 class LeapfrogAlgorithm : public Algorithm {
   public:
-    void operator()(Particle *, const Field *, double time, double dt) override;
+    void operator()(Particle *, const Field *, double time, double dt) const override;
 };
 #endif

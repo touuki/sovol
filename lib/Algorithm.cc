@@ -5,7 +5,7 @@
 REGISTER_ALGORITHM(RungeKuttaAlgorithm)
 
 void RungeKuttaAlgorithm::operator()(Particle *part, const Field *field,
-                                     double time, double dt) {
+                                     double time, double dt) const {
     double halfStep = .5 * dt;
     EMField em = field->get(part->position, time);
     Vector3<double> dxdt1 = Utils::velocity(part->momentum, part->mass);
@@ -30,7 +30,7 @@ void RungeKuttaAlgorithm::operator()(Particle *part, const Field *field,
 REGISTER_ALGORITHM(LeapfrogAlgorithm)
 
 void LeapfrogAlgorithm::operator()(Particle *part, const Field *field,
-                                   double time, double dt) {
+                                   double time, double dt) const {
     double halfStep = .5 * dt;
     part->position += Utils::velocity(part->momentum, part->mass) * halfStep;
     time += halfStep;

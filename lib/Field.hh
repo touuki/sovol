@@ -31,7 +31,7 @@ class CustomField : public Field {
     CustomField();
     CustomField(C_FUNC_P(_ex), C_FUNC_P(_ey), C_FUNC_P(_ez), C_FUNC_P(_bx),
                 C_FUNC_P(_by), C_FUNC_P(_bz));
-    EMField get(double x, double y, double z, double time) const;
+    EMField get(double x, double y, double z, double time) const override;
 };
 
 

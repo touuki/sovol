@@ -1,11 +1,7 @@
 #ifndef _SOVOL_PARTICLE_HH
 #define _SOVOL_PARTICLE_HH 1
 
-#include "ParticleFactory.hh"
 #include "Vector3.hh"
-#include <vector>
-
-class ParticleFactory;
 
 class Particle {
   public:
@@ -15,7 +11,6 @@ class Particle {
     double charge;
     double mass;
 
-    Particle(ParticleFactory *);
     Particle(const Vector3<double> &_position, const Vector3<double> &_momentum,
              double _charge, double _mass);
     void rotate(double polar_angle, double azimuthal_angle);

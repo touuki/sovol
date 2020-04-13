@@ -6,11 +6,9 @@ $(function () {
         fitWidth: true,
         transitionDuration: 0
     });
-    version = "1.0"
+    version = "1.1"
     custom_function = {};
     figures = {};
-    sim_start = false;
-    sim_id = 0;
     sim_data = null;
     function getDataObject() {
         return {
@@ -25,8 +23,9 @@ $(function () {
     }
 
     function checkReady() {
-        if (!Module)
+        if (!Module || !Module.getWasmSimulation)
             return;
+        sim = Module.getWasmSimulation("WasmSimulation");
         $('#start').removeAttr("disabled");
     };
     setTimeout(checkReady, 1000);
@@ -43,11 +42,10 @@ $(function () {
     };
 
     $('#start').click(function () {
-        if (sim_start) {
+        if (!sim || sim.isStart()) {
             return;
         } else {
             clearSimulation();
-            sim_start = true;
             let key_perfix = 'SC_';
             let obj = {};
             $('.simulation-input').filter(':visible').each((i, e) => {
@@ -76,47 +74,43 @@ $(function () {
                 fps: $('#rateControl_fps').val(),
                 dpf: $('#rateControl_dpf').val(),
             };
-            nextFrame(Module.initSimulation(obj), ++sim_id, rateControl);
+            sim.init(obj);
+            nextFrame(sim.getId(), rateControl);
         }
     });
 
-    function nextFrame(sim, id, rateControl) {
+    function nextFrame(id, rateControl) {
         let updatetime = new Date().getTime() + 1000 / rateControl.fps;
-        for (let i = 0; i < rateControl.dpf && sim_start && id == sim_id;) {
-            let data = Module.runAndGetData(sim);
+        for (let i = 0; i < rateControl.dpf;) {
+            let data = sim.runAndGetData(id);
+            if (data.aborted){
+                return;
+            }
             if (data.finished) {
                 updateFrame();
                 sim_data.pop();
-                sim_start = false;
-                delete sim;
                 break;
-            } else {
-                if (data.data) {
-                    if (data.isEndTime) {
-                        addData(data.data, true);
-                    } else {
-                        addData(data.data);
-                    }
-                    i++;
+            }
+            if (data.data) {
+                if (data.isEndTime) {
+                    addData(data.data, true);
+                } else {
+                    addData(data.data);
                 }
+                i++;
             }
         }
-        if (sim_start && id == sim_id) {
-            updateFrame();
-            let nowtime = new Date().getTime();
-            if (nowtime > updatetime) {
-                setTimeout(nextFrame, 0, sim, id, rateControl);
-            } else {
-                setTimeout(nextFrame, updatetime - nowtime, sim, id, rateControl);
-            }
+        updateFrame();
+        let nowtime = new Date().getTime();
+        if (nowtime > updatetime) {
+            setTimeout(nextFrame, 0, id, rateControl);
         } else {
-            delete sim;
+            setTimeout(nextFrame, updatetime - nowtime, id, rateControl);
         }
-
     };
 
     $('#stop').click(() => {
-        sim_start = false;
+        sim && sim.stop();
     });
 
     $('#FIELD_CLASSNAME').change(function () {

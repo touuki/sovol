@@ -1,34 +1,10 @@
 #include "Particle.hh"
-#include "ParticleFactory.hh"
-#include "Utils.hh"
+#include <cmath>
 
 Particle::Particle(const Vector3<double> &_position,
                    const Vector3<double> &_momentum, double _charge,
                    double _mass)
     : position(_position), momentum(_momentum), charge(_charge), mass(_mass){};
-
-Particle::Particle(ParticleFactory *factory)
-    : position(Vector3(0., 0., 0.)), momentum(Vector3(0., 0., 0.)), charge(factory->charge),
-      mass(factory->mass) {
-
-    double Ek = factory->kinetic_energy_dist(factory->random_engine);
-    while (Ek < 0.)
-        Ek = factory->kinetic_energy_dist(factory->random_engine);
-
-    double p = sqrt(pow(Ek + mass, 2) - pow(mass, 2));
-    double theta_x = factory->momentum_theta_x_dist(factory->random_engine);
-    double theta_y = factory->momentum_theta_y_dist(factory->random_engine);
-    double theta = sqrt(pow(theta_x, 2) + pow(theta_y, 2));
-    double phi = atan2(theta_y, theta_x);
-    momentum = Vector3(p * sin(theta) * cos(phi),
-                             p * sin(theta) * sin(phi), p * cos(theta));
-    position = Vector3(factory->position_x_dist(factory->random_engine),
-                             factory->position_y_dist(factory->random_engine),
-                             factory->position_z_dist(factory->random_engine));
-
-    rotate(factory->polar_angle, factory->azimuthal_angle);
-    translate(factory->translation);
-};
 
 Particle::~Particle(){};
 
@@ -49,5 +25,3 @@ void Particle::rotate(double beta, double alpha) {
 void Particle::translate(const Vector3<double> &translation) {
     position += translation;
 }
-
-REGISTER_PARTICLE(Particle)

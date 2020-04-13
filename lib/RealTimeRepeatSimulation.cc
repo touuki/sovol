@@ -1,6 +1,7 @@
 #include "RealTimeRepeatSimulation.hh"
 #include "Config.hh"
 #include "FieldFactory.hh"
+#include "ParticleFactoryProducer.hh"
 #include "Utils.hh"
 #include <ctime>
 
@@ -8,7 +9,8 @@ RealTimeRepeatSimulation::RealTimeRepeatSimulation()
     : RealTimeRepeatSimulation(
           FieldFactory::createObject(
               Config::getString(SOVOL_CONFIG_KEY(FIELD_CLASSNAME))),
-          new ParticleFactory(),
+          ParticleFactoryProducer::createFactory(
+              Config::getString(SOVOL_CONFIG_KEY(PARTICLEFACTORY_CLASSNAME))),
           AlgorithmFactory::getAlgorithm(
               Config::getString(SOVOL_CONFIG_KEY(ALGORITHM_CLASSNAME))),
           Config::getDouble(
@@ -30,7 +32,7 @@ RealTimeRepeatSimulation::RealTimeRepeatSimulation(
       remainingNumber(_remainingNumber > 1 ? _remainingNumber : 1),
       dataInterval(abs(_dataInterval)),
       dataStartTime(_dataStartTime > endTime ? endTime : _dataStartTime),
-      currentParticle(_particleFactory->createObject()), currentTime(0.),
+      currentParticle(_particleFactory->createParticle()), currentTime(0.),
       nextDataTime(0.){};
 
 RealTimeRepeatSimulation::~RealTimeRepeatSimulation() {
@@ -76,7 +78,7 @@ SimulationStatus RealTimeRepeatSimulation::run(int32_t maxIterationTimes) {
     }
 
     if (currentTime >= endTime) {
-        setParticle(particleFactory->createObject());
+        setParticle(particleFactory->createParticle());
         currentTime = 0.;
         nextDataTime = 0.;
     }
