@@ -84,6 +84,7 @@ val WasmSimulation::runAndGetData(int _id) {
         break;
     case SimulationStatus::FINISHED:
         result.set("finished", true);
+        start = false;
         break;
     case SimulationStatus::MAX_ITERATION_TIMES_REACHED:
         break;
