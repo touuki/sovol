@@ -98,6 +98,7 @@ EMSCRIPTEN_BINDINGS(module) {
              allow_raw_pointer<WasmSimulation>());
     class_<WasmSimulation>("WasmSimulation")
         .function("getId", &WasmSimulation::getId)
+        .function("isStart", &WasmSimulation::isStart)
         .function("stop", &WasmSimulation::stop)
         .function("init", &WasmSimulation::init)
         .function("runAndGetData", &WasmSimulation::runAndGetData);

@@ -4,6 +4,8 @@
 #include "Vector3.hh"
 #include <ctime>
 
+ParticleFactory::~ParticleFactory(){};
+
 REGISTER_PARTICLEFACTORY(BeamParticleFactory)
 
 BeamParticleFactory::BeamParticleFactory()
