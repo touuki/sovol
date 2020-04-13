@@ -1,5 +1,5 @@
-noinst_LIBRARIES = libsovol.a
-noinst_HEADERS = \
+lib_LIBRARIES = libsovol.a
+include_HEADERS = \
     Algorithm.hh \
     AlgorithmFactory.hh \
     Config.hh \
@@ -8,6 +8,7 @@ noinst_HEADERS = \
     LaguerreGaussianPulseField.hh \
     Particle.hh \
     ParticleFactory.hh \
+    ParticleFactoryProducer.hh \
     RealTimeRepeatSimulation.hh \
     Utils.hh \
     Vector3.hh

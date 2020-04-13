@@ -2,7 +2,6 @@
 *.o
 *.so
 *.a
-*.wasm
 
 #Autotools
 /autoscan.log
@@ -21,9 +20,7 @@ Makefile
 .deps
 
 #emscripten
-/a.out
-/a.out.js
-/wasm/*.js
+/a.out*
 
 #VSCode
 .vscode

@@ -1,1 +1,5 @@
-SUBDIRS = lib cli wasm
+if WASM
+SUBDIRS = lib wasm
+else
+SUBDIRS = lib cli
+endif
