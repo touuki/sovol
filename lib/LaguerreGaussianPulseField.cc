@@ -1,6 +1,5 @@
 #include "LaguerreGaussianPulseField.hh"
 #include "Config.hh"
-#include "FieldFactory.hh"
 #include "Utils.hh"
 
 using namespace std;
@@ -19,7 +18,7 @@ double generLaguePoly(int alpha, int k, double value) {
     return 0.;
 };
 
-REGISTER_FIELD(LaguerreGaussianPulseField)
+REGISTER_MULTITON(Field, LaguerreGaussianPulseField)
 
 LaguerreGaussianPulseField::LaguerreGaussianPulseField()
     : LaguerreGaussianPulseField(

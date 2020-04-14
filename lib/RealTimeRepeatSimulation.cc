@@ -1,7 +1,5 @@
 #include "RealTimeRepeatSimulation.hh"
 #include "Config.hh"
-#include "FieldFactory.hh"
-#include "ParticleFactoryProducer.hh"
 #include "Utils.hh"
 #include <ctime>
 
@@ -9,9 +7,9 @@ RealTimeRepeatSimulation::RealTimeRepeatSimulation()
     : RealTimeRepeatSimulation(
           FieldFactory::createObject(
               Config::getString(SOVOL_CONFIG_KEY(FIELD_CLASSNAME))),
-          ParticleFactoryProducer::createFactory(
+          ParticleFactoryFactory::createObject(
               Config::getString(SOVOL_CONFIG_KEY(PARTICLEFACTORY_CLASSNAME))),
-          AlgorithmFactory::getAlgorithm(
+          AlgorithmFactory::createObject(
               Config::getString(SOVOL_CONFIG_KEY(ALGORITHM_CLASSNAME))),
           Config::getDouble(
               SOVOL_CONFIG_KEY(REALTIMEREPEATSIMULATION_TIMESTEP)),

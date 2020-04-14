@@ -9,18 +9,6 @@ $(function () {
     version = "1.1"
     custom_function = {};
     figures = {};
-    sim_data = null;
-    function getDataObject() {
-        return {
-            x: [],
-            y: [],
-            z: [],
-            px: [],
-            py: [],
-            pz: [],
-            t: []
-        };
-    }
 
     function checkReady() {
         if (!Module || !Module.getWasmSimulation)
@@ -88,11 +76,10 @@ $(function () {
             }
             if (data.finished) {
                 updateFrame();
-                sim_data.pop();
-                break;
+                return;
             }
             if (data.data) {
-                if (data.isEndTime) {
+                if (data.isNewParticle) {
                     addData(data.data, true);
                 } else {
                     addData(data.data);
@@ -192,7 +179,7 @@ $(function () {
         figure.plot = plot;
         figure.id = id;
         figure.initSeries = function () {
-            this.series = [this.getSeriesElement()];
+            this.series = [];
         };
         figure.updateFrame = function () {
             this.plot.setOption({ series: this.series })
@@ -240,14 +227,14 @@ $(function () {
                     }
                 };
             }
-            figure.addData = function (data, isEndTime) {
+            figure.addData = function (data, isNewParticle) {
+                if (isNewParticle) {
+                    this.series.push(this.getSeriesElement());
+                }
                 let x = this.x.processData(data);
                 let y = this.y.processData(data);
                 let z = this.z.processData(data);
                 this.series[this.series.length - 1].data.push([x, y, z]);
-                if (isEndTime) {
-                    this.series.push(this.getSeriesElement());
-                }
             };
         } else {
             plot.setOption({
@@ -275,13 +262,13 @@ $(function () {
                     }
                 };
             };
-            figure.addData = function (data, isEndTime) {
+            figure.addData = function (data, isNewParticle) {
+                if (isNewParticle) {
+                    this.series.push(this.getSeriesElement());
+                }
                 let x = this.x.processData(data);
                 let y = this.y.processData(data);
                 this.series[this.series.length - 1].data.push([x, y]);
-                if (isEndTime) {
-                    this.series.push(this.getSeriesElement());
-                }
             };
 
         }
@@ -328,20 +315,9 @@ $(function () {
         $grid.masonry();
     });
 
-    function addData(data, isEndTime) {
-        let obj = sim_data[sim_data.length - 1];
-        obj.x.push(data.x);
-        obj.y.push(data.y);
-        obj.z.push(data.z);
-        obj.px.push(data.px);
-        obj.py.push(data.py);
-        obj.pz.push(data.pz);
-        obj.t.push(data.t);
-        if (isEndTime) {
-            sim_data.push(getDataObject());
-        }
+    function addData(data, isNewParticle) {
         for (const key in figures) {
-            figures[key].addData(data, isEndTime);
+            figures[key].addData(data, isNewParticle);
         }
     };
 
@@ -352,14 +328,13 @@ $(function () {
     };
 
     function clearSimulation() {
-        sim_data = [getDataObject()];
         for (const key in figures) {
             figures[key].clear();
         }
     };
 
     $('#export_data').click(function () {
-        funDownload(JSON.stringify({ version: version, data: sim_data }), 'sovol_data.json');
+        funDownload(JSON.stringify({ version: version, data: sim.getStoredData() }), 'sovol_data.json');
     });
 
     $('#export_args').click(function () {

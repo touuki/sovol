@@ -2,6 +2,7 @@
 #define _SOVOL_FIELD_HH 1
 
 #include "Vector3.hh"
+#include "FactoryHelper.hh"
 
 #define C_FUNC_P(func) double (*func)(double, double, double, double)
 
@@ -16,6 +17,8 @@ class Field {
     virtual EMField get(double x, double y, double z, double time) const = 0;
     EMField get(const Vector3<double> &position, double time) const;
 };
+
+DEFINE_FACTORY(Field)
 
 class CustomField : public Field {
   private:

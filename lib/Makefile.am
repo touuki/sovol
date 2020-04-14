@@ -1,13 +1,11 @@
 include_HEADERS = \
     Algorithm.hh \
-    AlgorithmFactory.hh \
     Config.hh \
+    FactoryHelper.hh \
     Field.hh \
-    FieldFactory.hh \
     LaguerreGaussianPulseField.hh \
     Particle.hh \
     ParticleFactory.hh \
-    ParticleFactoryProducer.hh \
     RealTimeRepeatSimulation.hh \
     Utils.hh \
     Vector3.hh

@@ -1,12 +1,13 @@
 #ifndef _SOVOL_REALTIMEREPEATSIMULATION_HH
 #define _SOVOL_REALTIMEREPEATSIMULATION_HH 1
 
-#include "AlgorithmFactory.hh"
+#include "Algorithm.hh"
 #include "Field.hh"
 #include "ParticleFactory.hh"
 #include <vector>
 
 enum SimulationStatus {
+    UNSET,
     DATA_OUTPUT,
     MAX_ITERATION_TIMES_REACHED,
     ENDTIME_REACHED,

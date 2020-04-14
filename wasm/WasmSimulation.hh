@@ -2,6 +2,7 @@
 #define _SOVOL_WASMSIMULATION_HH 1
 
 #include "RealTimeRepeatSimulation.hh"
+#include "FactoryHelper.hh"
 #include <emscripten/val.h>
 
 using namespace emscripten;
@@ -12,6 +13,8 @@ private:
     RealTimeRepeatSimulation *simulation;
     int id;
     bool start;
+    SimulationStatus lastStatus;
+    val storedData;
     void setSimulation(RealTimeRepeatSimulation *);
 public:
     WasmSimulation();
@@ -19,9 +22,13 @@ public:
     bool isStart() const;
     void stop();
     void init(val params);
-    virtual ~WasmSimulation();
-    virtual val getData();
+    val getStoredData() const;
     val runAndGetData(int _id);
+    virtual ~WasmSimulation();
+    virtual void storeData(bool isNewParticle);
+    virtual val getData() const;
 };
+
+DEFINE_FACTORY(WasmSimulation)
 
 #endif

@@ -1,16 +1,19 @@
 #include "WasmSimulation.hh"
 #include "Config.hh"
 #include "Utils.hh"
-#include "WasmSimulationFactory.hh"
 #include <emscripten/bind.h>
 #include <emscripten/val.h>
 #include <string>
 
 using namespace emscripten;
 
-REGISTER_WASMSIMULATION(WasmSimulation)
+REGISTER_SINGLETON(WasmSimulation, WasmSimulation)
 
-WasmSimulation::WasmSimulation() : simulation(nullptr), id(0), start(false){};
+WasmSimulation::WasmSimulation()
+    : simulation(nullptr), id(0), start(false),
+      lastStatus(SimulationStatus::UNSET), storedData(val::array()){};
+
+WasmSimulation::~WasmSimulation() { setSimulation(nullptr); }
 
 void WasmSimulation::setSimulation(RealTimeRepeatSimulation *_simulation) {
     if (simulation != _simulation) {
@@ -21,17 +24,11 @@ void WasmSimulation::setSimulation(RealTimeRepeatSimulation *_simulation) {
     }
 };
 
-int WasmSimulation::getId() const{
-    return id;
-};
+int WasmSimulation::getId() const { return id; };
 
-bool WasmSimulation::isStart() const{
-    return start;
-};
+bool WasmSimulation::isStart() const { return start; };
 
-void WasmSimulation::stop() {
-    start = false;
-}
+void WasmSimulation::stop() { start = false; }
 
 void WasmSimulation::init(val params) {
     val keys = val::global("Object").call<val>("keys", params);
@@ -43,23 +40,11 @@ void WasmSimulation::init(val params) {
     setSimulation(new RealTimeRepeatSimulation);
     start = true;
     id++;
+    lastStatus = SimulationStatus::UNSET;
+    storedData = val::array();
 };
 
-WasmSimulation::~WasmSimulation() { setSimulation(nullptr); }
-
-val WasmSimulation::getData() {
-    val result = val::object();
-    Particle *particle = simulation->getParticle();
-    result.set("t", simulation->getCurrentTime());
-    result.set("x", particle->position.getX());
-    result.set("y", particle->position.getY());
-    result.set("z", particle->position.getZ());
-    result.set("px", particle->momentum.getX());
-    result.set("py", particle->momentum.getY());
-    result.set("pz", particle->momentum.getZ());
-    result.set("Ek", Utils::kineticEnergy(particle->momentum, particle->mass));
-    return result;
-};
+val WasmSimulation::getStoredData() const { return storedData; };
 
 val WasmSimulation::runAndGetData(int _id) {
     val result = val::object();
@@ -74,13 +59,14 @@ val WasmSimulation::runAndGetData(int _id) {
         return result;
     }
     SimulationStatus status = simulation->run();
+    bool isNewParticle = lastStatus == SimulationStatus::ENDTIME_REACHED ||
+                         lastStatus == SimulationStatus::UNSET;
     switch (status) {
     case SimulationStatus::DATA_OUTPUT:
-        result.set("data", getData());
-        break;
     case SimulationStatus::ENDTIME_REACHED:
-        result.set("isEndTime", true);
         result.set("data", getData());
+        result.set("isNewParticle", isNewParticle);
+        storeData(isNewParticle);
         break;
     case SimulationStatus::FINISHED:
         result.set("finished", true);
@@ -91,16 +77,56 @@ val WasmSimulation::runAndGetData(int _id) {
     default:
         break;
     }
+    lastStatus = status;
     return result;
 };
 
+val WasmSimulation::getData() const {
+    val result = val::object();
+    Particle *particle = simulation->getParticle();
+    result.set("t", simulation->getCurrentTime());
+    result.set("x", particle->position.getX());
+    result.set("y", particle->position.getY());
+    result.set("z", particle->position.getZ());
+    result.set("px", particle->momentum.getX());
+    result.set("py", particle->momentum.getY());
+    result.set("pz", particle->momentum.getZ());
+    result.set("Ek", Utils::kineticEnergy(particle->momentum, particle->mass));
+    return result;
+};
+
+void WasmSimulation::storeData(bool isNewParticle) {
+    if (isNewParticle) {
+        val obj = val::object();
+        obj.set("x", val::array());
+        obj.set("y", val::array());
+        obj.set("z", val::array());
+        obj.set("px", val::array());
+        obj.set("py", val::array());
+        obj.set("pz", val::array());
+        obj.set("t", val::array());
+        storedData.call<val>("push", obj);
+    }
+    int length = storedData["length"].as<int>();
+    val current = storedData[length - 1];
+    Particle *particle = simulation->getParticle();
+    current["x"].call<double>("push", particle->position.getX());
+    current["y"].call<double>("push", particle->position.getY());
+    current["z"].call<double>("push", particle->position.getZ());
+    current["px"].call<double>("push", particle->momentum.getX());
+    current["py"].call<double>("push", particle->momentum.getY());
+    current["pz"].call<double>("push", particle->momentum.getZ());
+    current["t"].call<double>("push", simulation->getCurrentTime());
+};
+
 EMSCRIPTEN_BINDINGS(module) {
-    function("getWasmSimulation", &WasmSimulationFactory::getWasmSimulation,
+    function("getWasmSimulation", &WasmSimulationFactory::createObject,
              allow_raw_pointer<WasmSimulation>());
     class_<WasmSimulation>("WasmSimulation")
         .function("getId", &WasmSimulation::getId)
         .function("isStart", &WasmSimulation::isStart)
         .function("stop", &WasmSimulation::stop)
         .function("init", &WasmSimulation::init)
+        .function("getStoredData", &WasmSimulation::getStoredData)
         .function("runAndGetData", &WasmSimulation::runAndGetData);
 }

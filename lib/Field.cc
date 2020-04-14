@@ -1,8 +1,7 @@
 #include "Field.hh"
 #include "Config.hh"
-#include "FieldFactory.hh"
 
-REGISTER_FIELD(CustomField)
+REGISTER_MULTITON(Field, CustomField)
 
 Field::~Field(){};
 

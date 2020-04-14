@@ -1,10 +1,9 @@
 #include "Algorithm.hh"
-#include "AlgorithmFactory.hh"
 #include "Utils.hh"
 
 Algorithm::~Algorithm(){};
 
-REGISTER_ALGORITHM(RungeKuttaAlgorithm)
+REGISTER_SINGLETON(Algorithm, RungeKuttaAlgorithm)
 
 void RungeKuttaAlgorithm::operator()(Particle *part, const Field *field,
                                      double time, double dt) const {
@@ -32,7 +31,7 @@ void RungeKuttaAlgorithm::operator()(Particle *part, const Field *field,
     part->momentum += (dpdt1 + 2. * dpdt2 + 2. * dpdt3 + dpdt4) * (dt / 6.);
 };
 
-REGISTER_ALGORITHM(LeapfrogAlgorithm)
+REGISTER_SINGLETON(Algorithm, LeapfrogAlgorithm)
 
 void LeapfrogAlgorithm::operator()(Particle *part, const Field *field,
                                    double time, double dt) const {

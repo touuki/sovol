@@ -1,12 +1,11 @@
 #include "ParticleFactory.hh"
 #include "Config.hh"
-#include "ParticleFactoryProducer.hh"
 #include "Vector3.hh"
 #include <ctime>
 
 ParticleFactory::~ParticleFactory(){};
 
-REGISTER_PARTICLEFACTORY(BeamParticleFactory)
+REGISTER_MULTITON(ParticleFactory, BeamParticleFactory)
 
 BeamParticleFactory::BeamParticleFactory()
     : BeamParticleFactory(

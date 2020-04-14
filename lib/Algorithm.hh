@@ -3,6 +3,7 @@
 
 #include "Field.hh"
 #include "Particle.hh"
+#include "FactoryHelper.hh"
 #include <vector>
 
 class Algorithm {
@@ -10,6 +11,8 @@ class Algorithm {
     virtual ~Algorithm();
     virtual void operator()(Particle *, const Field *, double time, double dt) const = 0;
 };
+
+DEFINE_FACTORY(Algorithm)
 
 class RungeKuttaAlgorithm : public Algorithm {
   public:
@@ -20,4 +23,6 @@ class LeapfrogAlgorithm : public Algorithm {
   public:
     void operator()(Particle *, const Field *, double time, double dt) const override;
 };
+
+
 #endif

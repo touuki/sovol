@@ -3,6 +3,7 @@
 
 #include "Particle.hh"
 #include "Vector3.hh"
+#include "FactoryHelper.hh"
 #include <random>
 
 class ParticleFactory {
@@ -10,6 +11,8 @@ class ParticleFactory {
     virtual ~ParticleFactory();
     virtual Particle *createParticle() = 0;
 };
+
+DEFINE_FACTORY(ParticleFactory)
 
 class BeamParticleFactory : public ParticleFactory {
   private:
@@ -43,11 +46,12 @@ class BeamParticleFactory : public ParticleFactory {
   public:
     BeamParticleFactory();
     BeamParticleFactory(double _charge, double _mass, double _width = 0.,
-                    double _length = 0., double _kinetic_energy = 0.,
-                    double _energy_spread = 0., double _angular_divergence = 0.,
-                    double _polar_angle = 0., double _azimuthal_angle = 0.,
-                    double _translation_x = 0., double _translation_y = 0.,
-                    double _translation_z = 0.);
+                        double _length = 0., double _kinetic_energy = 0.,
+                        double _energy_spread = 0.,
+                        double _angular_divergence = 0.,
+                        double _polar_angle = 0., double _azimuthal_angle = 0.,
+                        double _translation_x = 0., double _translation_y = 0.,
+                        double _translation_z = 0.);
     Particle *createParticle() override;
 };
 
