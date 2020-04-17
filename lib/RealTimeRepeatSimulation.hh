@@ -3,7 +3,7 @@
 
 #include "Algorithm.hh"
 #include "Field.hh"
-#include "ParticleFactory.hh"
+#include "ParticleProducer.hh"
 #include <vector>
 
 enum SimulationStatus {
@@ -17,7 +17,7 @@ enum SimulationStatus {
 class RealTimeRepeatSimulation {
   private:
     Field *field;
-    ParticleFactory *particleFactory;
+    ParticleProducer *particleProducer;
     Algorithm *algorithm;
     double timeStep;
     double endTime;
@@ -34,7 +34,7 @@ class RealTimeRepeatSimulation {
 
   public:
     RealTimeRepeatSimulation();
-    RealTimeRepeatSimulation(Field *_field, ParticleFactory *_particleFactory,
+    RealTimeRepeatSimulation(Field *_field, ParticleProducer *_particleProducer,
                              Algorithm *_algorithm, double _timeStep,
                              double _endTime, int _remainingNumber = 1,
                              double _dataInterval = 0.,

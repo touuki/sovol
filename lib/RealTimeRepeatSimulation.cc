@@ -7,8 +7,8 @@ RealTimeRepeatSimulation::RealTimeRepeatSimulation()
     : RealTimeRepeatSimulation(
           FieldFactory::createObject(
               Config::getString(SOVOL_CONFIG_KEY(FIELD_CLASSNAME))),
-          ParticleFactoryFactory::createObject(
-              Config::getString(SOVOL_CONFIG_KEY(PARTICLEFACTORY_CLASSNAME))),
+          ParticleProducerFactory::createObject(
+              Config::getString(SOVOL_CONFIG_KEY(PARTICLEPRODUCER_CLASSNAME))),
           AlgorithmFactory::createObject(
               Config::getString(SOVOL_CONFIG_KEY(ALGORITHM_CLASSNAME))),
           Config::getDouble(
@@ -22,22 +22,22 @@ RealTimeRepeatSimulation::RealTimeRepeatSimulation()
               SOVOL_CONFIG_KEY(REALTIMEREPEATSIMULATION_DATASTARTTIME))){};
 
 RealTimeRepeatSimulation::RealTimeRepeatSimulation(
-    Field *_field, ParticleFactory *_particleFactory, Algorithm *_algorithm,
+    Field *_field, ParticleProducer *_particleProducer, Algorithm *_algorithm,
     double _timeStep, double _endTime, int _remainingNumber,
     double _dataInterval, double _dataStartTime)
-    : field(_field), particleFactory(_particleFactory), algorithm(_algorithm),
+    : field(_field), particleProducer(_particleProducer), algorithm(_algorithm),
       timeStep(abs(_timeStep)), endTime(abs(_endTime)),
       remainingNumber(_remainingNumber > 1 ? _remainingNumber : 1),
       dataInterval(abs(_dataInterval)),
       dataStartTime(_dataStartTime > endTime ? endTime : _dataStartTime),
-      currentParticle(_particleFactory->createParticle()), currentTime(0.),
+      currentParticle(_particleProducer->createParticle()), currentTime(0.),
       nextDataTime(0.){};
 
 RealTimeRepeatSimulation::~RealTimeRepeatSimulation() {
     if (field != nullptr)
         delete field;
-    if (particleFactory != nullptr)
-        delete particleFactory;
+    if (particleProducer != nullptr)
+        delete particleProducer;
     setParticle(nullptr);
 };
 
@@ -76,7 +76,7 @@ SimulationStatus RealTimeRepeatSimulation::run(int32_t maxIterationTimes) {
     }
 
     if (currentTime >= endTime) {
-        setParticle(particleFactory->createParticle());
+        setParticle(particleProducer->createParticle());
         currentTime = 0.;
         nextDataTime = 0.;
     }

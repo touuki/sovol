@@ -26,8 +26,7 @@
         }                                                                      \
                                                                                \
       private:                                                                 \
-        inline static std::map<std::string, base_name##Constructor> &          \
-        constructors() {                                                       \
+        static std::map<std::string, base_name##Constructor> &constructors() { \
             static std::map<std::string, base_name##Constructor> instance;     \
             return instance;                                                   \
         }                                                                      \

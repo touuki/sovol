@@ -5,19 +5,19 @@ include_HEADERS = \
     Field.hh \
     LaguerreGaussianPulseField.hh \
     Particle.hh \
-    ParticleFactory.hh \
+    ParticleProducer.hh \
     RealTimeRepeatSimulation.hh \
     Utils.hh \
     Vector3.hh
 if WASM
-libsovollibdir = ${libdir}
+libsovollibdir = $(libdir)
 libsovollib_PROGRAMS = libsovol.so
 libsovol_so_SOURCES = \
     Algorithm.cc \
     Field.cc \
     LaguerreGaussianPulseField.cc \
     Particle.cc \
-    ParticleFactory.cc \
+    ParticleProducer.cc \
     RealTimeRepeatSimulation.cc \
     Utils.cc 
 libsovol_so_CXXFLAGS = -std=c++17 -Wall
@@ -29,7 +29,7 @@ libsovol_a_SOURCES = \
     Field.cc \
     LaguerreGaussianPulseField.cc \
     Particle.cc \
-    ParticleFactory.cc \
+    ParticleProducer.cc \
     RealTimeRepeatSimulation.cc \
     Utils.cc 
 libsovol_a_CXXFLAGS = -std=c++17 -Wall

@@ -1,4 +1,4 @@
--var test = true
+-var test = false
 
 doctype html
 html
@@ -44,15 +44,15 @@ html
               i.fas.fa-file-export
             span Export Args
         .masonry-item.light-background
-          .table-title Particles Factory
+          .table-title Particle Producer
           table.input-table
             tr
               td
-                label(for="PARTICLEFACTORY_CLASSNAME") Class
+                label(for="PARTICLEPRODUCER_CLASSNAME") Class
             tr
               td
-                select#PARTICLEFACTORY_CLASSNAME.simulation-input.static-input
-                  option(value="BeamParticleFactory") BeamParticleFactory
+                select#PARTICLEPRODUCER_CLASSNAME.simulation-input.static-input
+                  option(value="BeamParticleProducer") BeamParticleProducer
           table.input-table
             tr
               td

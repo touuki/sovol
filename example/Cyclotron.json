@@ -2,8 +2,8 @@
     "version": "1.1",
     "static_inputs": [
         {
-            "key": "PARTICLEFACTORY_CLASSNAME",
-            "value": "BeamParticleFactory"
+            "key": "PARTICLEPRODUCER_CLASSNAME",
+            "value": "BeamParticleProducer"
         },
         {
             "key": "PARTICLES_MASS",
