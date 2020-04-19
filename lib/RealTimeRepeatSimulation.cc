@@ -5,12 +5,13 @@
 
 RealTimeRepeatSimulation::RealTimeRepeatSimulation()
     : RealTimeRepeatSimulation(
-          FieldFactory::createObject(
-              Config::getString(SOVOL_CONFIG_KEY(FIELD_CLASSNAME))),
+          FieldFactory::createObject(Config::getString(
+              SOVOL_CONFIG_KEY(FIELD_CLASSNAME), "CustomField")),
           ParticleProducerFactory::createObject(
-              Config::getString(SOVOL_CONFIG_KEY(PARTICLEPRODUCER_CLASSNAME))),
-          AlgorithmFactory::createObject(
-              Config::getString(SOVOL_CONFIG_KEY(ALGORITHM_CLASSNAME))),
+              Config::getString(SOVOL_CONFIG_KEY(PARTICLEPRODUCER_CLASSNAME),
+                                "BeamParticleProducer")),
+          AlgorithmFactory::createObject(Config::getString(
+              SOVOL_CONFIG_KEY(ALGORITHM_CLASSNAME), "LeapfrogAlgorithm")),
           Config::getDouble(
               SOVOL_CONFIG_KEY(REALTIMEREPEATSIMULATION_TIMESTEP)),
           Config::getDouble(SOVOL_CONFIG_KEY(REALTIMEREPEATSIMULATION_ENDTIME)),
