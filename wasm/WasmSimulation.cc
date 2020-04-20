@@ -13,16 +13,7 @@ WasmSimulation::WasmSimulation()
     : simulation(nullptr), id(0), start(false),
       lastStatus(SimulationStatus::UNSET), storedData(val::array()){};
 
-WasmSimulation::~WasmSimulation() { setSimulation(nullptr); }
-
-void WasmSimulation::setSimulation(RealTimeRepeatSimulation *_simulation) {
-    if (simulation != _simulation) {
-        if (simulation != nullptr) {
-            delete simulation;
-        }
-        simulation = _simulation;
-    }
-};
+WasmSimulation::~WasmSimulation(){};
 
 int WasmSimulation::getId() const { return id; };
 
@@ -37,7 +28,7 @@ void WasmSimulation::init(val params) {
         Config::setString(keys[i].as<std::string>().c_str(),
                           params[keys[i]].as<std::string>().c_str());
     }
-    setSimulation(new RealTimeRepeatSimulation);
+    simulation = std::make_shared<RealTimeRepeatSimulation>();
     start = true;
     id++;
     lastStatus = SimulationStatus::UNSET;
@@ -120,9 +111,10 @@ void WasmSimulation::storeData(bool isNewParticle) {
 };
 
 EMSCRIPTEN_BINDINGS(module) {
-    function("getWasmSimulation", &WasmSimulationFactory::createObject,
-             allow_raw_pointer<WasmSimulation>());
+    function("getWasmSimulation", &WasmSimulationFactory::createObject);
     class_<WasmSimulation>("WasmSimulation")
+        .smart_ptr_constructor("WasmSimulation",
+                               &std::make_shared<WasmSimulation>)
         .function("getId", &WasmSimulation::getId)
         .function("isStart", &WasmSimulation::isStart)
         .function("stop", &WasmSimulation::stop)

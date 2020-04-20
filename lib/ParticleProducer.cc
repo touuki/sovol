@@ -45,8 +45,8 @@ BeamParticleProducer::BeamParticleProducer(
       momentum_theta_y_dist(
           std::normal_distribution(0., angular_divergence * 0.25)){};
 
-Particle *BeamParticleProducer::createParticle() {
-    Particle *particle = ParticleFactory::createObject(className);
+std::shared_ptr<Particle> BeamParticleProducer::createParticle() {
+    std::shared_ptr<Particle> particle = ParticleFactory::createObject(className);
     double Ek = kinetic_energy_dist(random_engine);
     while (Ek < 0.)
         Ek = kinetic_energy_dist(random_engine);

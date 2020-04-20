@@ -8,7 +8,7 @@
 
 class ParticleProducer {
   public:
-    virtual Particle *createParticle() = 0;
+    virtual std::shared_ptr<Particle> createParticle() = 0;
     virtual ~ParticleProducer();
 };
 
@@ -48,7 +48,7 @@ class BeamParticleProducer : public ParticleProducer {
         double _length = 0., double _kinetic_energy = 0.,
         double _energy_spread = 0., double _angular_divergence = 0.,
         double _polar_angle = 0., double _azimuthal_angle = 0.);
-    Particle *createParticle() override;
+    std::shared_ptr<Particle> createParticle() override;
 };
 
 #endif

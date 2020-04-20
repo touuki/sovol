@@ -23,9 +23,10 @@ RealTimeRepeatSimulation::RealTimeRepeatSimulation()
               SOVOL_CONFIG_KEY(REALTIMEREPEATSIMULATION_DATASTARTTIME))){};
 
 RealTimeRepeatSimulation::RealTimeRepeatSimulation(
-    Field *_field, ParticleProducer *_particleProducer, Algorithm *_algorithm,
-    double _timeStep, double _endTime, int _remainingNumber,
-    double _dataInterval, double _dataStartTime)
+    std::shared_ptr<Field> _field,
+    std::shared_ptr<ParticleProducer> _particleProducer,
+    std::shared_ptr<Algorithm> _algorithm, double _timeStep, double _endTime,
+    int _remainingNumber, double _dataInterval, double _dataStartTime)
     : field(_field), particleProducer(_particleProducer), algorithm(_algorithm),
       timeStep(abs(_timeStep)), endTime(abs(_endTime)),
       remainingNumber(_remainingNumber > 1 ? _remainingNumber : 1),
@@ -33,14 +34,6 @@ RealTimeRepeatSimulation::RealTimeRepeatSimulation(
       dataStartTime(_dataStartTime > endTime ? endTime : _dataStartTime),
       currentParticle(_particleProducer->createParticle()), currentTime(0.),
       nextDataTime(0.){};
-
-RealTimeRepeatSimulation::~RealTimeRepeatSimulation() {
-    if (field != nullptr)
-        delete field;
-    if (particleProducer != nullptr)
-        delete particleProducer;
-    setParticle(nullptr);
-};
 
 double RealTimeRepeatSimulation::calculateNextDataTime() {
     if (currentTime < nextDataTime) {
@@ -58,15 +51,8 @@ double RealTimeRepeatSimulation::calculateNextDataTime() {
     return endTime;
 };
 
-void RealTimeRepeatSimulation::setParticle(Particle *_particle) {
-    if (currentParticle != _particle && currentParticle != nullptr) {
-        delete currentParticle;
-    }
-    currentParticle = _particle;
-};
-
 Particle *RealTimeRepeatSimulation::getParticle() const {
-    return currentParticle;
+    return currentParticle.get();
 };
 
 double RealTimeRepeatSimulation::getCurrentTime() const { return currentTime; };
@@ -77,7 +63,7 @@ SimulationStatus RealTimeRepeatSimulation::run(int32_t maxIterationTimes) {
     }
 
     if (currentTime >= endTime) {
-        setParticle(particleProducer->createParticle());
+        currentParticle = particleProducer->createParticle();
         currentTime = 0.;
         nextDataTime = 0.;
     }
@@ -90,7 +76,7 @@ SimulationStatus RealTimeRepeatSimulation::run(int32_t maxIterationTimes) {
 
     for (int32_t i = 0; currentTime < nextDataTime && i < maxIterationTimes;
          i++) {
-        (*algorithm)(currentParticle, field, currentTime, timeStep);
+        (*algorithm)(currentParticle.get(), field.get(), currentTime, timeStep);
         currentTime += timeStep;
     }
 
