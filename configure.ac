@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([sovol], [1.1], [touuki@protonmail.com])
+AC_INIT([sovol], [1.1.1], [touuki@protonmail.com])
 AM_INIT_AUTOMAKE([foreign -Wall -Werror])
 AM_CONDITIONAL([WASM], [test `basename $CXX` = "em++"])
 AC_CONFIG_SRCDIR([lib/Field.hh])

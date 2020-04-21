@@ -11,6 +11,7 @@ html
     else
       link(rel="stylesheet" href="/css/style.css")
       link(rel="stylesheet", href="https://static.touuki.com/fontawesome/css/all.css")
+    title Sovol - A Wasm/CLI Program of Relativistic Particle Tracking in EM Field
     script(src="https://static.touuki.com/js/jquery-3.4.1.min.js")
     script(src="https://static.touuki.com/js/echarts.min.js")
     script(src="https://static.touuki.com/js/echarts-gl.min.js")
@@ -18,10 +19,17 @@ html
     script(src="https://static.touuki.com/js/dataTool.min.js")
     script(src="https://static.touuki.com/js/masonry.pkgd.min.js")
     if test
-      script(src="/sovol/html/libsovol-wasm.js")
+      script(src="libsovol-wasm.js")
+      script(src="common.dev.js")
+      script(src="figure.dev.js")
+      script(src="script.dev.js")
     else
       script(src="/js/libsovol-wasm.js")
-    title Sovol - A Wasm/CLI Program of Relativistic Particle Tracking in EM Field
+      script(src="/js/common.prod.js")
+      script(src="/js/figure.prod.js")
+      script(src="/js/script.prod.js")
+    script.
+      $(function(){setTimeout(checkReady, 1000)});
   body
     .overflow-wrapper
       .masonry
@@ -300,7 +308,3 @@ html
                   span.icon
                     i.fas.fa-plus
                   span Add
-      if test
-        script(src="script.js")
-      else
-        script(src="/js/script.js")
