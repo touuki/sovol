@@ -1,4 +1,4 @@
--var test = false
+-var test = true
 
 doctype html
 html
@@ -29,7 +29,7 @@ html
       script(src="/js/figure.prod.js")
       script(src="/js/script.prod.js")
     script.
-      $(function(){setTimeout(checkReady, 1000)});
+      $(function(){setTimeout(function(){initSim.start()}, 1000)});
   body
     .overflow-wrapper
       .masonry
@@ -56,11 +56,16 @@ html
           table.input-table
             tr
               td
-                label(for="PARTICLEPRODUCER_CLASSNAME") Class
+                label(for="PARTICLEPRODUCER_CLASSNAME") Producer Class
+              td
+                label(for="PARTICLE_CLASSNAME") Particle Class
             tr
               td
                 select#PARTICLEPRODUCER_CLASSNAME.simulation-input.static-input
                   option(value="BeamParticleProducer") BeamParticleProducer
+              td
+                select#PARTICLE_CLASSNAME.simulation-input.static-input
+                  option(value="Particle") Particle
           table.input-table
             tr
               td

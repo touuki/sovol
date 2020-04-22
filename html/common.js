@@ -53,3 +53,65 @@ function funDownload(content, filename) {
 }
 
 Object.values = Object.values || (obj => Object.keys(obj).map(key => obj[key]));
+
+class ConditionalExecutor {
+  constructor(conditional, execution, options){
+    this.conditional = conditional;
+    this.execution = execution;
+    options = options || {};
+    this.interval =  options.interval || 300;
+    this.started = false;
+    this.finished = false;
+  }
+
+  get conditional(){
+    return this._conditional;
+  }
+
+  set conditional(value){
+    if (typeof value !== 'function') {
+      throw new Error("Conditional must be a function.");
+    }
+    this._conditional = value;
+  }
+
+  get execution(){
+    return this._execution;
+  }
+
+  set execution(value){
+    if (typeof value !== 'function') {
+      throw new Error("Callback must be a function.");
+    }
+    this._execution = value;
+  }
+
+  check() {
+    if (this.started) {
+      if (this.conditional()) {
+        this.finished = true;
+        this.execution();
+      } else {
+        setTimeout(this.check, this.interval);
+      }
+    }
+  }
+
+  stop() {
+    if (this.finished) {
+      throw new Error("The Executor has already finished.");
+    }
+    this.started = false;
+  }
+
+  start(){
+    if (this.finished) {
+      throw new Error("The Executor has already finished.");
+    }
+    if (this.started) {
+      throw new Error("The Executor has already started.");;
+    }
+    this.started = true;
+    this.check();
+  }
+}

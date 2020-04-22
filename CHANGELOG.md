@@ -3,6 +3,7 @@
 * Use smart pointers
 * Fix some bugs
 * Separte JavaScript file
+* Add a Synchrocyclotron example
 
 ## 2020.04.14, Version 1.1
 * Separate Algorithm and Particle entity

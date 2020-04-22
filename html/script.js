@@ -1,3 +1,11 @@
+const initSim = new ConditionalExecutor(() => Module && Module.getWasmSimulation, () => {
+  window.sim = Module.getWasmSimulation("WasmSimulation");
+  document.getElementById("start").disabled = '';
+});
+const version = "1.1.1";
+const custom_function = {};
+const figures = {};
+
 $(function () {
   window.$grid = $('.masonry').masonry({
     columnWidth: 480,
@@ -6,18 +14,6 @@ $(function () {
     fitWidth: true,
     transitionDuration: 0
   });
-  window.version = "1.1.1"
-  window.custom_function = {};
-  window.figures = {};
-
-  window.checkReady = () => {
-    if (!Module || !Module.getWasmSimulation){
-      setTimeout(checkReady, 2000);
-      return;
-    }
-    window.sim = Module.getWasmSimulation("WasmSimulation");
-    document.getElementById("start").disabled = '';
-  }
 
   $('#start').click(function () {
     if (!sim || sim.isStart()) {

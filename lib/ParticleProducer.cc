@@ -9,7 +9,7 @@ REGISTER_MULTITON(ParticleProducer, BeamParticleProducer)
 
 BeamParticleProducer::BeamParticleProducer()
     : BeamParticleProducer(
-          Config::getString(SOVOL_CONFIG_KEY(PARTICLE_CLASS), "Particle"),
+          Config::getString(SOVOL_CONFIG_KEY(PARTICLE_CLASSNAME), "Particle"),
           Vector3(Config::getDouble(SOVOL_CONFIG_KEY(PARTICLES_TRANSLATION_X)),
                   Config::getDouble(SOVOL_CONFIG_KEY(PARTICLES_TRANSLATION_Y)),
                   Config::getDouble(SOVOL_CONFIG_KEY(PARTICLES_TRANSLATION_Z))),

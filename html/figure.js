@@ -84,11 +84,11 @@ class Figure2d extends Figure {
       backgroundColor: '#fff',
       xAxis: {
         type: 'value',
-        name: `${this.x.name} [${this.x.unit}]`,
+        name: `${this.x.name}${this.x.unit ? ` [${this.x.unit}]` : ''}`,
       },
       yAxis: {
         type: 'value',
-        name: `${this.y.name} [${this.y.unit}]`,
+        name: `${this.y.name}${this.y.unit ? ` [${this.y.unit}]` : ''}`,
       }
     });
   }
@@ -125,15 +125,15 @@ class Figure3d extends Figure {
       backgroundColor: '#fff',
       xAxis3D: {
         type: 'value',
-        name: `${this.x.name} [${this.x.unit}]`,
+        name: `${this.x.name}${this.x.unit ? ` [${this.x.unit}]` : ''}`,
       },
       yAxis3D: {
         type: 'value',
-        name: `${this.y.name} [${this.y.unit}]`,
+        name: `${this.y.name}${this.y.unit ? ` [${this.y.unit}]` : ''}`,
       },
       zAxis3D: {
         type: 'value',
-        name: `${this.z.name} [${this.z.unit}]`,
+        name: `${this.z.name}${this.z.unit ? ` [${this.z.unit}]` : ''}`,
       },
       grid3D: {
         viewControl: {
