@@ -154,7 +154,7 @@ $(function () {
   });
 
   $('#arguments_table').on('click', '.remove-button', function () {
-    $(this).parents('tr').remove();
+    $(this).parents('tr').first().remove();
     $grid.masonry();
   });
 

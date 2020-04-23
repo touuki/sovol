@@ -29,7 +29,7 @@ class RealTimeRepeatSimulation {
     double currentTime;
     double nextDataTime;
 
-    double calculateNextDataTime();
+    double calculateNextDataTime() const;
 
   public:
     RealTimeRepeatSimulation();

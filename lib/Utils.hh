@@ -32,6 +32,7 @@ class Utils {
                                         const Vector3<double> &velocity,
                                         const EMField &emField);
     static double kineticEnergy(const Vector3<double> &momentum, double mass);
+    static double generLaguePoly(int alpha, int k, double value);
 };
 
 inline double Utils::random(double min, double max) {
@@ -66,6 +67,20 @@ inline Vector3<double> Utils::lorentzForce(double charge,
 
 inline double Utils::kineticEnergy(const Vector3<double> &momentum, double mass) {
     return sqrt(pow(mass, 2) + momentum.square()) - mass;
+};
+
+inline double Utils::generLaguePoly(int alpha, int k, double value) {
+    if (k == 0) {
+        return 1.;
+    } else if (k == 1) {
+        return 1 + alpha - value;
+    } else if (k > 1) {
+        return ((2 * k - 1 + alpha - value) *
+                    generLaguePoly(alpha, k - 1, value) -
+                (k - 1 + alpha) * generLaguePoly(alpha, k - 2, value)) /
+               k;
+    }
+    return 0.;
 };
 
 #endif

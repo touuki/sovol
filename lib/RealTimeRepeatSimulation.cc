@@ -35,7 +35,7 @@ RealTimeRepeatSimulation::RealTimeRepeatSimulation(
       currentParticle(_particleProducer->createParticle()), currentTime(0.),
       nextDataTime(0.){};
 
-double RealTimeRepeatSimulation::calculateNextDataTime() {
+double RealTimeRepeatSimulation::calculateNextDataTime() const {
     if (currentTime < nextDataTime) {
         return nextDataTime;
     }

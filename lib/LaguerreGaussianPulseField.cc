@@ -4,20 +4,6 @@
 
 using namespace std;
 
-double generLaguePoly(int alpha, int k, double value) {
-    if (k == 0) {
-        return 1.;
-    } else if (k == 1) {
-        return 1 + alpha - value;
-    } else if (k > 1) {
-        return ((2 * k - 1 + alpha - value) *
-                    generLaguePoly(alpha, k - 1, value) -
-                (k - 1 + alpha) * generLaguePoly(alpha, k - 2, value)) /
-               k;
-    }
-    return 0.;
-};
-
 REGISTER_MULTITON(Field, LaguerreGaussianPulseField)
 
 LaguerreGaussianPulseField::LaguerreGaussianPulseField()
@@ -53,7 +39,7 @@ complex<double> LaguerreGaussianPulseField::amplitude(double x, double y,
     double psiz = (abs(l) + 2 * p + 1) * atan(z / zR);
     double item1 = l == 0 ? 1. : pow(sqrt(2. * r2) / wz, abs(l));
     double item2 =
-        p == 0 ? 1. : generLaguePoly(abs(l), p, 2. * r2 / pow(wz, 2));
+        p == 0 ? 1. : Utils::generLaguePoly(abs(l), p, 2. * r2 / pow(wz, 2));
     double extraPhase = l == 0 ? 0. : l * atan2(y, x);
     return a0 * (w0 / wz) * item1 * item2 * exp(-r2 / pow(wz, 2)) *
            exp(-1.i * (.5 * r2 * irz + extraPhase - psiz));
