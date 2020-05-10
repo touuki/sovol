@@ -76,7 +76,7 @@ SimulationStatus RealTimeRepeatSimulation::run(int32_t maxIterationTimes) {
 
     for (int32_t i = 0; currentTime < nextDataTime && i < maxIterationTimes;
          i++) {
-        (*algorithm)(currentParticle.get(), field.get(), currentTime, timeStep);
+        (*algorithm)(currentParticle.get(), *field, currentTime, timeStep);
         currentTime += timeStep;
     }
 

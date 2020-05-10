@@ -95,7 +95,7 @@ $(function () {
 
   $('#particles_plots_input select').each((i, e) => {
     for (const key in Figure.variables) {
-      $(e).append(`<option value="${key}">${key}</option>`);
+      $(e).append(`<option value="${key}">${Figure.variables[key].name}</option>`);
     }
   });
 
@@ -103,7 +103,9 @@ $(function () {
     const id = `particles_plot_${Math.random().toString().substr(-8)}`;
     const element = $(
       `<div class="masonry-item light-background">
-        <div class="table-title">${axes.z ? `${axes.x}-${axes.y}-${axes.z}` : `${axes.x}-${axes.y}`}</div>
+        <div class="table-title">${axes.z ? `${Figure.variables[axes.x].name}-${
+        Figure.variables[axes.y].name}-${Figure.variables[axes.z].name}` :
+        `${Figure.variables[axes.x].name}-${Figure.variables[axes.y].name}`}</div>
         <div class="figure" id="${id}" data-x-axis="${axes.x}" data-y-axis="${axes.y}" data-z-axis="${axes.z}"></div>
         <table class="input-table">
           <tr>

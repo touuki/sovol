@@ -14,8 +14,8 @@ typedef struct EMField {
 class Field {
   public:
     virtual ~Field();
-    virtual EMField get(double x, double y, double z, double time) const = 0;
-    EMField get(const Vector3<double> &position, double time) const;
+    virtual EMField operator()(double x, double y, double z, double time) const = 0;
+    EMField operator()(const Vector3<double> &position, double time) const;
 };
 
 DEFINE_FACTORY(Field)
@@ -34,7 +34,7 @@ class CustomField : public Field {
     CustomField();
     CustomField(C_FUNC_P(_ex), C_FUNC_P(_ey), C_FUNC_P(_ez), C_FUNC_P(_bx),
                 C_FUNC_P(_by), C_FUNC_P(_bz));
-    EMField get(double x, double y, double z, double time) const override;
+    EMField operator()(double x, double y, double z, double time) const override;
 };
 
 

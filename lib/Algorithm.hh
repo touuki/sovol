@@ -9,19 +9,19 @@
 class Algorithm {
   public:
     virtual ~Algorithm();
-    virtual void operator()(Particle *, const Field *, double time, double dt) const = 0;
+    virtual void operator()(Particle *, const Field &, double time, double dt) const = 0;
 };
 
 DEFINE_FACTORY(Algorithm)
 
 class RungeKuttaAlgorithm : public Algorithm {
   public:
-    void operator()(Particle *, const Field *, double time, double dt) const override;
+    void operator()(Particle *, const Field &, double time, double dt) const override;
 };
 
 class LeapfrogAlgorithm : public Algorithm {
   public:
-    void operator()(Particle *, const Field *, double time, double dt) const override;
+    void operator()(Particle *, const Field &, double time, double dt) const override;
 };
 
 

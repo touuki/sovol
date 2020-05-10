@@ -53,7 +53,7 @@ double LaguerreGaussianPulseField::envelope(double x, double y, double z,
     return 1. / cosh(log(3. + 2. * sqrt(2)) * phase / tau);
 };
 
-EMField LaguerreGaussianPulseField::get(double x, double y, double z,
+EMField LaguerreGaussianPulseField::operator()(double x, double y, double z,
                                         double t) const {
     complex<double> u = amplitude(x, y, z);
     complex<double> pupx =

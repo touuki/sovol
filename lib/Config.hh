@@ -3,11 +3,28 @@
 
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 
 #define SOVOL_CONFIG_KEY(key) "SC_" #key
 
 class Config {
   public:
+    static bool getBool(const char *key, bool defaultValue = false) {
+        const char *value;
+        if ((value = getenv(key)) != nullptr) {
+            if (strcmp(value, "1") == 0 || strcmp(value, "true") == 0 ||
+                strcmp(value, "True") == 0 || strcmp(value, "TRUE") == 0) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return defaultValue;
+        }
+    };
+    static int setBool(const char *key, bool value) {
+        return setenv(key, value ? "true" : "false", 1);
+    };
     static double getDouble(const char *key, double defaultValue = 0.) {
         const char *value;
         if ((value = getenv(key)) != nullptr) {

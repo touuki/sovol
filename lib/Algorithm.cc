@@ -5,24 +5,24 @@ Algorithm::~Algorithm(){};
 
 REGISTER_SINGLETON(Algorithm, RungeKuttaAlgorithm)
 
-void RungeKuttaAlgorithm::operator()(Particle *part, const Field *field,
+void RungeKuttaAlgorithm::operator()(Particle *part, const Field &field,
                                      double time, double dt) const {
     double halfStep = .5 * dt;
-    EMField em = field->get(part->position, time);
+    EMField em = field(part->position, time);
     Vector3<double> dxdt1 = Utils::velocity(part->momentum, part->mass);
     Vector3<double> dpdt1 = Utils::lorentzForce(part->charge, dxdt1, em);
 
-    em = field->get(part->position + dxdt1 * halfStep, time + halfStep);
+    em = field(part->position + dxdt1 * halfStep, time + halfStep);
     Vector3<double> dxdt2 =
         Utils::velocity(part->momentum + dpdt1 * halfStep, part->mass);
     Vector3<double> dpdt2 = Utils::lorentzForce(part->charge, dxdt2, em);
 
-    em = field->get(part->position + dxdt2 * halfStep, time + halfStep);
+    em = field(part->position + dxdt2 * halfStep, time + halfStep);
     Vector3<double> dxdt3 =
         Utils::velocity(part->momentum + dpdt2 * halfStep, part->mass);
     Vector3<double> dpdt3 = Utils::lorentzForce(part->charge, dxdt3, em);
 
-    em = field->get(part->position + dxdt3 * dt, time + dt);
+    em = field(part->position + dxdt3 * dt, time + dt);
     Vector3<double> dxdt4 =
         Utils::velocity(part->momentum + dpdt3 * dt, part->mass);
     Vector3<double> dpdt4 = Utils::lorentzForce(part->charge, dxdt4, em);
@@ -33,12 +33,12 @@ void RungeKuttaAlgorithm::operator()(Particle *part, const Field *field,
 
 REGISTER_SINGLETON(Algorithm, LeapfrogAlgorithm)
 
-void LeapfrogAlgorithm::operator()(Particle *part, const Field *field,
+void LeapfrogAlgorithm::operator()(Particle *part, const Field &field,
                                    double time, double dt) const {
     double halfStep = .5 * dt;
     part->position += Utils::velocity(part->momentum, part->mass) * halfStep;
     time += halfStep;
-    EMField em = field->get(part->position, time);
+    EMField em = field(part->position, time);
     Vector3<double> pMinus = part->momentum + part->charge * halfStep * em.e;
     Vector3<double> t = part->charge * dt /
                         (2. * part->mass * Utils::gamma(pMinus, part->mass)) *

@@ -29,7 +29,7 @@ class LaguerreGaussianPulseField : public Field {
     LaguerreGaussianPulseField(double _a0, double _tau, double _w0,
                                double _ey = 0., double _delay = 0., int _p = 0,
                                int _l = 0, double _h = 0.5, double _iphase = 0);
-    EMField get(double x, double y, double z, double time) const override;
+    EMField operator()(double x, double y, double z, double time) const override;
 };
 
 #endif
