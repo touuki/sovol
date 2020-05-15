@@ -51,11 +51,15 @@ double RealTimeRepeatSimulation::calculateNextDataTime() const {
     return endTime;
 };
 
-Particle *RealTimeRepeatSimulation::getParticle() const {
-    return currentParticle.get();
+std::shared_ptr<Particle> RealTimeRepeatSimulation::getParticle() const {
+    return currentParticle;
 };
 
 double RealTimeRepeatSimulation::getCurrentTime() const { return currentTime; };
+
+std::shared_ptr<Algorithm> RealTimeRepeatSimulation::getAlgorithm() const {
+    return algorithm;
+};
 
 SimulationStatus RealTimeRepeatSimulation::run(int32_t maxIterationTimes) {
     if (remainingNumber <= 0) {

@@ -20,7 +20,7 @@ class WasmSimulation {
     int getId() const;
     bool isStart() const;
     void stop();
-    void init(emscripten::val params);
+    virtual void init(emscripten::val params);
     emscripten::val getStoredData() const;
     emscripten::val runAndGetData(int _id);
     virtual ~WasmSimulation();

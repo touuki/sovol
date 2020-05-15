@@ -39,8 +39,9 @@ class RealTimeRepeatSimulation {
         std::shared_ptr<Algorithm> _algorithm, double _timeStep,
         double _endTime, int _remainingNumber = 1, double _dataInterval = 0.,
         double _dataStartTime = 0.);
-    Particle *getParticle() const;
+    std::shared_ptr<Particle> getParticle() const;
     double getCurrentTime() const;
+    std::shared_ptr<Algorithm> getAlgorithm() const;
     SimulationStatus run(int32_t maxIterationTimes = -1);
 };
 

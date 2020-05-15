@@ -32,7 +32,8 @@ void WasmSimulation::init(val params) {
     start = true;
     id++;
     lastStatus = SimulationStatus::UNSET;
-    storedData = val::array();
+    storedData = val::object();
+    storedData.set("particles", val::array());
 };
 
 val WasmSimulation::getStoredData() const { return storedData; };
@@ -74,7 +75,7 @@ val WasmSimulation::runAndGetData(int _id) {
 
 val WasmSimulation::getData() const {
     val result = val::object();
-    Particle *particle = simulation->getParticle();
+    std::shared_ptr<Particle> particle = simulation->getParticle();
     result.set("t", simulation->getCurrentTime());
     result.set("x", particle->position.getX());
     result.set("y", particle->position.getY());
@@ -87,6 +88,7 @@ val WasmSimulation::getData() const {
 };
 
 void WasmSimulation::storeData(bool isNewParticle) {
+    val particles = storedData["particles"];
     if (isNewParticle) {
         val obj = val::object();
         obj.set("x", val::array());
@@ -96,11 +98,11 @@ void WasmSimulation::storeData(bool isNewParticle) {
         obj.set("py", val::array());
         obj.set("pz", val::array());
         obj.set("t", val::array());
-        storedData.call<val>("push", obj);
+        particles.call<val>("push", obj);
     }
-    int length = storedData["length"].as<int>();
-    val current = storedData[length - 1];
-    Particle *particle = simulation->getParticle();
+    int length = particles["length"].as<int>();
+    val current = particles[length - 1];
+    std::shared_ptr<Particle> particle = simulation->getParticle();
     current["x"].call<double>("push", particle->position.getX());
     current["y"].call<double>("push", particle->position.getY());
     current["z"].call<double>("push", particle->position.getZ());
