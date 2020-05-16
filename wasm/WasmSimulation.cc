@@ -10,8 +10,8 @@ using namespace emscripten;
 REGISTER_SINGLETON(WasmSimulation, WasmSimulation)
 
 WasmSimulation::WasmSimulation()
-    : simulation(nullptr), id(0), start(false),
-      lastStatus(SimulationStatus::UNSET), storedData(val::array()){};
+    : simulation(nullptr), id(0), start(false), lastStatus(UNSET),
+      storedData(val::array()){};
 
 WasmSimulation::~WasmSimulation(){};
 
@@ -31,7 +31,7 @@ void WasmSimulation::init(val params) {
     simulation = std::make_shared<RealTimeRepeatSimulation>();
     start = true;
     id++;
-    lastStatus = SimulationStatus::UNSET;
+    lastStatus = UNSET;
     storedData = val::object();
     storedData.set("particles", val::array());
 };
@@ -50,21 +50,20 @@ val WasmSimulation::runAndGetData(int _id) {
         result.set("message", "Inconsistent ID.");
         return result;
     }
-    SimulationStatus status = simulation->run();
-    bool isNewParticle = lastStatus == SimulationStatus::ENDTIME_REACHED ||
-                         lastStatus == SimulationStatus::UNSET;
+    simulation_status status = simulation->run();
+    bool isNewParticle = lastStatus == ENDTIME_REACHED || lastStatus == UNSET;
     switch (status) {
-    case SimulationStatus::DATA_OUTPUT:
-    case SimulationStatus::ENDTIME_REACHED:
+    case DATA_OUTPUT:
+    case ENDTIME_REACHED:
         result.set("data", getData());
         result.set("isNewParticle", isNewParticle);
         storeData(isNewParticle);
         break;
-    case SimulationStatus::FINISHED:
+    case FINISHED:
         result.set("finished", true);
         start = false;
         break;
-    case SimulationStatus::MAX_ITERATION_TIMES_REACHED:
+    case MAX_ITERATION_TIMES_REACHED:
         break;
     default:
         break;

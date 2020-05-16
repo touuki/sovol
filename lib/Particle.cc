@@ -15,11 +15,11 @@ Particle::~Particle(){};
 // See https://en.wikipedia.org/wiki/Euler_angles
 //     https://en.wikipedia.org/wiki/Rotation_matrix
 void Particle::rotate(double beta, double alpha) {
-    Vector3<double> rotateX(cos(alpha) * cos(beta), -sin(alpha),
-                            cos(alpha) * sin(beta));
-    Vector3<double> rotateY(sin(alpha) * cos(beta), cos(alpha),
-                            sin(alpha) * sin(beta));
-    Vector3<double> rotateZ(-sin(beta), 0., cos(beta));
+    Vector3<double> rotateX(std::cos(alpha) * std::cos(beta), -std::sin(alpha),
+                            std::cos(alpha) * std::sin(beta));
+    Vector3<double> rotateY(std::sin(alpha) * std::cos(beta), std::cos(alpha),
+                            std::sin(alpha) * std::sin(beta));
+    Vector3<double> rotateZ(-std::sin(beta), 0., std::cos(beta));
     position = Vector3(rotateX.dot(position), rotateY.dot(position),
                        rotateZ.dot(position));
     momentum = Vector3(rotateX.dot(momentum), rotateY.dot(momentum),

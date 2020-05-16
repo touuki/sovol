@@ -28,9 +28,9 @@ RealTimeRepeatSimulation::RealTimeRepeatSimulation(
     std::shared_ptr<Algorithm> _algorithm, double _timeStep, double _endTime,
     int _remainingNumber, double _dataInterval, double _dataStartTime)
     : field(_field), particleProducer(_particleProducer), algorithm(_algorithm),
-      timeStep(abs(_timeStep)), endTime(abs(_endTime)),
+      timeStep(std::abs(_timeStep)), endTime(std::abs(_endTime)),
       remainingNumber(_remainingNumber > 1 ? _remainingNumber : 1),
-      dataInterval(abs(_dataInterval)),
+      dataInterval(std::abs(_dataInterval)),
       dataStartTime(_dataStartTime > endTime ? endTime : _dataStartTime),
       currentParticle(_particleProducer->createParticle()), currentTime(0.),
       nextDataTime(0.){};
@@ -61,9 +61,9 @@ std::shared_ptr<Algorithm> RealTimeRepeatSimulation::getAlgorithm() const {
     return algorithm;
 };
 
-SimulationStatus RealTimeRepeatSimulation::run(int32_t maxIterationTimes) {
+simulation_status RealTimeRepeatSimulation::run(int32_t maxIterationTimes) {
     if (remainingNumber <= 0) {
-        return SimulationStatus::FINISHED;
+        return FINISHED;
     }
 
     if (currentTime >= endTime) {
@@ -86,12 +86,12 @@ SimulationStatus RealTimeRepeatSimulation::run(int32_t maxIterationTimes) {
 
     if (currentTime >= endTime) {
         remainingNumber--;
-        return SimulationStatus::ENDTIME_REACHED;
+        return ENDTIME_REACHED;
     }
 
     if (currentTime < nextDataTime) {
-        return SimulationStatus::MAX_ITERATION_TIMES_REACHED;
+        return MAX_ITERATION_TIMES_REACHED;
     }
 
-    return SimulationStatus::DATA_OUTPUT;
+    return DATA_OUTPUT;
 };

@@ -6,7 +6,7 @@
 #include "ParticleProducer.hh"
 #include <vector>
 
-enum SimulationStatus {
+enum simulation_status {
     UNSET,
     DATA_OUTPUT,
     MAX_ITERATION_TIMES_REACHED,
@@ -42,7 +42,7 @@ class RealTimeRepeatSimulation {
     std::shared_ptr<Particle> getParticle() const;
     double getCurrentTime() const;
     std::shared_ptr<Algorithm> getAlgorithm() const;
-    SimulationStatus run(int32_t maxIterationTimes = -1);
+    simulation_status run(int32_t maxIterationTimes = -1);
 };
 
 #endif

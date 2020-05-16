@@ -43,22 +43,22 @@ inline double Utils::random(double min, double max) {
 inline Vector3<double> Utils::randomOnSphere() {
     double theta = random(0., 2 * M_PI);
     double u = random(-1., 1.);
-    return Vector3(sqrt(1. - pow(u, 2)) * cos(theta),
-                   sqrt(1. - pow(u, 2)) * sin(theta), u);
+    return Vector3(std::sqrt(1. - std::pow(u, 2)) * std::cos(theta),
+                   std::sqrt(1. - std::pow(u, 2)) * std::sin(theta), u);
 };
 
 inline Vector3<double> Utils::velocity(const Vector3<double> &momentum,
                                        double mass) {
-    return momentum / sqrt(pow(mass, 2) + momentum.square());
+    return momentum / std::sqrt(std::pow(mass, 2) + momentum.square());
 };
 
 inline double Utils::gamma(const Vector3<double> &momentum, double mass) {
-    return sqrt(1. + momentum.square() / pow(mass, 2));
+    return std::sqrt(1. + momentum.square() / std::pow(mass, 2));
 };
 
 inline Vector3<double> Utils::momentum(const Vector3<double> &velocity,
                                        double mass) {
-    return mass / sqrt(1. - velocity.square()) * velocity;
+    return mass / std::sqrt(1. - velocity.square()) * velocity;
 };
 
 inline Vector3<double> Utils::lorentzForce(double charge,
@@ -69,7 +69,7 @@ inline Vector3<double> Utils::lorentzForce(double charge,
 
 inline double Utils::kineticEnergy(const Vector3<double> &momentum,
                                    double mass) {
-    return sqrt(pow(mass, 2) + momentum.square()) - mass;
+    return std::sqrt(std::pow(mass, 2) + momentum.square()) - mass;
 };
 
 inline double Utils::generLaguePoly(int alpha, int k, double value) {

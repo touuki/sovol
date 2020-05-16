@@ -10,7 +10,7 @@ class WasmSimulation {
     std::shared_ptr<RealTimeRepeatSimulation> simulation;
     int id;
     bool start;
-    SimulationStatus lastStatus;
+    simulation_status lastStatus;
     emscripten::val storedData;
     virtual void storeData(bool isNewParticle);
     virtual emscripten::val getData() const;

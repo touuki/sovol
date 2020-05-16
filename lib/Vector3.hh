@@ -158,7 +158,7 @@ template <typename T> inline T Vector3<T>::square() const {
 };
 
 template <typename T> inline Vector3<T> Vector3<T>::unit() const {
-    return *this / sqrt(square());
+    return *this / std::sqrt(square());
 };
 
 #endif

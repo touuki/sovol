@@ -25,32 +25,32 @@ LaguerreGaussianPulseField::LaguerreGaussianPulseField(double _a0, double _tau,
                                                        double _delay, int _p,
                                                        int _l, double _h,
                                                        double _iphase)
-    : a0(abs(_a0) *
-         sqrt((double)Utils::factorial(_p) / Utils::factorial(_p + abs(_l)))),
-      tau(abs(_tau)), w0(abs(_w0)), zR(0.5 * pow(w0, 2)),
-      ex(sqrt(1. - pow(_ey, 2))), ey(_ey), delay(_delay), p(abs(_p)), l(_l),
-      h(abs(_h)), iphase(_iphase){};
+    : a0(std::abs(_a0) *
+         std::sqrt((double)Utils::factorial(_p) / Utils::factorial(_p + std::abs(_l)))),
+      tau(std::abs(_tau)), w0(std::abs(_w0)), zR(0.5 * std::pow(w0, 2)),
+      ex(std::sqrt(1. - std::pow(_ey, 2))), ey(_ey), delay(_delay), p(std::abs(_p)), l(_l),
+      h(std::abs(_h)), iphase(_iphase){};
 
 complex<double> LaguerreGaussianPulseField::amplitude(double x, double y,
                                                       double z) const {
-    double r2 = pow(x, 2) + pow(y, 2);
-    double wz = w0 * sqrt(1. + pow(z, 2) / (pow(zR, 2)));
-    double irz = z / (pow(z, 2) + pow(zR, 2));
-    double psiz = (abs(l) + 2 * p + 1) * atan(z / zR);
-    double item1 = l == 0 ? 1. : pow(sqrt(2. * r2) / wz, abs(l));
+    double r2 = std::pow(x, 2) + std::pow(y, 2);
+    double wz = w0 * std::sqrt(1. + std::pow(z, 2) / (std::pow(zR, 2)));
+    double irz = z / (std::pow(z, 2) + std::pow(zR, 2));
+    double psiz = (std::abs(l) + 2 * p + 1) * std::atan(z / zR);
+    double item1 = l == 0 ? 1. : std::pow(std::sqrt(2. * r2) / wz, std::abs(l));
     double item2 =
-        p == 0 ? 1. : Utils::generLaguePoly(abs(l), p, 2. * r2 / pow(wz, 2));
-    double extraPhase = l == 0 ? 0. : l * atan2(y, x);
-    return a0 * (w0 / wz) * item1 * item2 * exp(-r2 / pow(wz, 2)) *
-           exp(-1.i * (.5 * r2 * irz + extraPhase - psiz));
+        p == 0 ? 1. : Utils::generLaguePoly(std::abs(l), p, 2. * r2 / std::pow(wz, 2));
+    double extraPhase = l == 0 ? 0. : l * std::atan2(y, x);
+    return a0 * (w0 / wz) * item1 * item2 * std::exp(-r2 / std::pow(wz, 2)) *
+           std::exp(-1.i * (.5 * r2 * irz + extraPhase - psiz));
 };
 
 double LaguerreGaussianPulseField::envelope(double x, double y, double z,
                                             double t) const {
-    double r2 = pow(x, 2) + pow(y, 2);
-    double irz = z / (pow(z, 2) + pow(zR, 2));
+    double r2 = std::pow(x, 2) + std::pow(y, 2);
+    double irz = z / (std::pow(z, 2) + std::pow(zR, 2));
     double phase = (t - delay) - (z + .5 * r2 * irz);
-    return 1. / cosh(log(3. + 2. * sqrt(2)) * phase / tau);
+    return 1. / std::cosh(std::log(3. + 2. * std::sqrt(2)) * phase / tau);
 };
 
 EMField LaguerreGaussianPulseField::operator()(double x, double y, double z,
@@ -60,7 +60,7 @@ EMField LaguerreGaussianPulseField::operator()(double x, double y, double z,
         (amplitude(x + h, y, z) - amplitude(x - h, y, z)) / (2. * h);
     complex<double> pupy =
         (amplitude(x, y + h, z) - amplitude(x, y - h, z)) / (2. * h);
-    complex<double> common = exp(1.i * (t - z + iphase)) * envelope(x, y, z, t);
+    complex<double> common = std::exp(1.i * (t - z + iphase)) * envelope(x, y, z, t);
     complex<double> Ex = -1.i * ex * u * common;
     complex<double> Ey = ey * u * common;
     complex<double> Ez = -(ex * pupx + ey * pupy * 1.i) * common;
