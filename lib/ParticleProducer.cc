@@ -28,10 +28,10 @@ BeamParticleProducer::BeamParticleProducer(
     double _charge, double _mass, double _width, double _length,
     double _kinetic_energy, double _energy_spread, double _angular_divergence,
     double _polar_angle, double _azimuthal_angle)
-    : className(_className), charge(_charge), mass(std::abs(_mass)),
-      width(std::abs(_width)), length(std::abs(_length)),
-      kinetic_energy(std::abs(_kinetic_energy)), energy_spread(std::abs(_energy_spread)),
-      angular_divergence(std::abs(_angular_divergence)), polar_angle(_polar_angle),
+    : className(_className), charge(_charge), mass(std::fabs(_mass)),
+      width(std::fabs(_width)), length(std::fabs(_length)),
+      kinetic_energy(std::fabs(_kinetic_energy)), energy_spread(std::fabs(_energy_spread)),
+      angular_divergence(std::fabs(_angular_divergence)), polar_angle(_polar_angle),
       azimuthal_angle(_azimuthal_angle), translation(_translation),
       random_engine(std::default_random_engine(time(NULL))),
       kinetic_energy_dist(std::normal_distribution(

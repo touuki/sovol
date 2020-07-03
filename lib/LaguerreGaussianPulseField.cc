@@ -25,11 +25,11 @@ LaguerreGaussianPulseField::LaguerreGaussianPulseField(double _a0, double _tau,
                                                        double _delay, int _p,
                                                        int _l, double _h,
                                                        double _iphase)
-    : a0(std::abs(_a0) *
+    : a0(std::fabs(_a0) *
          std::sqrt((double)Utils::factorial(_p) / Utils::factorial(_p + std::abs(_l)))),
-      tau(std::abs(_tau)), w0(std::abs(_w0)), zR(0.5 * std::pow(w0, 2)),
+      tau(std::fabs(_tau)), w0(std::fabs(_w0)), zR(0.5 * std::pow(w0, 2)),
       ex(std::sqrt(1. - std::pow(_ey, 2))), ey(_ey), delay(_delay), p(std::abs(_p)), l(_l),
-      h(std::abs(_h)), iphase(_iphase){};
+      h(std::fabs(_h)), iphase(_iphase){};
 
 complex<double> LaguerreGaussianPulseField::amplitude(double x, double y,
                                                       double z) const {

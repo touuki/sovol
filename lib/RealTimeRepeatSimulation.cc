@@ -28,9 +28,9 @@ RealTimeRepeatSimulation::RealTimeRepeatSimulation(
     std::shared_ptr<Algorithm> _algorithm, double _timeStep, double _endTime,
     int _remainingNumber, double _dataInterval, double _dataStartTime)
     : field(_field), particleProducer(_particleProducer), algorithm(_algorithm),
-      timeStep(std::abs(_timeStep)), endTime(std::abs(_endTime)),
+      timeStep(std::fabs(_timeStep)), endTime(std::fabs(_endTime)),
       remainingNumber(_remainingNumber > 1 ? _remainingNumber : 1),
-      dataInterval(std::abs(_dataInterval)),
+      dataInterval(std::fabs(_dataInterval)),
       dataStartTime(_dataStartTime > endTime ? endTime : _dataStartTime),
       currentParticle(_particleProducer->createParticle()), currentTime(0.),
       nextDataTime(0.){};
