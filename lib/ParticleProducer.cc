@@ -33,7 +33,7 @@ BeamParticleProducer::BeamParticleProducer(
       kinetic_energy(std::fabs(_kinetic_energy)), energy_spread(std::fabs(_energy_spread)),
       angular_divergence(std::fabs(_angular_divergence)), polar_angle(_polar_angle),
       azimuthal_angle(_azimuthal_angle), translation(_translation),
-      random_engine(std::default_random_engine(time(NULL))),
+      random_engine(std::default_random_engine(Config::getInt(SOVOL_CONFIG_KEY(RANDOM_SEED), time(NULL)))),
       kinetic_energy_dist(std::normal_distribution(
           kinetic_energy,
           kinetic_energy * energy_spread / (100. * 2. * std::sqrt(2. * M_LN2)))),
