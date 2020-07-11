@@ -6,7 +6,7 @@ REGISTER_MULTITON(Field, CustomField)
 Field::~Field(){};
 
 EMField Field::operator()(const Vector3<double> &position, double t) const {
-    return operator()(position.getX(), position.getY(), position.getZ(), t);
+    return operator()(position.x, position.y, position.z, t);
 };
 
 double CustomField::defaultFunction(double, double, double, double) {

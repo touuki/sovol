@@ -5,22 +5,11 @@
 #include <iostream>
 
 template <typename T> class Vector3 {
-  private:
-    T x;
-    T y;
-    T z;
-
   public:
+    T x,y,z;
     static Vector3 zero;
     Vector3();
     Vector3(const T &_x, const T &_y, const T &_z);
-
-    T getX() const;
-    T getY() const;
-    T getZ() const;
-    void setX(const T &);
-    void setY(const T &);
-    void setZ(const T &);
 
     bool operator==(const Vector3 &) const;
     bool operator!=(const Vector3 &) const;
@@ -59,18 +48,6 @@ template <typename T> inline Vector3<T>::Vector3() : x(0), y(0), z(0){};
 template <typename T>
 inline Vector3<T>::Vector3(const T &_x, const T &_y, const T &_z)
     : x(_x), y(_y), z(_z){};
-
-template <typename T> inline T Vector3<T>::getX() const { return x; };
-
-template <typename T> inline T Vector3<T>::getY() const { return y; };
-
-template <typename T> inline T Vector3<T>::getZ() const { return z; };
-
-template <typename T> inline void Vector3<T>::setX(const T &_x) { x = _x; };
-
-template <typename T> inline void Vector3<T>::setY(const T &_y) { y = _y; };
-
-template <typename T> inline void Vector3<T>::setZ(const T &_z) { z = _z; };
 
 template <typename T>
 inline bool Vector3<T>::operator==(const Vector3 &v) const {

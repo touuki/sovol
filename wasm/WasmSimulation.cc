@@ -76,12 +76,12 @@ val WasmSimulation::getData() const {
     val result = val::object();
     std::shared_ptr<Particle> particle = simulation->getParticle();
     result.set("t", simulation->getCurrentTime());
-    result.set("x", particle->position.getX());
-    result.set("y", particle->position.getY());
-    result.set("z", particle->position.getZ());
-    result.set("px", particle->momentum.getX());
-    result.set("py", particle->momentum.getY());
-    result.set("pz", particle->momentum.getZ());
+    result.set("x", particle->position.x);
+    result.set("y", particle->position.y);
+    result.set("z", particle->position.z);
+    result.set("px", particle->momentum.x);
+    result.set("py", particle->momentum.y);
+    result.set("pz", particle->momentum.z);
     result.set("Ek", Utils::kineticEnergy(particle->momentum, particle->mass));
     return result;
 };
@@ -102,12 +102,12 @@ void WasmSimulation::storeData(bool isNewParticle) {
     int length = particles["length"].as<int>();
     val current = particles[length - 1];
     std::shared_ptr<Particle> particle = simulation->getParticle();
-    current["x"].call<double>("push", particle->position.getX());
-    current["y"].call<double>("push", particle->position.getY());
-    current["z"].call<double>("push", particle->position.getZ());
-    current["px"].call<double>("push", particle->momentum.getX());
-    current["py"].call<double>("push", particle->momentum.getY());
-    current["pz"].call<double>("push", particle->momentum.getZ());
+    current["x"].call<double>("push", particle->position.x);
+    current["y"].call<double>("push", particle->position.y);
+    current["z"].call<double>("push", particle->position.z);
+    current["px"].call<double>("push", particle->momentum.x);
+    current["py"].call<double>("push", particle->momentum.y);
+    current["pz"].call<double>("push", particle->momentum.z);
     current["t"].call<double>("push", simulation->getCurrentTime());
 };
 
