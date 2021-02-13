@@ -1,1 +1,175 @@
-{"version":"1.1.1","static_inputs":[{"key":"PARTICLEPRODUCER_CLASSNAME","value":"BeamParticleProducer"},{"key":"PARTICLE_CLASSNAME","value":"Particle"},{"key":"PARTICLES_MASS","value":"1"},{"key":"PARTICLES_CHARGE","value":"-1"},{"key":"PARTICLES_WIDTH","value":"0"},{"key":"PARTICLES_LENGTH","value":"0"},{"key":"REALTIMEREPEATSIMULATION_REMAININGNUMBER","value":"1"},{"key":"PARTICLES_KINETIC_ENERGY","value":"0"},{"key":"PARTICLES_ENERGY_SPREAD","value":"0"},{"key":"PARTICLES_ANGULAR_DIVERGENCE","value":"0"},{"key":"PARTICLES_POLAR_ANGLE","value":"0"},{"key":"PARTICLES_AZIMUTHAL_ANGLE","value":"0"},{"key":"PARTICLES_TRANSLATION_X","value":"0"},{"key":"PARTICLES_TRANSLATION_Y","value":"0"},{"key":"PARTICLES_TRANSLATION_Z","value":"0"},{"key":"FIELD_CLASSNAME","value":"LaguerreGaussianPulseField"},{"key":"CUSTOMFIELD_EX","value":"return 0;"},{"key":"CUSTOMFIELD_EY","value":"return 0;"},{"key":"CUSTOMFIELD_EZ","value":"return 0;"},{"key":"CUSTOMFIELD_BX","value":"return 0;"},{"key":"CUSTOMFIELD_BY","value":"return 0;"},{"key":"CUSTOMFIELD_BZ","value":"return 0;"},{"key":"LAGUERREGAUSSIANPULSEFIELD_TAU","value":"5 * 2 * Math.PI"},{"key":"LAGUERREGAUSSIANPULSEFIELD_A0","value":"5"},{"key":"LAGUERREGAUSSIANPULSEFIELD_W0","value":"5 * 2 * Math.PI"},{"key":"LAGUERREGAUSSIANPULSEFIELD_EY","value":"0"},{"key":"LAGUERREGAUSSIANPULSEFIELD_DELAY","value":"50 * 2 * Math.PI"},{"key":"LAGUERREGAUSSIANPULSEFIELD_IPHASE","value":"0"},{"key":"LAGUERREGAUSSIANPULSEFIELD_P","value":"0"},{"key":"LAGUERREGAUSSIANPULSEFIELD_L","value":"0"},{"key":"LAGUERREGAUSSIANPULSEFIELD_H","value":"0.1 * 2 * Math.PI"},{"key":"ALGORITHM_CLASSNAME","value":"LeapfrogAlgorithm"},{"key":"REALTIMEREPEATSIMULATION_TIMESTEP","value":"0.001 * 2 * Math.PI"},{"key":"REALTIMEREPEATSIMULATION_ENDTIME","value":"100 * 2 * Math.PI"},{"key":"REALTIMEREPEATSIMULATION_DATASTARTTIME","value":"30 * 2 * Math.PI"},{"key":"REALTIMEREPEATSIMULATION_DATAINTERVAL","value":"0.05 * 2 * Math.PI"},{"key":"rateControl_dpf","value":"30"},{"key":"rateControl_fps","value":"25"}],"customfield_arguments":[],"plot_figures":[{"xAxis":"z","yAxis":"x","zAxis":""},{"xAxis":"pz","yAxis":"px","zAxis":""},{"xAxis":"t","yAxis":"Ek","zAxis":""}]}
+{
+    "version": "1.2.0",
+    "static_inputs": [
+        {
+            "key": "PARTICLEPRODUCER_CLASSNAME",
+            "value": "BeamParticleProducer"
+        },
+        {
+            "key": "PARTICLE_CLASSNAME",
+            "value": "Particle"
+        },
+        {
+            "key": "PARTICLES_MASS",
+            "value": "1"
+        },
+        {
+            "key": "PARTICLES_CHARGE",
+            "value": "-1"
+        },
+        {
+            "key": "PARTICLES_WIDTH",
+            "value": "0"
+        },
+        {
+            "key": "PARTICLES_LENGTH",
+            "value": "0"
+        },
+        {
+            "key": "REALTIMEREPEATSIMULATION_REMAININGNUMBER",
+            "value": "1"
+        },
+        {
+            "key": "PARTICLES_KINETIC_ENERGY",
+            "value": "0"
+        },
+        {
+            "key": "PARTICLES_ENERGY_SPREAD",
+            "value": "0"
+        },
+        {
+            "key": "PARTICLES_ANGULAR_DIVERGENCE",
+            "value": "0"
+        },
+        {
+            "key": "PARTICLES_POLAR_ANGLE",
+            "value": "0"
+        },
+        {
+            "key": "PARTICLES_AZIMUTHAL_ANGLE",
+            "value": "0"
+        },
+        {
+            "key": "PARTICLES_TRANSLATION_X",
+            "value": "0"
+        },
+        {
+            "key": "PARTICLES_TRANSLATION_Y",
+            "value": "0"
+        },
+        {
+            "key": "PARTICLES_TRANSLATION_Z",
+            "value": "0"
+        },
+        {
+            "key": "FIELD_CLASSNAME",
+            "value": "LaguerreGaussianPulseField"
+        },
+        {
+            "key": "CUSTOMFIELD_EX",
+            "value": "return 0;"
+        },
+        {
+            "key": "CUSTOMFIELD_EY",
+            "value": "return 0;"
+        },
+        {
+            "key": "CUSTOMFIELD_EZ",
+            "value": "return 0;"
+        },
+        {
+            "key": "CUSTOMFIELD_BX",
+            "value": "return 0;"
+        },
+        {
+            "key": "CUSTOMFIELD_BY",
+            "value": "return 0;"
+        },
+        {
+            "key": "CUSTOMFIELD_BZ",
+            "value": "return 0;"
+        },
+        {
+            "key": "LAGUERREGAUSSIANPULSEFIELD_TAU",
+            "value": "5 * 2 * Math.PI"
+        },
+        {
+            "key": "LAGUERREGAUSSIANPULSEFIELD_A0",
+            "value": "5"
+        },
+        {
+            "key": "LAGUERREGAUSSIANPULSEFIELD_W0",
+            "value": "5 * 2 * Math.PI"
+        },
+        {
+            "key": "LAGUERREGAUSSIANPULSEFIELD_EY",
+            "value": "0"
+        },
+        {
+            "key": "LAGUERREGAUSSIANPULSEFIELD_DELAY",
+            "value": "50 * 2 * Math.PI"
+        },
+        {
+            "key": "LAGUERREGAUSSIANPULSEFIELD_IPHASE",
+            "value": "0"
+        },
+        {
+            "key": "LAGUERREGAUSSIANPULSEFIELD_P",
+            "value": "0"
+        },
+        {
+            "key": "LAGUERREGAUSSIANPULSEFIELD_L",
+            "value": "0"
+        },
+        {
+            "key": "LAGUERREGAUSSIANPULSEFIELD_H",
+            "value": "0.1 * 2 * Math.PI"
+        },
+        {
+            "key": "ALGORITHM_CLASSNAME",
+            "value": "LeapfrogAlgorithm"
+        },
+        {
+            "key": "REALTIMEREPEATSIMULATION_TIMESTEP",
+            "value": "0.001 * 2 * Math.PI"
+        },
+        {
+            "key": "REALTIMEREPEATSIMULATION_ENDTIME",
+            "value": "100 * 2 * Math.PI"
+        },
+        {
+            "key": "REALTIMEREPEATSIMULATION_DATASTARTTIME",
+            "value": "30 * 2 * Math.PI"
+        },
+        {
+            "key": "REALTIMEREPEATSIMULATION_DATAINTERVAL",
+            "value": "0.05 * 2 * Math.PI"
+        },
+        {
+            "key": "rateControl_dpf",
+            "value": "30"
+        },
+        {
+            "key": "rateControl_fps",
+            "value": "25"
+        }
+    ],
+    "customfield_arguments": [],
+    "plot_figures": [
+        {
+            "xAxis": "z",
+            "yAxis": "x",
+            "figureClass": "Figure2dLine"
+        },
+        {
+            "xAxis": "pz",
+            "yAxis": "px",
+            "figureClass": "Figure2dLine"
+        },
+        {
+            "xAxis": "t",
+            "yAxis": "Ek",
+            "figureClass": "Figure2dLine"
+        }
+    ]
+}

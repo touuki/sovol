@@ -1,5 +1,5 @@
 {
-    "version": "1.1.1",
+    "version": "1.2.0",
     "static_inputs": [
         {
             "key": "PARTICLEPRODUCER_CLASSNAME",
@@ -180,17 +180,17 @@
         {
             "xAxis": "t",
             "yAxis": "Ek",
-            "zAxis": ""
+            "figureClass": "Figure2dLine"
         },
         {
             "xAxis": "x",
             "yAxis": "y",
-            "zAxis": ""
+            "figureClass": "Figure2dLine"
         },
         {
             "xAxis": "px",
             "yAxis": "py",
-            "zAxis": ""
+            "figureClass": "Figure2dLine"
         }
     ]
 }

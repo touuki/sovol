@@ -13,21 +13,21 @@ html
       link(rel="stylesheet", href="https://static.touuki.com/fontawesome/css/all.css")
     title Sovol - A Wasm/CLI Program of Relativistic Particle Tracking in EM Field
     script(src="https://static.touuki.com/js/jquery-3.4.1.min.js")
-    script(src="https://static.touuki.com/js/echarts.min.js")
-    script(src="https://static.touuki.com/js/echarts-gl.min.js")
-    script(src="https://static.touuki.com/js/ecStat.min.js")
-    script(src="https://static.touuki.com/js/dataTool.min.js")
     script(src="https://static.touuki.com/js/masonry.pkgd.min.js")
     if test
+      script(src="echarts.min.js")
+      script(src="echarts-gl.min.js")
       script(src="libsovol-wasm.js")
-      script(src="common.dev.js")
-      script(src="figure.dev.js")
-      script(src="script.dev.js")
+      script(src="common.js")
+      script(src="figure.js")
+      script(src="script.js")
     else
+      script(src="https://static.touuki.com/js/echarts.min.js")
+      script(src="https://static.touuki.com/js/echarts-gl.min.js")
       script(src="/js/libsovol-wasm.js")
-      script(src="/js/common.prod.js")
-      script(src="/js/figure.prod.js")
-      script(src="/js/script.prod.js")
+      script(src="/js/common.js")
+      script(src="/js/figure.js")
+      script(src="/js/script.js")
     script.
       $(function(){setTimeout(function(){initSim.start()}, 1000)});
   body
@@ -300,12 +300,30 @@ html
                 label(for="zAxis") z-axis
             tr
               td
-                select#xAxis
+                select#xAxis.axis
               td
-                select#yAxis
+                select#yAxis.axis
               td
-                select#zAxis
-                  option(value="") (Blank)
+                select#zAxis.axis
+          table.input-table
+            tr
+              td
+                label(for="cAxis") color-axis
+              td
+                label(for="color") color
+              td
+                label(for="figureClass") Class
+            tr
+              td
+                select#cAxis.axis
+              td
+                input#color(type="text", value="['#0000FF', 'rgba(255,0,0,1)']")
+              td
+                select#figureClass
+                  option(value="Figure2dLine") Line
+                  option(value="Figure3dLine") Line3D
+                  option(value="Figure2dScatter") Scatter
+                  option(value="Figure3dScatter") Scatter3D
           table.input-table
             tr
               td

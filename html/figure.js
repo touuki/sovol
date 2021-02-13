@@ -1,32 +1,27 @@
 
 class Figure {
-  constructor(plot, id, axes) {
+  constructor(plot, id, options) {
     this.plot = plot;
     this.id = id;
-    this.initSeries();
+    this.plot.setOption({
+      animation: false,
+      backgroundColor: '#fff'
+    })
   }
 
-  initSeries() {
-    this.series = [];
+  static getLabel(variable) {
+    return `${variable.name}${variable.unit ? ` [${variable.unit}]` : ''}`
   }
 
   updateFrame() {
-    this.plot.setOption({ series: this.series })
-  }
-
-  clear() {
-    for (let i = 0; i < this.series.length; i++) {
-      this.series[i] = this.getSeriesElement();
-    }
-    this.updateFrame();
-    this.initSeries();
-  }
-
-  getSeriesElement() {
     throw new Error("Not implement.");
   }
 
-  addData(data, isNewParticle) {
+  clear() {
+    throw new Error("Not implement.");
+  }
+
+  addData(data) {
     throw new Error("Not implement.");
   }
 }
@@ -74,21 +69,50 @@ Figure.variables = {
   }
 };
 
-class Figure2d extends Figure {
-  constructor(plot, id, axes) {
-    super(plot, id, axes);
-    this.x = Figure.variables[axes.x];
-    this.y = Figure.variables[axes.y];
+class FigureLine extends Figure {
+  constructor(plot, id, options) {
+    super(plot, id, options)
+    this.series = []
+  }
+
+  updateFrame() {
+    this.plot.setOption({ series: this.series })
+  }
+
+  clear() {
+    for (let i = 0; i < this.series.length; i++) {
+      this.series[i] = this.getSeriesElement();
+    }
+    this.updateFrame();
+    this.series = []
+  }
+
+  getSeriesElement() {
+    throw new Error("Not implement.");
+  }
+}
+
+class Figure2dLine extends FigureLine {
+  constructor(plot, id, options) {
+    super(plot, id, options);
+    this.x = Figure.variables[options.xAxis];
+    this.y = Figure.variables[options.yAxis];
     this.plot.setOption({
-      tooltip: {},
-      backgroundColor: '#fff',
       xAxis: {
         type: 'value',
-        name: `${this.x.name}${this.x.unit ? ` [${this.x.unit}]` : ''}`,
+        name: Figure.getLabel(this.x),
+        nameLocation: 'center',
+        axisLine: {
+          onZero: false
+        }
       },
       yAxis: {
         type: 'value',
-        name: `${this.y.name}${this.y.unit ? ` [${this.y.unit}]` : ''}`,
+        name: Figure.getLabel(this.y),
+        nameLocation: 'center',
+        axisLine: {
+          onZero: false
+        }
       }
     });
   }
@@ -104,36 +128,47 @@ class Figure2d extends Figure {
     };
   }
 
-  addData(data, isNewParticle) {
-    if (isNewParticle) {
+  addData(data) {
+    if (data.isNewParticle) {
       this.series.push(this.getSeriesElement());
     }
-    const x = this.x.processData(data);
-    const y = this.y.processData(data);
+    const x = this.x.processData(data.data);
+    const y = this.y.processData(data.data);
     this.series[this.series.length - 1].data.push([x, y]);
   }
 }
 
-class Figure3d extends Figure {
-  constructor(plot, id, axes) {
-    super(plot, id, axes);
-    this.x = Figure.variables[axes.x];
-    this.y = Figure.variables[axes.y];
-    this.z = Figure.variables[axes.z];
+
+class Figure3dLine extends FigureLine {
+  constructor(plot, id, options) {
+    super(plot, id, options);
+    this.x = Figure.variables[options.xAxis];
+    this.y = Figure.variables[options.yAxis];
+    this.z = Figure.variables[options.zAxis];
     this.plot.setOption({
-      tooltip: {},
-      backgroundColor: '#fff',
       xAxis3D: {
         type: 'value',
-        name: `${this.x.name}${this.x.unit ? ` [${this.x.unit}]` : ''}`,
+        name: Figure.getLabel(this.x),
+        nameLocation: 'center',
+        axisLine: {
+          onZero: false
+        }
       },
       yAxis3D: {
         type: 'value',
-        name: `${this.y.name}${this.y.unit ? ` [${this.y.unit}]` : ''}`,
+        name: Figure.getLabel(this.y),
+        nameLocation: 'center',
+        axisLine: {
+          onZero: false
+        }
       },
       zAxis3D: {
         type: 'value',
-        name: `${this.z.name}${this.z.unit ? ` [${this.z.unit}]` : ''}`,
+        name: Figure.getLabel(this.z),
+        nameLocation: 'center',
+        axisLine: {
+          onZero: false
+        }
       },
       grid3D: {
         viewControl: {
@@ -153,13 +188,164 @@ class Figure3d extends Figure {
     };
   }
 
-  addData(data, isNewParticle) {
-    if (isNewParticle) {
+  addData(data) {
+    if (data.isNewParticle) {
       this.series.push(this.getSeriesElement());
     }
-    const x = this.x.processData(data);
-    const y = this.y.processData(data);
-    const z = this.z.processData(data);
+    const x = this.x.processData(data.data);
+    const y = this.y.processData(data.data);
+    const z = this.z.processData(data.data);
     this.series[this.series.length - 1].data.push([x, y, z]);
+  }
+}
+
+class FigureScatter extends Figure {
+  constructor(plot, id, options) {
+    super(plot, id, options)
+    this.plot.setOption({
+      visualMap: [{
+        right: 10,
+        top: 'center',
+        inRange: {
+          color: options.color ? eval(options.color) : ['rgba(0,0,255,1)', 'rgba(255,0,0,1)']
+        }
+      }]
+    })
+  }
+
+  updateFrame() {
+    typeof this.min !== 'undefined' && this.plot.setOption({
+      visualMap: [{
+        min: this.min,
+        max: this.max
+      }]
+    })
+    this.plot.resize()
+  }
+
+  clear() {
+    this.min = undefined
+    this.max = undefined
+    this.plot.setOption({ series: [{ data: [] }] })
+    this.updateFrame();
+  }
+}
+
+class Figure2dScatter extends FigureScatter {
+  constructor(plot, id, options) {
+    super(plot, id, options);
+    this.x = Figure.variables[options.xAxis]
+    this.y = Figure.variables[options.yAxis]
+    this.c = Figure.variables[options.cAxis]
+    this.plot.setOption({
+      visualMap: [{
+        text: [Figure.getLabel(this.c)]
+      }],
+      xAxis: {
+        type: 'value',
+        name: Figure.getLabel(this.x),
+        nameLocation: 'center',
+        axisLine: {
+          onZero: false
+        }
+      },
+      yAxis: {
+        type: 'value',
+        name: Figure.getLabel(this.y),
+        nameLocation: 'center',
+        axisLine: {
+          onZero: false
+        }
+      },
+      series: [{
+        type: 'scatter',
+        //symbolSize: 1,
+        data: [],
+        large: true,
+        largeThreshold: 2000
+      }]
+    });
+  }
+
+  addData(data) {
+    if (data.endtimeReached) {
+      const x = this.x.processData(data.data);
+      const y = this.y.processData(data.data);
+      const c = this.c.processData(data.data);
+      if (typeof this.max === 'undefined' || c > this.max) {
+        this.max = c;
+      }
+      if (typeof this.min === 'undefined' || c < this.min) {
+        this.min = c;
+      }
+      this.plot.appendData({ seriesIndex: 0, data: [[x, y, c]] })
+    }
+  }
+}
+
+class Figure3dScatter extends FigureScatter {
+  constructor(plot, id, options) {
+    super(plot, id, options);
+    this.x = Figure.variables[options.xAxis]
+    this.y = Figure.variables[options.yAxis]
+    this.z = Figure.variables[options.zAxis]
+    this.c = Figure.variables[options.cAxis]
+    this.plot.setOption({
+      visualMap: [{
+        text: [Figure.getLabel(this.c)]
+      }],
+      xAxis3D: {
+        type: 'value',
+        name: Figure.getLabel(this.x),
+        nameLocation: 'center',
+        axisLine: {
+          onZero: false
+        }
+      },
+      yAxis3D: {
+        type: 'value',
+        name: Figure.getLabel(this.y),
+        nameLocation: 'center',
+        axisLine: {
+          onZero: false
+        }
+      },
+      zAxis3D: {
+        type: 'value',
+        name: Figure.getLabel(this.z),
+        nameLocation: 'center',
+        axisLine: {
+          onZero: false
+        }
+      },
+      grid3D: {
+        viewControl: {
+          projection: 'orthographic'
+        }
+      },
+      series: [{
+        type: 'scatter3D',
+        //symbolSize: 1,
+        data: [],
+        large: true,
+        largeThreshold: 2000
+      }]
+    });
+  }
+
+  addData(data) {
+    if (data.endtimeReached) {
+      const x = this.x.processData(data.data);
+      const y = this.y.processData(data.data);
+      const z = this.z.processData(data.data);
+      const c = this.c.processData(data.data);
+      if (typeof this.max === 'undefined' || c > this.max) {
+        this.max = c;
+      }
+      if (typeof this.min === 'undefined' || c < this.min) {
+        this.min = c;
+      }
+      this.plot.appendData({ seriesIndex: 0, data: [[x, y, z, c]] })
+    }
   }
 }

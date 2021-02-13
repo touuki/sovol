@@ -2,7 +2,7 @@ const initSim = new ConditionalExecutor(() => Module && Module.getWasmSimulation
   window.sim = Module.getWasmSimulation("WasmSimulation");
   document.getElementById("start").disabled = '';
 });
-const version = "1.1.1";
+const version = "1.2.0";
 const custom_function = {};
 const figures = {};
 
@@ -22,13 +22,9 @@ $(function () {
       Object.values(figures).forEach(e => e.clear());
       const perfix = 'SC_';
       const obj = {};
-      $('.simulation-input').filter(':visible').each((i, e) => {
-        if ($(e).hasClass('eval')) {
-          obj[`${perfix}${e.id}`] = eval(e.value).toString();
-        } else {
-          obj[`${perfix}${e.id}`] = e.value.toString();
-        }
-      });
+      $('.simulation-input').filter(':visible').each((i, e) =>
+        obj[`${perfix}${e.id}`] = $(e).hasClass('eval') ? eval(e.value).toString() : e.value.toString()
+      );
       if (obj[`${perfix}FIELD_CLASSNAME`] == 'CustomField') {
         const arguments_string = $('#arguments_table').children().map(function (i, e) {
           return `var ${$(e).find('.customfield-argument-key').val()} = ${$(e).find('.customfield-argument-value').val()};`;
@@ -63,12 +59,8 @@ $(function () {
         return;
       }
       if (data.data) {
-        if (data.isNewParticle) {
-          Object.values(figures).forEach(e => e.addData(data.data, true));
-        } else {
-          Object.values(figures).forEach(e => e.addData(data.data));
-        }
-        i++;
+        Object.values(figures).forEach(e => e.addData(data))
+        i++
       }
     }
     Object.values(figures).forEach(e => e.updateFrame());
@@ -93,20 +85,17 @@ $(function () {
 
   $('#FIELD_CLASSNAME').change();
 
-  $('#particles_plots_input select').each((i, e) => {
+  $('#particles_plots_input select.axis').each((i, e) => {
     for (const key in Figure.variables) {
       $(e).append(`<option value="${key}">${Figure.variables[key].name}</option>`);
     }
   });
 
-  function addParticlesPlot(axes) {
+  function addParticlesPlot(options) {
     const id = `particles_plot_${Math.random().toString().substr(-8)}`;
     const element = $(
       `<div class="masonry-item light-background">
-        <div class="table-title">${axes.z ? `${Figure.variables[axes.x].name}-${
-        Figure.variables[axes.y].name}-${Figure.variables[axes.z].name}` :
-        `${Figure.variables[axes.x].name}-${Figure.variables[axes.y].name}`}</div>
-        <div class="figure" id="${id}" data-x-axis="${axes.x}" data-y-axis="${axes.y}" data-z-axis="${axes.z}"></div>
+        <div class="figure" id="${id}"></div>
         <table class="input-table">
           <tr>
             <td>
@@ -117,19 +106,22 @@ $(function () {
           </tr>
         </table>
       </div>`);
+    for (const key in options) {
+      element.find('.figure')[0].dataset[key] = options[key];
+    }
     $grid.append(element).masonry('appended', element);
     const plot = echarts.init($(`#${id}`)[0]);
-    if (axes.z) {
-      figures[id] = new Figure3d(plot, id, axes);
-    } else {
-      figures[id] = new Figure2d(plot, id, axes);
+
+    const figureClass = eval(options.figureClass)
+    if (Figure.isPrototypeOf(figureClass)) {
+      figures[id] = new figureClass(plot, id, options)
     }
   }
 
   $('#add_particles_plot').click(function () {
-    const inp = {};
-    $('#particles_plots_input').find('input, select').each((i, e) => inp[e.id] = e.value);
-    addParticlesPlot({ x: inp.xAxis, y: inp.yAxis, z: inp.zAxis });
+    const options = {};
+    $('#particles_plots_input').find('input, select').each((i, e) => options[e.id] = e.value);
+    addParticlesPlot(options);
   });
 
   $('body').on('click', '.remove-figure', function () {
@@ -179,13 +171,7 @@ $(function () {
         value: $(e).find('.customfield-argument-value').val()
       };
     }).get();
-    obj.plot_figures = $('.figure').map(function (i, e) {
-      return {
-        xAxis: e.dataset.xAxis,
-        yAxis: e.dataset.yAxis,
-        zAxis: e.dataset.zAxis
-      };
-    }).get();
+    obj.plot_figures = $('.figure').map((i, e) => e.dataset).get();
     funDownload(JSON.stringify(obj), 'sovol_args.json');
   });
 
@@ -219,9 +205,8 @@ $(function () {
       }
       $('.remove-figure').click();
       if (obj.plot_figures instanceof Array) {
-        for (let i = obj.plot_figures.length - 1; i >= 0; i--) {
-          const element = obj.plot_figures[i];
-          addParticlesPlot({ x: element.xAxis, y: element.yAxis, z: element.zAxis });
+        for (const options of obj.plot_figures) {
+          addParticlesPlot(options)
         }
       }
     };

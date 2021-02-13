@@ -53,8 +53,9 @@ val WasmSimulation::runAndGetData(int _id) {
     simulation_status status = simulation->run();
     bool isNewParticle = lastStatus == ENDTIME_REACHED || lastStatus == UNSET;
     switch (status) {
-    case DATA_OUTPUT:
     case ENDTIME_REACHED:
+        result.set("endtimeReached", true);
+    case DATA_OUTPUT:
         result.set("data", getData());
         result.set("isNewParticle", isNewParticle);
         storeData(isNewParticle);
