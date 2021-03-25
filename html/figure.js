@@ -30,37 +30,77 @@ Figure.variables = {
   x: {
     name: "x",
     unit: "c/ω",
-    processData: (data) => data.x,
+    processData: (data) => data.pos.x,
   },
   y: {
     name: "y",
     unit: "c/ω",
-    processData: (data) => data.y,
+    processData: (data) => data.pos.y,
   },
   z: {
     name: "z",
     unit: "c/ω",
-    processData: (data) => data.z,
+    processData: (data) => data.pos.z,
   },
   px: {
     name: "px",
     unit: "m_e c",
-    processData: (data) => data.px,
+    processData: (data) => data.mom.x,
   },
   py: {
     name: "py",
     unit: "m_e c",
-    processData: (data) => data.py,
+    processData: (data) => data.mom.y,
   },
   pz: {
     name: "pz",
     unit: "m_e c",
-    processData: (data) => data.pz,
+    processData: (data) => data.mom.z,
+  },
+  Ex: {
+    name: "Ex",
+    unit: "m_e cω/e",
+    processData: (data) => data.E.x,
+  },
+  Ey: {
+    name: "Ey",
+    unit: "m_e cω/e",
+    processData: (data) => data.E.y,
+  },
+  Ez: {
+    name: "Ez",
+    unit: "m_e cω/e",
+    processData: (data) => data.E.z,
+  },
+  Bx: {
+    name: "Bx",
+    unit: "m_e ω/e",
+    processData: (data) => data.B.x,
+  },
+  By: {
+    name: "By",
+    unit: "m_e ω/e",
+    processData: (data) => data.B.y,
+  },
+  Bz: {
+    name: "Bz",
+    unit: "m_e ω/e",
+    processData: (data) => data.B.z,
   },
   Ek: {
     name: "Ek",
     unit: "m_e c2",
     processData: (data) => data.Ek,
+  },
+  thetax: {
+    name: "θx",
+    unit: "m_e c",
+    processData: (data) => - data.mom.x/data.mom.z,
+  },
+  thetay: {
+    name: "θy",
+    unit: "m_e c",
+    processData: (data) => - data.mom.y/data.mom.z,
   },
   t: {
     name: "t",
@@ -200,25 +240,19 @@ class Figure3dLine extends FigureLine {
 }
 
 class FigureScatter extends Figure {
-  constructor(plot, id, options) {
-    super(plot, id, options)
-    this.plot.setOption({
-      visualMap: [{
-        right: 10,
-        top: 'center',
-        inRange: {
-          color: options.color ? eval(options.color) : ['rgba(0,0,255,1)', 'rgba(255,0,0,1)']
-        }
-      }]
-    })
-  }
 
   updateFrame() {
-    typeof this.min !== 'undefined' && this.plot.setOption({
+    this.plot.setOption({
       visualMap: [{
-        min: this.min,
-        max: this.max
-      }]
+        min: typeof this.min !== 'undefined' ? this.min : 0,
+        max: typeof this.max !== 'undefined' ? this.max : 200
+      }],
+      title: {
+        left: 'center',
+        text: `${this.c.name}:[${typeof this.min !== 'undefined'
+          && this.min.toExponential(2)},${typeof this.max !== 'undefined'
+          && this.max.toExponential(2)}]`
+      },
     })
     this.plot.resize()
   }
@@ -239,8 +273,17 @@ class Figure2dScatter extends FigureScatter {
     this.c = Figure.variables[options.cAxis]
     this.plot.setOption({
       visualMap: [{
-        text: [Figure.getLabel(this.c)]
+        text: [Figure.getLabel(this.c)],
+        right: 10,
+        top: 'center',
+        inRange: {
+          color: options.color ? eval(options.color) : ['rgba(0,0,255,1)', 'rgba(255,0,0,1)']
+        }
       }],
+      title: {
+        left: 'center',
+        text: `${this.c.name}:[NaN,NaN]`
+      },
       xAxis: {
         type: 'value',
         name: Figure.getLabel(this.x),
@@ -292,8 +335,17 @@ class Figure3dScatter extends FigureScatter {
     this.c = Figure.variables[options.cAxis]
     this.plot.setOption({
       visualMap: [{
-        text: [Figure.getLabel(this.c)]
+        text: [Figure.getLabel(this.c)],
+        right: 10,
+        top: 'center',
+        inRange: {
+          color: options.color ? eval(options.color) : ['rgba(0,0,255,1)', 'rgba(255,0,0,1)']
+        }
       }],
+      title: {
+        left: 'center',
+        text: `${this.c.name}:[NaN,NaN]`
+      },
       xAxis3D: {
         type: 'value',
         name: Figure.getLabel(this.x),
@@ -326,9 +378,7 @@ class Figure3dScatter extends FigureScatter {
       series: [{
         type: 'scatter3D',
         //symbolSize: 1,
-        data: [],
-        large: true,
-        largeThreshold: 2000
+        data: []
       }]
     });
   }

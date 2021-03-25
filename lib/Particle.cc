@@ -3,7 +3,7 @@
 
 REGISTER_MULTITON(Particle, Particle)
 
-Particle::Particle() : charge(-1.), mass(1.) {};
+Particle::Particle() : charge(-1.), mass(1.){};
 
 Particle::Particle(const Vector3<double> &_position,
                    const Vector3<double> &_momentum, double _charge,

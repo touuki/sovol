@@ -14,6 +14,10 @@ class WasmSimulation {
     emscripten::val storedData;
     virtual void storeData(bool isNewParticle);
     virtual emscripten::val getData() const;
+    static void storeVector(emscripten::val object, const char *key,
+                            Vector3<double> &vector, bool asArray = false);
+    static void storeScalar(emscripten::val object, const char *key, double scalar,
+                            bool asArray = false);
 
   public:
     WasmSimulation();

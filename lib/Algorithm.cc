@@ -9,6 +9,7 @@ void RungeKuttaAlgorithm::operator()(Particle *part, const Field &field,
                                      double time, double dt) const {
     double halfStep = .5 * dt;
     EMField em = field(part->position, time);
+    part->em = em;
     Vector3<double> dxdt1 = Utils::velocity(part->momentum, part->mass);
     Vector3<double> dpdt1 = Utils::lorentzForce(part->charge, dxdt1, em);
 
@@ -46,6 +47,7 @@ void LeapfrogAlgorithm::operator()(Particle *part, const Field &field,
     Vector3<double> s = 2. / (1. + t.square()) * t;
     Vector3<double> pPrime = pMinus + pMinus.cross(t);
     Vector3<double> pPlus = pMinus + pPrime.cross(s);
+    part->em = em;
     part->momentum = pPlus + part->charge * halfStep * em.e;
     part->position += Utils::velocity(part->momentum, part->mass) * halfStep;
 };

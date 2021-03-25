@@ -2,6 +2,7 @@
 #define _SOVOL_PARTICLE_HH 1
 
 #include "FactoryHelper.hh"
+#include "Field.hh"
 #include "Vector3.hh"
 
 class Particle {
@@ -9,6 +10,7 @@ class Particle {
     virtual ~Particle();
     Vector3<double> position;
     Vector3<double> momentum;
+    EMField em;
     double charge;
     double mass;
 

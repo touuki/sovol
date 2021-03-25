@@ -76,14 +76,12 @@ val WasmSimulation::runAndGetData(int _id) {
 val WasmSimulation::getData() const {
     val result = val::object();
     std::shared_ptr<Particle> particle = simulation->getParticle();
-    result.set("t", simulation->getCurrentTime());
-    result.set("x", particle->position.x);
-    result.set("y", particle->position.y);
-    result.set("z", particle->position.z);
-    result.set("px", particle->momentum.x);
-    result.set("py", particle->momentum.y);
-    result.set("pz", particle->momentum.z);
-    result.set("Ek", Utils::kineticEnergy(particle->momentum, particle->mass));
+    storeScalar(result, "t", simulation->getCurrentTime());
+    storeVector(result, "pos", particle->position);
+    storeVector(result, "mom", particle->momentum);
+    storeVector(result, "E", particle->em.e);
+    storeVector(result, "B", particle->em.b);
+    storeScalar(result, "Ek", Utils::kineticEnergy(particle->momentum, particle->mass));
     return result;
 };
 
@@ -91,26 +89,59 @@ void WasmSimulation::storeData(bool isNewParticle) {
     val particles = storedData["particles"];
     if (isNewParticle) {
         val obj = val::object();
-        obj.set("x", val::array());
-        obj.set("y", val::array());
-        obj.set("z", val::array());
-        obj.set("px", val::array());
-        obj.set("py", val::array());
-        obj.set("pz", val::array());
-        obj.set("t", val::array());
         particles.call<val>("push", obj);
     }
     int length = particles["length"].as<int>();
     val current = particles[length - 1];
     std::shared_ptr<Particle> particle = simulation->getParticle();
-    current["x"].call<double>("push", particle->position.x);
-    current["y"].call<double>("push", particle->position.y);
-    current["z"].call<double>("push", particle->position.z);
-    current["px"].call<double>("push", particle->momentum.x);
-    current["py"].call<double>("push", particle->momentum.y);
-    current["pz"].call<double>("push", particle->momentum.z);
-    current["t"].call<double>("push", simulation->getCurrentTime());
+    storeVector(current, "pos", particle->position, true);
+    storeVector(current, "mom", particle->momentum, true);
+    storeVector(current, "E", particle->em.e, true);
+    storeVector(current, "B", particle->em.b, true);
+    storeScalar(current, "t", simulation->getCurrentTime(), true);
 };
+
+void WasmSimulation::storeVector(val r, const char *s, Vector3<double> &v,
+               bool asArray) {
+    if (asArray) {
+        if (r.hasOwnProperty(s)) {
+            val o = r[s];
+            o["x"].call<double>("push", v.x);
+            o["y"].call<double>("push", v.y);
+            o["z"].call<double>("push", v.z);
+        } else {
+            val o = val::object();
+            o.set("x", val::array());
+            o.set("y", val::array());
+            o.set("z", val::array());
+            o["x"].call<double>("push", v.x);
+            o["y"].call<double>("push", v.y);
+            o["z"].call<double>("push", v.z);
+            r.set(s, o);
+        }
+    } else {
+        val o = val::object();
+        o.set("x", v.x);
+        o.set("y", v.y);
+        o.set("z", v.z);
+        r.set(s, o);
+    }
+}
+
+void WasmSimulation::storeScalar(val r, const char *s, double v,
+               bool asArray) {
+    if (asArray) {
+        if (r.hasOwnProperty(s)) {
+            r[s].call<double>("push", v);
+        } else {
+            val a = val::array();
+            a.call<double>("push", v);
+            r.set(s, a);
+        }
+    } else {
+        r.set(s, v);
+    }
+}
 
 EMSCRIPTEN_BINDINGS(module) {
     function("getWasmSimulation", &WasmSimulationFactory::createObject);
