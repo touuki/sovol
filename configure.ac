@@ -15,11 +15,14 @@ AC_PROG_RANLIB
 # Checks for libraries.
 
 # Checks for header files.
+AC_CHECK_HEADER_STDBOOL
 
 # Checks for typedefs, structures, and compiler characteristics.
+AC_C_INLINE
+AC_TYPE_INT32_T
 
 # Checks for library functions.
-# AC_CHECK_FUNCS([pow sqrt])
+AC_CHECK_FUNCS([pow sqrt setenv])
 
 AC_CONFIG_FILES([Makefile lib/Makefile cli/Makefile wasm/Makefile])
 AC_OUTPUT
