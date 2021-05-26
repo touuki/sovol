@@ -99,6 +99,7 @@ void WasmSimulation::storeData(bool isNewParticle) {
     storeVector(current, "E", particle->em.e, true);
     storeVector(current, "B", particle->em.b, true);
     storeScalar(current, "t", simulation->getCurrentTime(), true);
+    storeScalar(current, "Ek", Utils::kineticEnergy(particle->momentum, particle->mass), true);
 };
 
 void WasmSimulation::storeVector(val r, const char *s, Vector3<double> &v,
