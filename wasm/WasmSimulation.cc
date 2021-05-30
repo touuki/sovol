@@ -34,6 +34,7 @@ void WasmSimulation::init(val params) {
     lastStatus = UNSET;
     storedData = val::object();
     storedData.set("particles", val::array());
+    storedData.set("inputs", params);
 };
 
 val WasmSimulation::getStoredData() const { return storedData; };

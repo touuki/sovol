@@ -1,4 +1,4 @@
--var test = true
+-var test = false
 
 doctype html
 html
@@ -25,16 +25,16 @@ html
       script(src="https://static.touuki.com/js/echarts.min.js")
       script(src="https://static.touuki.com/js/echarts-gl.min.js")
       script(src="/js/libsovol-wasm.js")
-      script(src="/js/common.js")
-      script(src="/js/figure.js")
-      script(src="/js/script.js")
+      script(src="/js/common.prod.js")
+      script(src="/js/figure.prod.js")
+      script(src="/js/script.prod.js")
     script.
       $(function(){setTimeout(function(){initSim.start()}, 1000)});
   body
     .overflow-wrapper
       .masonry
         .masonry-item.buttons
-          a.button.is-blue(href="https://github.com/touuki/sovol/blob/master/USAGE.md" target="_blank", rel="noopener noreferrer")
+          a.button.is-blue(href="https://github.com/touuki/sovol/blob/master/README.md" target="_blank", rel="noopener noreferrer")
             span.icon
               i.fas.fa-book
             span Usage
