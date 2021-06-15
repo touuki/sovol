@@ -7,6 +7,7 @@ include_HEADERS = \
     Particle.hh \
     ParticleProducer.hh \
     RealTimeRepeatSimulation.hh \
+    Rotator.hh \
     Utils.hh \
     Vector3.hh
 if WASM

@@ -31,8 +31,7 @@ BeamParticleProducer::BeamParticleProducer(
     : className(_className), charge(_charge), mass(std::fabs(_mass)),
       width(std::fabs(_width)), length(std::fabs(_length)),
       kinetic_energy(std::fabs(_kinetic_energy)), energy_spread(std::fabs(_energy_spread)),
-      angular_divergence(std::fabs(_angular_divergence)), polar_angle(_polar_angle),
-      azimuthal_angle(_azimuthal_angle), translation(_translation),
+      angular_divergence(std::fabs(_angular_divergence)), translation(_translation), rotator(_azimuthal_angle, _polar_angle, 0),
       random_engine(std::default_random_engine(Config::getInt(SOVOL_CONFIG_KEY(RANDOM_SEED), time(NULL)))),
       kinetic_energy_dist(std::normal_distribution(
           kinetic_energy,
@@ -63,7 +62,8 @@ std::shared_ptr<Particle> BeamParticleProducer::createParticle() {
                 position_z_dist(random_engine));
     particle->charge = charge;
     particle->mass = mass;
-    particle->rotate(polar_angle, azimuthal_angle);
+    particle->position = rotator(particle->position);
+    particle->momentum = rotator(particle->momentum);
     particle->translate(translation);
     return particle;
 };

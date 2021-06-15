@@ -17,7 +17,6 @@ class Particle {
     Particle();
     Particle(const Vector3<double> &_position, const Vector3<double> &_momentum,
              double _charge, double _mass);
-    void rotate(double polar_angle, double azimuthal_angle);
     void translate(const Vector3<double> &translation);
 };
 

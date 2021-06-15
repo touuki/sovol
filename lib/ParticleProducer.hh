@@ -4,6 +4,7 @@
 #include "FactoryHelper.hh"
 #include "Particle.hh"
 #include "Vector3.hh"
+#include "Rotator.hh"
 #include <random>
 
 class ParticleProducer {
@@ -24,9 +25,8 @@ class BeamParticleProducer : public ParticleProducer {
     double kinetic_energy;
     double energy_spread;
     double angular_divergence;
-    double polar_angle;
-    double azimuthal_angle;
     Vector3<double> translation;
+    IntrinsicRotator<double> rotator;
 
     std::default_random_engine random_engine;
 
