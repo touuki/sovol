@@ -21,7 +21,7 @@ Makefile
 .deps
 
 #emscripten
-/a.out*
+/a.wasm
 
 #VSCode
 .vscode

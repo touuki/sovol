@@ -1,3 +1,6 @@
+#include <iostream>
+
 int main(int argc, char *const argv[]) {
-    return 0;
+  std::cout << "Only available in Pro version currently." << std::endl;
+  return 0;
 }

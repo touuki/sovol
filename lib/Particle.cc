@@ -1,4 +1,5 @@
 #include "Particle.hh"
+
 #include <cmath>
 
 REGISTER_MULTITON(Particle, Particle)
@@ -13,5 +14,5 @@ Particle::Particle(const Vector3<double> &_position,
 Particle::~Particle(){};
 
 void Particle::translate(const Vector3<double> &translation) {
-    position += translation;
+  position += translation;
 }

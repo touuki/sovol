@@ -1,7 +1,9 @@
 #include "RealTimeRepeatSimulation.hh"
+
+#include <ctime>
+
 #include "Config.hh"
 #include "Utils.hh"
-#include <ctime>
 
 RealTimeRepeatSimulation::RealTimeRepeatSimulation()
     : RealTimeRepeatSimulation(
@@ -27,71 +29,75 @@ RealTimeRepeatSimulation::RealTimeRepeatSimulation(
     std::shared_ptr<ParticleProducer> _particleProducer,
     std::shared_ptr<Algorithm> _algorithm, double _timeStep, double _endTime,
     int _remainingNumber, double _dataInterval, double _dataStartTime)
-    : field(_field), particleProducer(_particleProducer), algorithm(_algorithm),
-      timeStep(std::fabs(_timeStep)), endTime(std::fabs(_endTime)),
+    : field(_field),
+      particleProducer(_particleProducer),
+      algorithm(_algorithm),
+      timeStep(std::fabs(_timeStep)),
+      endTime(std::fabs(_endTime)),
       remainingNumber(_remainingNumber > 1 ? _remainingNumber : 1),
       dataInterval(std::fabs(_dataInterval)),
       dataStartTime(_dataStartTime > endTime ? endTime : _dataStartTime),
-      currentParticle(_particleProducer->createParticle()), currentTime(0.),
+      currentParticle(_particleProducer->createParticle()),
+      currentTime(0.),
       nextDataTime(0.){};
 
 double RealTimeRepeatSimulation::calculateNextDataTime() const {
-    if (currentTime < nextDataTime) {
-        return nextDataTime;
-    }
-    if (currentTime < dataStartTime) {
-        return dataStartTime;
-    }
-    if (dataInterval <= 0.) {
-        return endTime;
-    }
-    if (currentTime < endTime && currentTime + dataInterval < endTime) {
-        return currentTime + dataInterval;
-    }
+  if (currentTime < nextDataTime) {
+    return nextDataTime;
+  }
+  if (currentTime < dataStartTime) {
+    return dataStartTime;
+  }
+  if (dataInterval <= 0.) {
     return endTime;
+  }
+  if (currentTime < endTime && currentTime + dataInterval < endTime) {
+    return currentTime + dataInterval;
+  }
+  return endTime;
 };
 
-std::shared_ptr<Particle> RealTimeRepeatSimulation::getParticle() const {
-    return currentParticle;
+Particle* RealTimeRepeatSimulation::getParticle() const {
+  return currentParticle.get();
 };
 
 double RealTimeRepeatSimulation::getCurrentTime() const { return currentTime; };
 
-std::shared_ptr<Algorithm> RealTimeRepeatSimulation::getAlgorithm() const {
-    return algorithm;
+Algorithm* RealTimeRepeatSimulation::getAlgorithm() const {
+  return algorithm.get();
 };
 
 simulation_status RealTimeRepeatSimulation::run(int32_t maxIterationTimes) {
-    if (remainingNumber <= 0) {
-        return FINISHED;
-    }
+  if (remainingNumber <= 0) {
+    return FINISHED;
+  }
 
-    if (currentTime >= endTime) {
-        currentParticle = particleProducer->createParticle();
-        currentTime = 0.;
-        nextDataTime = 0.;
-    }
+  if (currentTime >= endTime) {
+    currentParticle = particleProducer->createParticle();
+    currentTime = 0.;
+    nextDataTime = 0.;
+  }
 
-    if (maxIterationTimes < 0) {
-        maxIterationTimes = INT32_MAX;
-    }
+  if (maxIterationTimes < 0) {
+    maxIterationTimes = INT32_MAX;
+  }
 
-    nextDataTime = calculateNextDataTime();
+  nextDataTime = calculateNextDataTime();
 
-    for (int32_t i = 0; currentTime < nextDataTime && i < maxIterationTimes;
-         i++) {
-        (*algorithm)(currentParticle.get(), *field, currentTime, timeStep);
-        currentTime += timeStep;
-    }
+  for (int32_t i = 0; currentTime < nextDataTime && i < maxIterationTimes;
+       i++) {
+    (*algorithm)(currentParticle.get(), *field, currentTime, timeStep);
+    currentTime += timeStep;
+  }
 
-    if (currentTime >= endTime) {
-        remainingNumber--;
-        return ENDTIME_REACHED;
-    }
+  if (currentTime >= endTime) {
+    remainingNumber--;
+    return ENDTIME_REACHED;
+  }
 
-    if (currentTime < nextDataTime) {
-        return MAX_ITERATION_TIMES_REACHED;
-    }
+  if (currentTime < nextDataTime) {
+    return MAX_ITERATION_TIMES_REACHED;
+  }
 
-    return DATA_OUTPUT;
+  return DATA_OUTPUT;
 };
