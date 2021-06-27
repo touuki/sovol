@@ -7,11 +7,8 @@
 #include "Vector3.hh"
 
 class Utils {
- private:
-  static std::default_random_engine e;
-  static std::uniform_real_distribution<double> dist;
-
  public:
+  static thread_local std::mt19937 e;
   template <typename T>
   static T factorial(T n) {
     if (n < 0) {
@@ -35,14 +32,12 @@ class Utils {
   static double generLaguePoly(int alpha, int k, double value);
 };
 
-inline double Utils::random(double min, double max) {
-  return min + (max - min) * dist(e);
-};
-
 // See http://mathworld.wolfram.com/SpherePointPicking.html
 inline Vector3<double> Utils::randomOnSphere() {
-  double theta = random(0., 2 * M_PI);
-  double u = random(-1., 1.);
+  static std::uniform_real_distribution<double> rand_theta(0., 2 * M_PI);
+  static std::uniform_real_distribution<double> rand_u(-1., 1.);
+  double theta = rand_theta(e);
+  double u = rand_u(e);
   return Vector3(std::sqrt(1. - std::pow(u, 2)) * std::cos(theta),
                  std::sqrt(1. - std::pow(u, 2)) * std::sin(theta), u);
 };

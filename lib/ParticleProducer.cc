@@ -3,6 +3,7 @@
 #include <ctime>
 
 #include "Config.hh"
+#include "Utils.hh"
 #include "Vector3.hh"
 
 ParticleProducer::~ParticleProducer(){};
@@ -40,8 +41,6 @@ BeamParticleProducer::BeamParticleProducer(
       angular_divergence(std::fabs(_angular_divergence)),
       translation(_translation),
       rotator(_azimuthal_angle, _polar_angle, 0),
-      random_engine(std::default_random_engine(
-          Config::getInt(SOVOL_CONFIG_KEY(RANDOM_SEED), time(NULL)))),
       kinetic_energy_dist(std::normal_distribution(
           kinetic_energy, kinetic_energy * energy_spread /
                               (100. * 2. * std::sqrt(2. * M_LN2)))),
@@ -55,20 +54,20 @@ BeamParticleProducer::BeamParticleProducer(
 
 std::shared_ptr<Particle> BeamParticleProducer::createParticle() {
   std::shared_ptr<Particle> particle = ParticleFactory::createObject(className);
-  double Ek = kinetic_energy_dist(random_engine);
-  while (Ek < 0.) Ek = kinetic_energy_dist(random_engine);
+  double Ek = kinetic_energy_dist(Utils::e);
+  while (Ek < 0.) Ek = kinetic_energy_dist(Utils::e);
 
   double p = std::sqrt(std::pow(Ek + mass, 2) - std::pow(mass, 2));
-  double theta_x = momentum_theta_x_dist(random_engine);
-  double theta_y = momentum_theta_y_dist(random_engine);
+  double theta_x = momentum_theta_x_dist(Utils::e);
+  double theta_y = momentum_theta_y_dist(Utils::e);
   double theta = std::sqrt(std::pow(theta_x, 2) + std::pow(theta_y, 2));
   double phi = std::atan2(theta_y, theta_x);
   particle->momentum =
       Vector3(p * std::sin(theta) * std::cos(phi),
               p * std::sin(theta) * std::sin(phi), p * std::cos(theta));
   particle->position =
-      Vector3(position_x_dist(random_engine), position_y_dist(random_engine),
-              position_z_dist(random_engine));
+      Vector3(position_x_dist(Utils::e), position_y_dist(Utils::e),
+              position_z_dist(Utils::e));
   particle->charge = charge;
   particle->mass = mass;
   particle->position = rotator(particle->position);

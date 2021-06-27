@@ -29,8 +29,6 @@ class BeamParticleProducer : public ParticleProducer {
   Vector3<double> translation;
   IntrinsicRotator<double> rotator;
 
-  std::default_random_engine random_engine;
-
   std::normal_distribution<double> kinetic_energy_dist;
 
   std::normal_distribution<double> position_x_dist;
