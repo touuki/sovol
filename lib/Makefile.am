@@ -1,6 +1,7 @@
 include_HEADERS = \
     Algorithm.hh \
     Config.hh \
+    Distribution.hh \
     FactoryHelper.hh \
     Field.hh \
     LaguerreGaussianPulseField.hh \

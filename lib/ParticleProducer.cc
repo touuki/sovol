@@ -37,13 +37,16 @@ BeamParticleProducer::BeamParticleProducer(
       width(std::fabs(_width)),
       length(std::fabs(_length)),
       kinetic_energy(std::fabs(_kinetic_energy)),
-      energy_spread(std::fabs(_energy_spread)),
+      energy_spread(_energy_spread),
       angular_divergence(std::fabs(_angular_divergence)),
       translation(_translation),
       rotator(_azimuthal_angle, _polar_angle, 0),
-      kinetic_energy_dist(std::normal_distribution(
-          kinetic_energy, kinetic_energy * energy_spread /
-                              (100. * 2. * std::sqrt(2. * M_LN2)))),
+      kinetic_energy_dist(
+          _energy_spread < 0
+              ? Distribution(std::uniform_real_distribution(0., kinetic_energy))
+              : Distribution(std::normal_distribution(
+                    kinetic_energy, kinetic_energy * energy_spread /
+                                        (100. * 2. * std::sqrt(2. * M_LN2))))),
       position_x_dist(std::normal_distribution(0., width * 0.25)),
       position_y_dist(std::normal_distribution(0., width * 0.25)),
       position_z_dist(std::uniform_real_distribution(-length, 0.)),

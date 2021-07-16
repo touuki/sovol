@@ -3,6 +3,7 @@
 
 #include <random>
 
+#include "Distribution.hh"
 #include "FactoryHelper.hh"
 #include "Particle.hh"
 #include "Rotator.hh"
@@ -29,7 +30,7 @@ class BeamParticleProducer : public ParticleProducer {
   Vector3<double> translation;
   IntrinsicRotator<double> rotator;
 
-  std::normal_distribution<double> kinetic_energy_dist;
+  Distribution<double> kinetic_energy_dist;
 
   std::normal_distribution<double> position_x_dist;
   std::normal_distribution<double> position_y_dist;
