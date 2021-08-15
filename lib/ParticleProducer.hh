@@ -18,7 +18,7 @@ class ParticleProducer {
 DEFINE_FACTORY(ParticleProducer)
 
 class BeamParticleProducer : public ParticleProducer {
- private:
+ protected:
   std::string className;
   double charge;
   double mass;
