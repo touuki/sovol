@@ -1,14 +1,14 @@
 #ifndef _SOVOL_UTILS_HH
 #define _SOVOL_UTILS_HH 1
 
+#include <ctime>
 #include <random>
 
 #include "Field.hh"
-#include "Vector3.hh"
 
 class Utils {
  public:
-  static thread_local std::mt19937 e;
+  thread_local std::mt19937 e;
   template <typename T>
   static T factorial(T n) {
     if (n < 0) {
@@ -27,10 +27,12 @@ class Utils {
   static Vector3<double> momentum(const Vector3<double> &velocity, double mass);
   static Vector3<double> lorentzForce(double charge,
                                       const Vector3<double> &velocity,
-                                      const EMField &emField);
+                                      const EMField<double> &emField);
   static double kineticEnergy(const Vector3<double> &momentum, double mass);
   static double generLaguePoly(int alpha, int k, double value);
 };
+
+thread_local std::mt19937 Utils::e(time(NULL));
 
 // See http://mathworld.wolfram.com/SpherePointPicking.html
 inline Vector3<double> Utils::randomOnSphere() {
@@ -58,8 +60,8 @@ inline Vector3<double> Utils::momentum(const Vector3<double> &velocity,
 
 inline Vector3<double> Utils::lorentzForce(double charge,
                                            const Vector3<double> &velocity,
-                                           const EMField &em) {
-  return charge * (em.e + velocity.cross(em.b));
+                                           const EMField<double> &em) {
+  return charge * (em.E + velocity.cross(em.B));
 };
 
 inline double Utils::kineticEnergy(const Vector3<double> &momentum,

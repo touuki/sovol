@@ -86,8 +86,8 @@ val WasmSimulation::getData() const {
   storeScalar(result, "t", simulation->getCurrentTime());
   storeVector(result, "pos", particle->position);
   storeVector(result, "mom", particle->momentum);
-  storeVector(result, "E", particle->em.e);
-  storeVector(result, "B", particle->em.b);
+  storeVector(result, "E", particle->em.E);
+  storeVector(result, "B", particle->em.B);
   storeScalar(result, "Ek",
               Utils::kineticEnergy(particle->momentum, particle->mass));
   return result;
@@ -104,8 +104,8 @@ void WasmSimulation::storeData(bool isNewParticle) {
   Particle *particle = simulation->getParticle();
   storeVector(current, "pos", particle->position, true);
   storeVector(current, "mom", particle->momentum, true);
-  storeVector(current, "E", particle->em.e, true);
-  storeVector(current, "B", particle->em.b, true);
+  storeVector(current, "E", particle->em.E, true);
+  storeVector(current, "B", particle->em.B, true);
   storeScalar(current, "t", simulation->getCurrentTime(), true);
   storeScalar(current, "Ek",
               Utils::kineticEnergy(particle->momentum, particle->mass), true);

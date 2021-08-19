@@ -41,14 +41,14 @@ void LeapfrogAlgorithm::operator()(Particle *part, const Field &field,
   part->position += Utils::velocity(part->momentum, part->mass) * halfStep;
   time += halfStep;
   EMField em = field(part->position, time);
-  Vector3<double> pMinus = part->momentum + part->charge * halfStep * em.e;
+  Vector3<double> pMinus = part->momentum + part->charge * halfStep * em.E;
   Vector3<double> t = part->charge * dt /
                       (2. * part->mass * Utils::gamma(pMinus, part->mass)) *
-                      em.b;
+                      em.B;
   Vector3<double> s = 2. / (1. + t.square()) * t;
   Vector3<double> pPrime = pMinus + pMinus.cross(t);
   Vector3<double> pPlus = pMinus + pPrime.cross(s);
   part->em = em;
-  part->momentum = pPlus + part->charge * halfStep * em.e;
+  part->momentum = pPlus + part->charge * halfStep * em.E;
   part->position += Utils::velocity(part->momentum, part->mass) * halfStep;
 };

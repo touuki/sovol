@@ -1,12 +1,12 @@
-#ifndef _SOVOL_FACTORYHELPER_HH
-#define _SOVOL_FACTORYHELPER_HH 1
+#ifndef _SOVOL_WASMFACTORYHELPER_HH
+#define _SOVOL_WASMFACTORYHELPER_HH 1
 
 #include <map>
 #include <memory>
 #include <string>
 
 #define DEFINE_FACTORY(base_name)                                          \
-  typedef std::shared_ptr<base_name> (*base_name##Constructor)();          \
+  typedef std::shared_ptr<base_name> (*base_name##Constructor)(val v);     \
   class base_name##Factory {                                               \
    public:                                                                 \
     static void registerClass(const std::string &className,                \
@@ -14,8 +14,8 @@
       constructors()[className] = constructor;                             \
     }                                                                      \
                                                                            \
-    static std::shared_ptr<base_name> createObject(                        \
-        const std::string &className) {                                    \
+    static std::shared_ptr<base_name> createObject(val v) {                \
+      std::string className = v["name"].as<std::string>();                 \
       base_name##Constructor constructor = nullptr;                        \
       if (constructors().find(className) != constructors().end())          \
         constructor = constructors().find(className)->second;              \
@@ -24,7 +24,7 @@
                   << className << " is not found." << std::endl;           \
         return nullptr;                                                    \
       }                                                                    \
-      return (*constructor)();                                             \
+      return (*constructor)(v);                                            \
     }                                                                      \
                                                                            \
    private:                                                                \
@@ -41,8 +41,8 @@
       base_name##Factory::registerClass(#class_name,                       \
                                         class_name##Helper::creatObjFunc); \
     }                                                                      \
-    static std::shared_ptr<base_name> creatObjFunc() {                     \
-      return std::make_shared<class_name>();                               \
+    static std::shared_ptr<base_name> creatObjFunc(val v) {                \
+      return std::make_shared<class_name>(v);                              \
     }                                                                      \
   };                                                                       \
   class_name##Helper class_name##helper;
@@ -54,7 +54,7 @@
       base_name##Factory::registerClass(#class_name,                       \
                                         class_name##Helper::creatObjFunc); \
     }                                                                      \
-    static std::shared_ptr<base_name> creatObjFunc() {                     \
+    static std::shared_ptr<base_name> creatObjFunc(val v) {                \
       if (instance == nullptr) instance = std::make_shared<class_name>();  \
       return instance;                                                     \
     }                                                                      \

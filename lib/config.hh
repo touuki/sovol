@@ -1,13 +1,23 @@
 #ifndef _SOVOL_CONFIG_HH
 #define _SOVOL_CONFIG_HH 1
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten/val.h>
+
+#include "WasmFactoryHelper.hh"
+using namespace emscripten;
+#else
+#include "Lua.hh"
+#include "LuaFactoryHelper.hh"
+#endif
+
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 
 #define SOVOL_CONFIG_KEY(key) "SC_" #key
 
-class Config {
+class Env {
  public:
   static bool getBool(const char *key, bool defaultValue = false) {
     const char *value;

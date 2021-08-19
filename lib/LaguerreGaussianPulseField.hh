@@ -21,6 +21,7 @@ class LaguerreGaussianPulseField : public Field {
   int l;
   double h;
   double iphase;
+  double k; // 2 * PI / lambda
 
   std::complex<double> amplitude(double x, double y, double z) const;
   double envelope(double x, double y, double z, double time) const;
@@ -29,8 +30,9 @@ class LaguerreGaussianPulseField : public Field {
   LaguerreGaussianPulseField();
   LaguerreGaussianPulseField(double _a0, double _tau, double _w0,
                              double _ey = 0., double _delay = 0., int _p = 0,
-                             int _l = 0, double _h = 0.5, double _iphase = 0);
-  EMField operator()(double x, double y, double z, double time) const override;
+                             int _l = 0, double _h = 0.5, double _iphase = 0,
+                             double _k = 1.);
+  EMField<double> operator()(double x, double y, double z, double time) const override;
 };
 
 #endif

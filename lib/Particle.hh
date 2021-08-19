@@ -10,7 +10,7 @@ class Particle {
   virtual ~Particle();
   Vector3<double> position;
   Vector3<double> momentum;
-  EMField em;
+  EMField<double> em;
   double charge;
   double mass;
 
