@@ -18,7 +18,7 @@ field = {
             shifters = {
                 {
                     name = "FieldRotator",
-                    center = {0, 0, 2}
+                    center = {0, 0, 2},
                     rotator = {
                         name = "IntrinsicRotator",
                         alpha = math.pi / 2,
@@ -34,7 +34,7 @@ field = {
         },
         {
             name = "CustomField",
-            function_name = "custom_field"
+            global_function_name = "custom_field"
         }
     }
 }

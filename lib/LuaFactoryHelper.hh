@@ -6,17 +6,15 @@
 #include <string>
 
 #define DEFINE_FACTORY(base_name)                                            \
-  typedef std::shared_ptr<base_name> (*base_name##Constructor)(lua_State *); \
+  typedef std::shared_ptr<base_name> (*base_name##Constructor)(Lua &); \
   class base_name##Factory {                                                 \
    public:                                                                   \
     static void registerClass(const std::string &className,                  \
                               base_name##Constructor constructor) {          \
       constructors()[className] = constructor;                               \
     }                                                                        \
-    static std::shared_ptr<base_name> createObject(lua_State *L) {           \
-      lua_getfield(L, -1, "name");                                           \
-      std::string className = lua_tostring(L, -1);                           \
-      lua_pop(L, 1);                                                         \
+    static std::shared_ptr<base_name> createObject(Lua &lua) {         \
+      std::string className = lua.getField<std::string>("name");             \
       base_name##Constructor constructor = nullptr;                          \
       if (constructors().find(className) != constructors().end())            \
         constructor = constructors().find(className)->second;                \
@@ -25,7 +23,7 @@
                   << className << " is not found." << std::endl;             \
         return nullptr;                                                      \
       }                                                                      \
-      return (*constructor)(L);                                              \
+      return (*constructor)(lua);                                            \
     }                                                                        \
                                                                              \
    private:                                                                  \
@@ -42,8 +40,8 @@
       base_name##Factory::registerClass(#class_name,                       \
                                         class_name##Helper::creatObjFunc); \
     }                                                                      \
-    static std::shared_ptr<base_name> creatObjFunc(lua_State *L) {         \
-      return std::make_shared<class_name>(L);                              \
+    static std::shared_ptr<base_name> creatObjFunc(Lua &lua) {       \
+      return std::make_shared<class_name>(lua);                            \
     }                                                                      \
   };                                                                       \
   class_name##Helper class_name##helper;
@@ -55,7 +53,7 @@
       base_name##Factory::registerClass(#class_name,                       \
                                         class_name##Helper::creatObjFunc); \
     }                                                                      \
-    static std::shared_ptr<base_name> creatObjFunc(lua_State *L) {         \
+    static std::shared_ptr<base_name> creatObjFunc(Lua &) {          \
       if (instance == nullptr) instance = std::make_shared<class_name>();  \
       return instance;                                                     \
     }                                                                      \

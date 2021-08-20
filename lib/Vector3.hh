@@ -16,17 +16,8 @@ class Vector3 {
 #ifdef __EMSCRIPTEN__
   Vector3(val v) : x(v[0].as<T>()), y(v[1].as<T>()), z(v[2].as<T>()){};
 #else
-  Vector3(lua_State *L) {
-    lua_rawgeti(L, -1, 1);
-    x = lua_tonumber(L, -1);
-    lua_pop(L, 1);
-    lua_rawgeti(L, -1, 2);
-    y = lua_tonumber(L, -1);
-    lua_pop(L, 1);
-    lua_rawgeti(L, -1, 3);
-    z = lua_tonumber(L, -1);
-    lua_pop(L, 1);
-  };
+  Vector3(Lua &lua)
+      : x(lua.getField<T>(1)), y(lua.getField<T>(2)), z(lua.getField<T>(3)){};
 #endif
 
   bool operator==(const Vector3 &v) const {
