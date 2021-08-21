@@ -4,7 +4,6 @@
 #include <random>
 
 #include "Distribution.hh"
-#include "FactoryHelper.hh"
 #include "Particle.hh"
 #include "Rotator.hh"
 #include "Vector3.hh"
@@ -28,7 +27,7 @@ class BeamParticleProducer : public ParticleProducer {
   double energy_spread;
   double angular_divergence;
   Vector3<double> translation;
-  IntrinsicRotator<double> rotator;
+  IntrinsicRotator rotator;
 
   Distribution<double> kinetic_energy_dist;
 

@@ -5,7 +5,6 @@
 
 #include <string>
 
-#include "Config.hh"
 #include "Utils.hh"
 
 using namespace emscripten;

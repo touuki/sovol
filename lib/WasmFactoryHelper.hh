@@ -3,10 +3,12 @@
 
 #include <map>
 #include <memory>
+#include <sstream>
 #include <string>
 
 #define DEFINE_FACTORY(base_name)                                          \
-  typedef std::shared_ptr<base_name> (*base_name##Constructor)(val v);     \
+  typedef std::shared_ptr<base_name> (*base_name##Constructor)(            \
+      emscripten::val v);                                                  \
   class base_name##Factory {                                               \
    public:                                                                 \
     static void registerClass(const std::string &className,                \
@@ -14,15 +16,16 @@
       constructors()[className] = constructor;                             \
     }                                                                      \
                                                                            \
-    static std::shared_ptr<base_name> createObject(val v) {                \
+    static std::shared_ptr<base_name> createObject(emscripten::val v) {    \
       std::string className = v["name"].as<std::string>();                 \
       base_name##Constructor constructor = nullptr;                        \
       if (constructors().find(className) != constructors().end())          \
         constructor = constructors().find(className)->second;              \
       if (constructor == nullptr) {                                        \
-        std::cerr << "ERROR: Create " #base_name " failed. Class "         \
-                  << className << " is not found." << std::endl;           \
-        return nullptr;                                                    \
+        std::stringstream ss;                                              \
+        ss << "ERROR: Create " #base_name " failed. Class " << className   \
+           << " is not found.";                                            \
+        throw std::runtime_error(ss.str());                                \
       }                                                                    \
       return (*constructor)(v);                                            \
     }                                                                      \
@@ -41,7 +44,7 @@
       base_name##Factory::registerClass(#class_name,                       \
                                         class_name##Helper::creatObjFunc); \
     }                                                                      \
-    static std::shared_ptr<base_name> creatObjFunc(val v) {                \
+    static std::shared_ptr<base_name> creatObjFunc(emscripten::val v) {    \
       return std::make_shared<class_name>(v);                              \
     }                                                                      \
   };                                                                       \
@@ -54,7 +57,7 @@
       base_name##Factory::registerClass(#class_name,                       \
                                         class_name##Helper::creatObjFunc); \
     }                                                                      \
-    static std::shared_ptr<base_name> creatObjFunc(val v) {                \
+    static std::shared_ptr<base_name> creatObjFunc(emscripten::val v) {    \
       if (instance == nullptr) instance = std::make_shared<class_name>();  \
       return instance;                                                     \
     }                                                                      \

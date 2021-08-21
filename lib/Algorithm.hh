@@ -3,7 +3,6 @@
 
 #include <vector>
 
-#include "FactoryHelper.hh"
 #include "Field.hh"
 #include "Particle.hh"
 

@@ -50,6 +50,22 @@ class Lua {
     }
     return std::string(r);
   }
+  template <typename ReturnType>
+  ReturnType pop(int type, ReturnType defaultValue) {
+    if (type == LUA_TNIL) {
+      lua_pop(L, 1);
+      return defaultValue;
+    } else {
+      return pop<ReturnType>(type);
+    }
+  };
+  template <typename ReturnType>
+  ReturnType pop(int type) {
+    // if (type == LUA_TFUNCTION) {
+    //   call(1);
+    // }
+    return pop<ReturnType>();
+  };
 
  public:
   Lua(const Lua&) = delete;
@@ -84,7 +100,6 @@ class Lua {
       L = nullptr;
     }
   };
-  bool isNil(int index = -1) { return lua_isnil(L, index); }
   template <typename... Args>
   void call(int nresults, Args&&... args) {
     if (!lua_isfunction(L, -1)) {
@@ -109,46 +124,40 @@ class Lua {
       throw std::runtime_error(ss.str());
     }
   }
-  template <typename U, typename T>
-  U getField(T key, U defaultValue) {
+  template <typename ReturnType>
+  ReturnType pop() {
+    ReturnType r = as<ReturnType>();
+    lua_pop(L, 1);
+    return r;
+  };
+  template <typename ReturnType, typename KeyType>
+  ReturnType getField(KeyType key, ReturnType defaultValue) {
     int type = visitField(key);
-    U r;
-    if (type == LUA_TNIL) {
-      r = defaultValue;
-    } else {
-      r = as<U>();
-    }
-    lua_pop(L, 1);
-    return r;
+    return pop<ReturnType>(type, defaultValue);
   };
-  template <typename U, typename T>
-  U getField(T key) {
+  template <typename ReturnType, typename KeyType>
+  ReturnType getField(KeyType key) {
     int type = visitField(key);
-    U r = as<U>();
-    lua_pop(L, 1);
-    return r;
+    return pop<ReturnType>(type);
   };
-  template <typename U>
-  U getGlobal(const char* name, U defaultValue) {
+  template <typename ReturnType>
+  ReturnType getGlobal(const char* name, ReturnType defaultValue) {
     int type = visitGlobal(name);
-    U r;
-    if (type == LUA_TNIL) {
-      r = defaultValue;
-    } else {
-      r = as<U>();
+    return pop<ReturnType>(type, defaultValue);
+  };
+  template <typename ReturnType>
+  ReturnType getGlobal(const char* name) {
+    int type = visitGlobal(name);
+    return pop<ReturnType>(type);
+  };
+  int visitNext() {
+    if (!lua_istable(L, -2)) {
+      throw std::runtime_error("Input lua script error: Not a table");
     }
-    lua_pop(L, 1);
-    return r;
-  };
-  template <typename U>
-  U getGlobal(const char* name) {
-    int type = visitGlobal(name);
-    U r = as<U>();
-    lua_pop(L, 1);
-    return r;
-  };
-  template <typename T>
-  int visitField(T key) {
+    return lua_next(L, -2);
+  }
+  template <typename KeyType>
+  int visitField(KeyType key) {
     if (!lua_istable(L, -1)) {
       throw std::runtime_error("Input lua script error: Not a table");
     }
@@ -156,6 +165,18 @@ class Lua {
     return lua_gettable(L, -2);
   }
   int visitGlobal(const char* name) { return lua_getglobal(L, name); }
+  void startTraverse() {
+    if (!lua_istable(L, -1)) {
+      throw std::runtime_error("Input lua script error: Not a table");
+    }
+    lua_pushnil(L);
+  }
+  void popNil() {
+    if (!lua_isnil(L, -1)) {
+      throw std::runtime_error("Input lua script error: Not nil");
+    }
+    lua_pop(L, -1);
+  }
   void leaveTable() {
     if (!lua_istable(L, -1)) {
       throw std::runtime_error("Input lua script error: Not a table");

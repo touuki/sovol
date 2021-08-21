@@ -7,20 +7,26 @@
 #include "Field.hh"
 
 class Utils {
+ private:
+  static std::uniform_real_distribution<double> rand;
+
  public:
-  thread_local std::mt19937 e;
-  template <typename T>
-  static T factorial(T n) {
+  static thread_local std::mt19937 e;
+  template <typename Integer,
+            typename = std::enable_if_t<std::is_integral_v<Integer>>>
+  static Integer factorial(Integer n) {
     if (n < 0) {
       std::cerr << "ERROR:factorial n less than zero." << std::endl;
     }
-    T v = 1;
-    for (T i = n; i > 0; i--) {
+    Integer v = 1;
+    for (Integer i = n; i > 0; i--) {
       v *= i;
     }
     return v;
   };
-  static double random(double min = 0., double max = 1.);
+  static double random(double min = 0., double max = 1.) {
+    return rand(e) * (max - min) + min;
+  };
   static Vector3<double> randomOnSphere();
   static Vector3<double> velocity(const Vector3<double> &momentum, double mass);
   static double gamma(const Vector3<double> &momentum, double mass);
@@ -32,6 +38,7 @@ class Utils {
   static double generLaguePoly(int alpha, int k, double value);
 };
 
+std::uniform_real_distribution<double> Utils::rand;
 thread_local std::mt19937 Utils::e(time(NULL));
 
 // See http://mathworld.wolfram.com/SpherePointPicking.html

@@ -14,7 +14,7 @@ class Vector3 {
   Vector3() : x(0), y(0), z(0){};
   Vector3(const T &_x, const T &_y, const T &_z) : x(_x), y(_y), z(_z){};
 #ifdef __EMSCRIPTEN__
-  Vector3(val v) : x(v[0].as<T>()), y(v[1].as<T>()), z(v[2].as<T>()){};
+  Vector3(emscripten::val v) : x(v[0].as<T>()), y(v[1].as<T>()), z(v[2].as<T>()){};
 #else
   Vector3(Lua &lua)
       : x(lua.getField<T>(1)), y(lua.getField<T>(2)), z(lua.getField<T>(3)){};

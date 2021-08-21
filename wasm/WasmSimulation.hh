@@ -3,7 +3,6 @@
 
 #include <emscripten/val.h>
 
-#include "FactoryHelper.hh"
 #include "RealTimeRepeatSimulation.hh"
 
 class WasmSimulation {

@@ -1,94 +1,26 @@
 #ifndef _SOVOL_CONFIG_HH
 #define _SOVOL_CONFIG_HH 1
-
+// #define __EMSCRIPTEN__ 1
 #ifdef __EMSCRIPTEN__
 #include <emscripten/val.h>
 
 #include "WasmFactoryHelper.hh"
-using namespace emscripten;
 #else
 #include "Lua.hh"
 #include "LuaFactoryHelper.hh"
 #endif
 
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
-
-#define SOVOL_CONFIG_KEY(key) "SC_" #key
-
-class Env {
- public:
-  static bool getBool(const char *key, bool defaultValue = false) {
-    const char *value;
-    if ((value = getenv(key)) != nullptr) {
-      if (strcmp(value, "1") == 0 || strcmp(value, "true") == 0 ||
-          strcmp(value, "True") == 0 || strcmp(value, "TRUE") == 0) {
-        return true;
-      } else {
-        return false;
-      }
-    } else {
-      return defaultValue;
-    }
-  };
-  static int setBool(const char *key, bool value) {
-    return setenv(key, value ? "true" : "false", 1);
-  };
-  static double getDouble(const char *key, double defaultValue = 0.) {
-    const char *value;
-    if ((value = getenv(key)) != nullptr) {
-      return atof(value);
-    } else {
-      return defaultValue;
-    }
-  };
-  static int setDouble(const char *key, double value) {
-    char s[64];
-    sprintf(s, "%.16g", value);
-    return setenv(key, s, 1);
-  };
-  static int getInt(const char *key, int defaultValue = 0) {
-    const char *value;
-    if ((value = getenv(key)) != nullptr) {
-      return atoi(value);
-    } else {
-      return defaultValue;
-    }
-  };
-  static int setInt(const char *key, int value) {
-    char s[64];
-    sprintf(s, "%d", value);
-    return setenv(key, s, 1);
-  };
-  template <typename T>
-  static T getPointer(const char *key, T defaultValue = nullptr) {
-    const char *value;
-    if ((value = getenv(key)) != nullptr) {
-      return reinterpret_cast<T>(atol(value));
-    } else {
-      return defaultValue;
-    }
-  };
-  template <typename T>
-  static int setPointer(const char *key, T value) {
-    char s[64];
-    sprintf(s, "%ld", reinterpret_cast<long>(value));
-    return setenv(key, s, 1);
-  };
-  static const char *getString(const char *key,
-                               const char *defaultValue = nullptr) {
-    const char *value;
-    if ((value = getenv(key)) != nullptr) {
-      return value;
-    } else {
-      return defaultValue;
-    }
-  };
-  static int setString(const char *key, const char *value) {
-    return setenv(key, value, 1);
-  };
-  static bool hasKey(const char *key) { return getenv(key) != nullptr; };
-};
+// data source https://physics.nist.gov/cuu/Constants
+#define CONST_PI 3.141592653589793238462643383279503  // pi
+#define CONST_M0 9.1093837015e-31                     // electron mass; unit: kg
+#define CONST_Q0 1.602176634e-19         // elementary charge; unit: C
+#define CONST_C 299792458.0              // speed of light in vacuum; unit: m/s
+#define CONST_C2 8.987551787368176e+16   // c^2
+#define CONST_HBAR 1.054571817e-34       // reduced Planck constant; unit: J s
+#define CONST_E_S 1.323285474948166e+18  // m_e**2 * c**3 / (hbar * q_0)
+#define CONST_ALPHA \
+  7.2973525693e-3  // fine-structure constant; q_0**2 / (2 * epsilon_0 * h * c)
+#define CONST_TAU_C 1.2880886674083155e-21          // h_bar / (m_e * c**2)
+#define CONST_SQRT3 1.73205080756887729352744634151 /* sqrt(3) */
 
 #endif
