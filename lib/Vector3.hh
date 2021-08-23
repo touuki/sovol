@@ -14,10 +14,24 @@ class Vector3 {
   Vector3() : x(0), y(0), z(0){};
   Vector3(const T &_x, const T &_y, const T &_z) : x(_x), y(_y), z(_z){};
 #ifdef __EMSCRIPTEN__
-  Vector3(emscripten::val v) : x(v[0].as<T>()), y(v[1].as<T>()), z(v[2].as<T>()){};
+  Vector3(emscripten::val v)
+      : x(v[0].as<T>()), y(v[1].as<T>()), z(v[2].as<T>()){};
+  emscripten::val toEmscriptenVal() const {
+    emscripten::val v = emscripten::val::array();
+    v.call<void>("push", x);
+    v.call<void>("push", y);
+    v.call<void>("push", z);
+    return v;
+  };
 #else
   Vector3(Lua &lua)
       : x(lua.getField<T>(1)), y(lua.getField<T>(2)), z(lua.getField<T>(3)){};
+  void luaPush(Lua &lua) const {
+    lua.createTable(3, 0);
+    lua.setField(1, x);
+    lua.setField(2, y);
+    lua.setField(3, z);
+  };
 #endif
 
   bool operator==(const Vector3 &v) const {

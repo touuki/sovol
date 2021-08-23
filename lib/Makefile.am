@@ -1,27 +1,27 @@
 include_HEADERS = \
     Algorithm.hh \
-    Config.hh \
-    Distribution.hh \
-    FactoryHelper.hh \
+    config.hh \
     Field.hh \
-    LaguerreGaussianPulseField.hh \
+    FieldShifter.hh \
+    Lua.hh \
+    LuaFactoryHelper.hh \
     Particle.hh \
-    ParticleProducer.hh \
+    ParticleShifter.hh \
     RealTimeRepeatSimulation.hh \
     Rotator.hh \
     Utils.hh \
-    Vector3.hh
+    Vector3.hh \
+    WasmFactoryHelper.hh
 if WASM
 libsovollibdir = $(libdir)
 libsovollib_PROGRAMS = libsovol.so
 libsovol_so_SOURCES = \
     Algorithm.cc \
     Field.cc \
-    LaguerreGaussianPulseField.cc \
+    FieldShifter.cc \
     Particle.cc \
-    ParticleProducer.cc \
-    RealTimeRepeatSimulation.cc \
-    Utils.cc 
+    ParticleShifter.cc \
+    RealTimeRepeatSimulation.cc
 libsovol_so_CXXFLAGS = -std=c++17 -Wall
 libsovol_so_LDFLAGS = -shared -fPIC
 else
@@ -29,10 +29,10 @@ lib_LIBRARIES = libsovol.a
 libsovol_a_SOURCES = \
     Algorithm.cc \
     Field.cc \
-    LaguerreGaussianPulseField.cc \
+    FieldShifter.cc \
+    Lua.cc \
     Particle.cc \
-    ParticleProducer.cc \
-    RealTimeRepeatSimulation.cc \
-    Utils.cc 
+    ParticleShifter.cc \
+    RealTimeRepeatSimulation.cc
 libsovol_a_CXXFLAGS = -std=c++17 -Wall
 endif

@@ -5,7 +5,6 @@
 
 #include "Algorithm.hh"
 #include "Field.hh"
-#include "ParticleProducer.hh"
 
 enum simulation_status {
   UNSET,

@@ -2,7 +2,6 @@
 
 #include <ctime>
 
-#include "Config.hh"
 #include "Utils.hh"
 
 RealTimeRepeatSimulation::RealTimeRepeatSimulation()

@@ -3,15 +3,17 @@
 
 #include <ctime>
 #include <random>
+#include <thread>
 
 #include "Field.hh"
 
 class Utils {
  private:
-  static std::uniform_real_distribution<double> rand;
+  static std::uniform_real_distribution<double> uniform_dist;
+  static std::normal_distribution<double> normal_dist;
+  static thread_local std::mt19937 e;
 
  public:
-  static thread_local std::mt19937 e;
   template <typename Integer,
             typename = std::enable_if_t<std::is_integral_v<Integer>>>
   static Integer factorial(Integer n) {
@@ -25,9 +27,30 @@ class Utils {
     return v;
   };
   static double random(double min = 0., double max = 1.) {
-    return rand(e) * (max - min) + min;
+    return uniform_dist(e) * (max - min) + min;
   };
-  static Vector3<double> randomOnSphere();
+  static double normal_distribution(double mean = 0., double stddev = 1.) {
+    return normal_dist(e) * stddev + mean;
+  };
+  // See http://mathworld.wolfram.com/SpherePointPicking.html
+  static Vector3<double> sphere_uniform_distribution(double length = 1.) {
+    double theta = random(0., 2 * M_PI);
+    double u = random(-1., 1.);
+    return Vector3(std::sqrt(1. - std::pow(u, 2)) * std::cos(theta),
+                   std::sqrt(1. - std::pow(u, 2)) * std::sin(theta), u) *
+           length;
+  };
+  // See: https://academic.oup.com/gji/article/203/2/893/575592
+  static Vector3<double> fisher_distribution(double kappa, double length = 1.) {
+    double cos_theta = std::log(random(std::exp(kappa) - 2 * std::sinh(kappa),
+                                       std::exp(kappa))) /
+                       kappa;
+    double sin_theta = std::sqrt(1. - std::pow(cos_theta, 2));
+    double phi = random(0., 2 * M_PI);
+    return Vector3(sin_theta * std::cos(phi), sin_theta * std::sin(phi),
+                   cos_theta) *
+           length;
+  };
   static Vector3<double> velocity(const Vector3<double> &momentum, double mass);
   static double gamma(const Vector3<double> &momentum, double mass);
   static Vector3<double> momentum(const Vector3<double> &velocity, double mass);
@@ -38,18 +61,10 @@ class Utils {
   static double generLaguePoly(int alpha, int k, double value);
 };
 
-std::uniform_real_distribution<double> Utils::rand;
-thread_local std::mt19937 Utils::e(time(NULL));
-
-// See http://mathworld.wolfram.com/SpherePointPicking.html
-inline Vector3<double> Utils::randomOnSphere() {
-  static std::uniform_real_distribution<double> rand_theta(0., 2 * M_PI);
-  static std::uniform_real_distribution<double> rand_u(-1., 1.);
-  double theta = rand_theta(e);
-  double u = rand_u(e);
-  return Vector3(std::sqrt(1. - std::pow(u, 2)) * std::cos(theta),
-                 std::sqrt(1. - std::pow(u, 2)) * std::sin(theta), u);
-};
+std::uniform_real_distribution<double> Utils::uniform_dist;
+std::normal_distribution<double> normal_dist;
+thread_local std::mt19937 Utils::e(
+    time(NULL) + std::hash<std::thread::id>{}(std::this_thread::get_id()));
 
 inline Vector3<double> Utils::velocity(const Vector3<double> &momentum,
                                        double mass) {

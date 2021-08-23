@@ -12,11 +12,8 @@ class FieldTranslator : public FieldShifter {
 #ifdef __EMSCRIPTEN__
   FieldTranslator(emscripten::val v) : displacement(v["displacement"]){};
 #else
-  FieldTranslator(Lua &lua) {
-    lua.visitField("displacement");
-    displacement = Vector3<double>(lua);
-    lua.leaveTable();
-  };
+  FieldTranslator(Lua &lua)
+      : displacement(lua.getField<Vector3<double> >("displacement")){};
 #endif
   Vector3<double> reversePosition(const Vector3<double> &pos) const override {
     return pos - displacement;
@@ -38,30 +35,19 @@ class FieldRotator : public FieldShifter {
                const std::shared_ptr<Rotator> &_rotator)
       : center(_center), rotator(_rotator){};
 #ifdef __EMSCRIPTEN__
-  FieldRotator(emscripten::val v) {
-    if (!v["center"].isUndefined()) {
-      center = Vector3<double>(v["center"]);
-    }
-    rotator = RotatorFactory::createObject(v["rotator"]);
-  };
+  FieldRotator(emscripten::val v)
+      : center(v["center"].isUndefined() ? Vector3<double>()
+                                         : Vector3<double>(v["center"])),
+        rotator(RotatorFactory::createObject(v["rotator"])){};
 #else
-  FieldRotator(Lua &lua) {
-    int type = lua.visitField("center");
-    if (type == LUA_TNIL) {
-      lua.popNil();
-    } else {
-      center = Vector3<double>(lua);
-      lua.leaveTable();
-    }
+  FieldRotator(Lua &lua) : center(lua.getField("center", Vector3<double>())) {
     lua.visitField("rotator");
     rotator = RotatorFactory::createObject(lua);
     lua.leaveTable();
   };
 #endif
   Vector3<double> reversePosition(const Vector3<double> &pos) const override {
-    Vector3 v = pos - center;
-    v = rotator->reverse(v);
-    return center + v;
+    return center + rotator->reverse(pos - center);
   };
   EMField<double> shiftEMField(const EMField<double> &em) const override {
     return EMField(Vector3(rotator->operator()(em.E)),

@@ -9,10 +9,23 @@
 class Lua {
  private:
   lua_State* L;
+  Lua(lua_State* _L) : L(_L){};
+  
   void push(const char* s) { lua_pushstring(L, s); };
   void push(const std::string& s) { lua_pushstring(L, s.c_str()); };
+  void push(bool b) { lua_pushboolean(L, b); };
+  template <typename T,
+            std::enable_if_t<
+                std::is_same_v<decltype(T::luaPush(std::declval<Lua&>())),
+                               void(Lua&)>,
+                bool> = true>
+  void push(const T& v) {
+    v.luaPush(*this);
+  };
   template <typename Integer,
-            std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
+            std::enable_if_t<std::is_integral_v<Integer> &&
+                                 !std::is_same_v<Integer, bool>,
+                             bool> = true>
   void push(Integer v) {
     lua_pushinteger(L, v);
   };
@@ -21,11 +34,25 @@ class Lua {
   void push(Floating v) {
     lua_pushnumber(L, v);
   };
+
+  template <
+      typename T,
+      std::enable_if_t<std::is_trivially_constructible_v<T, Lua&>, bool> = true>
+  T as() {
+    return T(*this);
+  };
+  template <typename Bool,
+            std::enable_if_t<std::is_same_v<Bool, bool>, bool> = true>
+  Bool as() {
+    return lua_toboolean(L, -1);
+  };
   template <typename Integer,
-            std::enable_if_t<std::is_integral_v<Integer>, bool> = true>
-  Integer as(int index = -1) {
+            std::enable_if_t<std::is_integral_v<Integer> &&
+                                 !std::is_same_v<Integer, bool>,
+                             bool> = true>
+  Integer as() {
     int isnum;
-    Integer r = lua_tointegerx(L, index, &isnum);
+    Integer r = lua_tointegerx(L, -1, &isnum);
     if (!isnum) {
       throw std::runtime_error("Lua error: Can't convert to integral.");
     }
@@ -33,9 +60,9 @@ class Lua {
   };
   template <typename Floating,
             std::enable_if_t<std::is_floating_point_v<Floating>, bool> = true>
-  Floating as(int index = -1) {
+  Floating as() {
     int isnum;
-    Floating r = lua_tonumberx(L, index, &isnum);
+    Floating r = lua_tonumberx(L, -1, &isnum);
     if (!isnum) {
       throw std::runtime_error("Lua error: Can't convert to number.");
     }
@@ -43,57 +70,37 @@ class Lua {
   }
   template <typename String,
             std::enable_if_t<std::is_same_v<String, std::string>, bool> = true>
-  std::string as(int index = -1) {
-    const char* r = lua_tostring(L, index);
+  std::string as() {
+    const char* r = lua_tostring(L, -1);
     if (!r) {
       throw std::runtime_error("Lua error: Can't convert to string.");
     }
     return std::string(r);
   }
-  template <typename ReturnType>
-  ReturnType pop(int type, ReturnType defaultValue) {
+
+  template <typename Value>
+  Value pop(int type, const Value& defaultValue) {
     if (type == LUA_TNIL) {
       lua_pop(L, 1);
       return defaultValue;
     } else {
-      return pop<ReturnType>(type);
+      return pop<Value>(type);
     }
   };
-  template <typename ReturnType>
-  ReturnType pop(int type) {
+  template <typename Value>
+  Value pop(int type) {
     // if (type == LUA_TFUNCTION) {
     //   call(1);
     // }
-    return pop<ReturnType>();
+    Value r = as<Value>();
+    lua_pop(L, 1);
+    return r;
   };
 
  public:
   Lua(const Lua&) = delete;
   Lua& operator=(const Lua&) = delete;
-  Lua(const std::string& _path) {
-    L = luaL_newstate();
-    if (L == nullptr) {
-      throw std::runtime_error("Lua error: Failed to new state.");
-    }
-    luaL_openlibs(L);
-    int ret = luaL_loadfile(L, _path.c_str());
-    if (ret) {
-      std::stringstream ss;
-      switch (ret) {
-        case LUA_ERRMEM:
-          throw std::runtime_error("Lua memory allocation error.");
-        case LUA_ERRSYNTAX:
-          ss << "Lua syntax error: ";
-          break;
-        case LUA_ERRFILE:
-          ss << "Load lua file failed: ";
-          break;
-      }
-      ss << as<std::string>();
-      throw std::runtime_error(ss.str());
-    }
-    call(LUA_MULTRET);
-  };
+  Lua(const std::string& _path);
   ~Lua() {
     if (L != nullptr) {
       lua_close(L);
@@ -124,31 +131,34 @@ class Lua {
       throw std::runtime_error(ss.str());
     }
   }
-  template <typename ReturnType>
-  ReturnType pop() {
-    ReturnType r = as<ReturnType>();
-    lua_pop(L, 1);
-    return r;
-  };
-  template <typename ReturnType, typename KeyType>
-  ReturnType getField(KeyType key, ReturnType defaultValue) {
+  template <typename Value, typename Key>
+  void setField(const Key& key, const Value& value) {
+    if (!lua_istable(L, -1)) {
+      throw std::runtime_error("Input lua script error: Not a table");
+    }
+    push(key);
+    push(value);
+    lua_settable(L, -3);
+  }
+  template <typename Value, typename Key>
+  Value getField(const Key& key, const Value& defaultValue) {
     int type = visitField(key);
-    return pop<ReturnType>(type, defaultValue);
+    return pop<Value>(type, defaultValue);
   };
-  template <typename ReturnType, typename KeyType>
-  ReturnType getField(KeyType key) {
+  template <typename Value, typename Key>
+  Value getField(const Key& key) {
     int type = visitField(key);
-    return pop<ReturnType>(type);
+    return pop<Value>(type);
   };
-  template <typename ReturnType>
-  ReturnType getGlobal(const char* name, ReturnType defaultValue) {
+  template <typename Value>
+  Value getGlobal(const char* name, const Value& defaultValue) {
     int type = visitGlobal(name);
-    return pop<ReturnType>(type, defaultValue);
+    return pop<Value>(type, defaultValue);
   };
-  template <typename ReturnType>
-  ReturnType getGlobal(const char* name) {
+  template <typename Value>
+  Value getGlobal(const char* name) {
     int type = visitGlobal(name);
-    return pop<ReturnType>(type);
+    return pop<Value>(type);
   };
   int visitNext() {
     if (!lua_istable(L, -2)) {
@@ -156,8 +166,8 @@ class Lua {
     }
     return lua_next(L, -2);
   }
-  template <typename KeyType>
-  int visitField(KeyType key) {
+  template <typename Key>
+  int visitField(const Key& key) {
     if (!lua_istable(L, -1)) {
       throw std::runtime_error("Input lua script error: Not a table");
     }
@@ -177,6 +187,9 @@ class Lua {
     }
     lua_pop(L, -1);
   }
+  void createTable(int narr = 0, int nrec = 0) {
+    lua_createtable(L, narr, nrec);
+  }
   void leaveTable() {
     if (!lua_istable(L, -1)) {
       throw std::runtime_error("Input lua script error: Not a table");
@@ -189,7 +202,5 @@ class Lua {
     return *instance;
   }
 };
-
-std::string Lua::path;
 
 #endif

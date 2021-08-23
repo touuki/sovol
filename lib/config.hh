@@ -1,6 +1,7 @@
 #ifndef _SOVOL_CONFIG_HH
 #define _SOVOL_CONFIG_HH 1
-// #define __EMSCRIPTEN__ 1
+#define __EMSCRIPTEN__ 1
+
 #ifdef __EMSCRIPTEN__
 #include <emscripten/val.h>
 

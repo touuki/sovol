@@ -26,6 +26,7 @@ class CustomField : public Field {
   CustomField(Lua &lua)
       : global_function_name(
             lua.getField<std::string>("global_function_name")){};
+
   EMField<double> operator()(const Vector3<double> &pos,
                              double t) const override {
     Lua &lua = Lua::getInstance();
