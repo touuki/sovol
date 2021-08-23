@@ -19,6 +19,7 @@ aclocal.m4
 Makefile.in
 Makefile
 .deps
+.dirstamp
 
 #emscripten
 /a.wasm

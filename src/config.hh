@@ -1,14 +1,14 @@
 #ifndef _SOVOL_CONFIG_HH
 #define _SOVOL_CONFIG_HH 1
-#define __EMSCRIPTEN__ 1
+//#define __EMSCRIPTEN__ 1
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten/val.h>
 
-#include "WasmFactoryHelper.hh"
+#include "wasm/FactoryHelper.hh"
 #else
 #include "Lua.hh"
-#include "LuaFactoryHelper.hh"
+#include "cli/FactoryHelper.hh"
 #endif
 
 // data source https://physics.nist.gov/cuu/Constants

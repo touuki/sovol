@@ -61,11 +61,6 @@ class Utils {
   static double generLaguePoly(int alpha, int k, double value);
 };
 
-std::uniform_real_distribution<double> Utils::uniform_dist;
-std::normal_distribution<double> normal_dist;
-thread_local std::mt19937 Utils::e(
-    time(NULL) + std::hash<std::thread::id>{}(std::this_thread::get_id()));
-
 inline Vector3<double> Utils::velocity(const Vector3<double> &momentum,
                                        double mass) {
   return momentum / std::sqrt(std::pow(mass, 2) + momentum.square());

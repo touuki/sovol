@@ -2,13 +2,13 @@
 
 #include "Rotator.hh"
 
-class ParticleCustomShifter : public ParticleShifter {
+class CustomParticleShifter : public ParticleShifter {
 #ifdef __EMSCRIPTEN__
  private:
   emscripten::val func;
 
  public:
-  ParticleCustomShifter(emscripten::val v) : func(v["func"]){};
+  CustomParticleShifter(emscripten::val v) : func(v["func"]){};
   void operator()(Particle &p) const override {
     emscripten::val result = func(p.toEmscriptenVal());
     if (!result["position"].isUndefined()) {
@@ -21,13 +21,13 @@ class ParticleCustomShifter : public ParticleShifter {
       p.polarization = Vector3<double>(result["polarization"]);
     }
   };
-  ~ParticleCustomShifter(){};
+  ~CustomParticleShifter(){};
 #else
  private:
   std::string global_function_name;
 
  public:
-  ParticleCustomShifter(Lua &lua)
+  CustomParticleShifter(Lua &lua)
       : global_function_name(
             lua.getField<std::string>("global_function_name")){};
 
@@ -42,6 +42,8 @@ class ParticleCustomShifter : public ParticleShifter {
   };
 #endif
 };
+
+REGISTER_MULTITON(ParticleShifter, CustomParticleShifter)
 
 class ParticleTranslator : public ParticleShifter {
  private:
@@ -69,56 +71,56 @@ class ParticleRotator : public ParticleShifter {
  private:
   Vector3<double> center;
   std::shared_ptr<Rotator> rotator;
-  bool disable_position;
-  bool disable_momentum;
-  bool disable_polarization;
+  bool affect_position;
+  bool affect_momentum;
+  bool affect_polarization;
 
  public:
   ParticleRotator(const Vector3<double> &_center,
                   const std::shared_ptr<Rotator> &_rotator,
-                  bool _disable_position = false,
-                  bool _disable_momentum = false,
-                  bool _disable_polarization = false)
+                  bool _affect_position = true,
+                  bool _affect_momentum = true,
+                  bool _affect_polarization = true)
       : center(_center),
         rotator(_rotator),
-        disable_position(_disable_position),
-        disable_momentum(_disable_momentum),
-        disable_polarization(_disable_polarization){};
+        affect_position(_affect_position),
+        affect_momentum(_affect_momentum),
+        affect_polarization(_affect_polarization){};
 #ifdef __EMSCRIPTEN__
   ParticleRotator(emscripten::val v)
       : center(v["center"].isUndefined() ? Vector3<double>()
                                          : Vector3<double>(v["center"])),
         rotator(RotatorFactory::createObject(v["rotator"])),
-        disable_position(v["disable_position"].isUndefined()
-                             ? false
-                             : v["disable_position"].as<bool>()),
-        disable_momentum(v["disable_momentum"].isUndefined()
-                             ? false
-                             : v["disable_momentum"].as<bool>()),
-        disable_polarization(v["disable_polarization"].isUndefined()
-                                 ? false
-                                 : v["disable_polarization"].as<bool>()){};
+        affect_position(v["affect_position"].isUndefined()
+                             ? true
+                             : v["affect_position"].as<bool>()),
+        affect_momentum(v["affect_momentum"].isUndefined()
+                             ? true
+                             : v["affect_momentum"].as<bool>()),
+        affect_polarization(v["affect_polarization"].isUndefined()
+                                 ? true
+                                 : v["affect_polarization"].as<bool>()){};
 #else
   ParticleRotator(Lua &lua)
       : center(lua.getField("center", Vector3<double>())),
-        disable_position(lua.getField("disable_position", false)),
-        disable_momentum(lua.getField("disable_momentum", false)),
-        disable_polarization(lua.getField("disable_polarization", false)) {
+        affect_position(lua.getField("affect_position", true)),
+        affect_momentum(lua.getField("affect_momentum", true)),
+        affect_polarization(lua.getField("affect_polarization", true)) {
     lua.visitField("rotator");
     rotator = RotatorFactory::createObject(lua);
     lua.leaveTable();
   };
 #endif
   void operator()(Particle &p) const override {
-    if (!disable_position) {
+    if (affect_position) {
       p.position = center + rotator->operator()(p.position - center);
     }
 
-    if (!disable_momentum) {
+    if (affect_momentum) {
       p.momentum = rotator->operator()(p.momentum);
     }
 
-    if (!disable_polarization) {
+    if (affect_polarization) {
       p.polarization = rotator->operator()(p.polarization);
     }
   };

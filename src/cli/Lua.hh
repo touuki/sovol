@@ -10,15 +10,15 @@ class Lua {
  private:
   lua_State* L;
   Lua(lua_State* _L) : L(_L){};
-  
+
   void push(const char* s) { lua_pushstring(L, s); };
   void push(const std::string& s) { lua_pushstring(L, s.c_str()); };
   void push(bool b) { lua_pushboolean(L, b); };
   template <typename T,
-            std::enable_if_t<
-                std::is_same_v<decltype(T::luaPush(std::declval<Lua&>())),
-                               void(Lua&)>,
-                bool> = true>
+            std::enable_if_t<std::is_same_v<decltype(std::declval<T>().luaPush(
+                                                std::declval<Lua&>())),
+                                            void>,
+                             bool> = true>
   void push(const T& v) {
     v.luaPush(*this);
   };
@@ -35,9 +35,8 @@ class Lua {
     lua_pushnumber(L, v);
   };
 
-  template <
-      typename T,
-      std::enable_if_t<std::is_trivially_constructible_v<T, Lua&>, bool> = true>
+  template <typename T,
+            std::enable_if_t<std::is_constructible_v<T, Lua&>, bool> = true>
   T as() {
     return T(*this);
   };

@@ -1,6 +1,6 @@
 #include "Lua.hh"
 
-#include "Utils.hh"
+#include "../Utils.hh"
 
 std::string Lua::path;
 

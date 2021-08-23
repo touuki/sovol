@@ -9,7 +9,7 @@ enum ParticleType { normal, electron };
 class Particle {
  public:
   ParticleType type;
-  double mass, charge, opticalDepth;
+  double mass, charge, optical_depth;
   Vector3<double> position, momentum, polarization;
   EMField<double> em_field;
   Particle() : type(electron), mass(1.), charge(-1.) { resetOpticalDepth(); };
@@ -20,7 +20,7 @@ class Particle {
   Particle(Lua &lua);
   void luaPush(Lua &lua) const;
 #endif
-  void resetOpticalDepth() { opticalDepth = -std::log(1. - Utils::random()); };
+  void resetOpticalDepth() { optical_depth = -std::log(1. - Utils::random()); };
 };
 
 #endif
