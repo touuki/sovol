@@ -1,6 +1,6 @@
 #include "Lua.hh"
 
-#include "../Utils.hh"
+#include "utils.hh"
 
 std::string Lua::path;
 
@@ -12,24 +12,28 @@ Lua::Lua(const std::string& _path) {
   luaL_openlibs(L);
   lua_register(L, "C_random", [](lua_State* L) -> int {
     int n = lua_gettop(L);
-    double r = Utils::random(n > 0 ? lua_tonumber(L, 1) : 0.,
+    double r = utils::random(n > 0 ? lua_tonumber(L, 1) : 0.,
                              n > 1 ? lua_tonumber(L, 2) : 1.);
-    lua_pushnumber(L, r);
+    Lua lua(L);
+    lua.push(r);
+    lua.L = nullptr;
     return 1;
   });
   lua_register(L, "C_normal_distribution", [](lua_State* L) -> int {
     int n = lua_gettop(L);
-    double r = Utils::normal_distribution(n > 0 ? lua_tonumber(L, 1) : 0.,
+    double r = utils::normal_distribution(n > 0 ? lua_tonumber(L, 1) : 0.,
                                           n > 1 ? lua_tonumber(L, 2) : 1.);
-    lua_pushnumber(L, r);
+    Lua lua(L);
+    lua.push(r);
+    lua.L = nullptr;
     return 1;
   });
   lua_register(L, "C_sphere_uniform_distribution", [](lua_State* L) -> int {
     int n = lua_gettop(L);
     Vector3<double> r =
-        Utils::sphere_uniform_distribution(n > 0 ? lua_tonumber(L, 1) : 1.);
+        utils::sphere_uniform_distribution(n > 0 ? lua_tonumber(L, 1) : 1.);
     Lua lua(L);
-    r.luaPush(lua);
+    lua.push(r);
     lua.L = nullptr;
     return 1;
   });
@@ -40,10 +44,10 @@ Lua::Lua(const std::string& _path) {
           "C_fisher_distribution expect at least one argument.");
     }
 
-    Vector3<double> r = Utils::fisher_distribution(
+    Vector3<double> r = utils::fisher_distribution(
         lua_tonumber(L, 1), n > 0 ? lua_tonumber(L, 2) : 1.);
     Lua lua(L);
-    r.luaPush(lua);
+    lua.push(r);
     lua.L = nullptr;
     return 1;
   });

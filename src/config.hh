@@ -7,7 +7,7 @@
 
 #include "wasm/FactoryHelper.hh"
 #else
-#include "Lua.hh"
+#include "cli/Lua.hh"
 #include "cli/FactoryHelper.hh"
 #endif
 

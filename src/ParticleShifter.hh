@@ -4,11 +4,10 @@
 #include "Particle.hh"
 
 class ParticleShifter {
+  DEFINE_FACTORY(ParticleShifter)
  public:
   virtual ~ParticleShifter(){};
   virtual void operator()(Particle &) const = 0;
 };
-
-DEFINE_FACTORY(ParticleShifter)
 
 #endif

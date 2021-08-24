@@ -39,12 +39,11 @@ class EMField {
 };
 
 class Field {
+  DEFINE_FACTORY(Field)
  public:
   virtual ~Field(){};
   virtual EMField<double> operator()(const Vector3<double> &pos,
                                      double time) const = 0;
 };
-
-DEFINE_FACTORY(Field)
 
 #endif

@@ -16,9 +16,8 @@ class H5Storage {
   H5::DataSpace singleRow;
 
  public:
-  H5Storage(const std::string &_fileName, const std::string &_storageItems,
-            hsize_t length);
-  ~H5Storage();
+  H5Storage(const std::string &_fileName,
+            const std::vector<std::string> &_storageItems, hsize_t length);
   void write(const std::map<std::string, std::vector<double>> &);
   void writeTime(double *);
 };

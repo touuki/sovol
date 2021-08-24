@@ -29,4 +29,4 @@ Makefile
 
 dist/
 
-/cli/sovol-cli
+/sovol-cli

@@ -3,16 +3,14 @@
 
 #include <vector>
 
-#include "Field.hh"
 #include "Particle.hh"
 
 class Algorithm {
+  DEFINE_FACTORY(Algorithm)
  public:
   virtual ~Algorithm(){};
   virtual void operator()(Particle &, const Field &, double time,
                           double dt) const = 0;
 };
-
-DEFINE_FACTORY(Algorithm)
 
 #endif

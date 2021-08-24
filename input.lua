@@ -47,14 +47,16 @@ function custom_field(x,y,z,t)
     }
 end
 
+reference_frequency = 2 * math.pi * c / 800e-9,
+
 control = {
-    time_step = 0.001 * period,
     total_particle_number = 100,
+    time_step = 0.001 * period,
     data_start_time = 15. * period,
     data_end_time = 45. * period,
     data_interval = 200,
-    reference_frequency = 2 * math.pi * c / 800e-9,
-    output_file_name = "todo_test_cli_args.h5"
+    parallel_workers = 8,
+    output_filename = "todo_test_cli_args.h5"
     output_items = {"x","y","z","px","py","pz","sx","sy","sz","Ex","Ey","Ez","Bx","By","Bz","optical_depth"}
 }
 

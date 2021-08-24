@@ -5,6 +5,7 @@
 #include <memory>
 #include <sstream>
 #include <string>
+#include <vector>
 
 class Lua {
  private:
@@ -35,6 +36,29 @@ class Lua {
     lua_pushnumber(L, v);
   };
 
+  template <typename T,
+            std::enable_if_t<
+                std::is_same_v<T, std::vector<typename T::value_type,
+                                              typename T::allocator_type>>,
+                bool> = true>
+  T as() {
+    T vector;
+    int type, i = 1;
+    while ((type = visitField(i++)) != LUA_TNIL) {
+      vector.push_back(pop<typename T::value_type>(type));
+    }
+    lua_pop(L, 1);  // pop nil
+    return vector;
+  };
+  template <typename T,
+            std::enable_if_t<
+                std::is_same_v<decltype(T::element_type::createObject(
+                                   std::declval<Lua&>())),
+                               std::shared_ptr<typename T::element_type>>,
+                bool> = true>
+  T as() {
+    return T::element_type::createObject(*this);
+  };
   template <typename T,
             std::enable_if_t<std::is_constructible_v<T, Lua&>, bool> = true>
   T as() {
@@ -179,12 +203,6 @@ class Lua {
       throw std::runtime_error("Input lua script error: Not a table");
     }
     lua_pushnil(L);
-  }
-  void popNil() {
-    if (!lua_isnil(L, -1)) {
-      throw std::runtime_error("Input lua script error: Not nil");
-    }
-    lua_pop(L, -1);
   }
   void createTable(int narr = 0, int nrec = 0) {
     lua_createtable(L, narr, nrec);

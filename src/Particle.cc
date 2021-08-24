@@ -1,6 +1,6 @@
 #include "Particle.hh"
 
-#include "Utils.hh"
+#include "utils.hh"
 
 #ifdef __EMSCRIPTEN__
 Particle::Particle(emscripten::val v)

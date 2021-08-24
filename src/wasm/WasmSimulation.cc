@@ -5,7 +5,7 @@
 
 #include <string>
 
-#include "Utils.hh"
+#include "utils.hh"
 
 using namespace emscripten;
 
@@ -88,7 +88,7 @@ val WasmSimulation::getData() const {
   storeVector(result, "E", particle->em.E);
   storeVector(result, "B", particle->em.B);
   storeScalar(result, "Ek",
-              Utils::kineticEnergy(particle->momentum, particle->mass));
+              utils::kineticEnergy(particle->momentum, particle->mass));
   return result;
 };
 
@@ -107,7 +107,7 @@ void WasmSimulation::storeData(bool isNewParticle) {
   storeVector(current, "B", particle->em.B, true);
   storeScalar(current, "t", simulation->getCurrentTime(), true);
   storeScalar(current, "Ek",
-              Utils::kineticEnergy(particle->momentum, particle->mass), true);
+              utils::kineticEnergy(particle->momentum, particle->mass), true);
 };
 
 void WasmSimulation::storeVector(val r, const char *s, Vector3<double> &v,

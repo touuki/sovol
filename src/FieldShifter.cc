@@ -40,11 +40,9 @@ class FieldRotator : public FieldShifter {
                                          : Vector3<double>(v["center"])),
         rotator(RotatorFactory::createObject(v["rotator"])){};
 #else
-  FieldRotator(Lua &lua) : center(lua.getField("center", Vector3<double>())) {
-    lua.visitField("rotator");
-    rotator = RotatorFactory::createObject(lua);
-    lua.leaveTable();
-  };
+  FieldRotator(Lua &lua)
+      : center(lua.getField("center", Vector3<double>())),
+        rotator(lua.getField<std::shared_ptr<Rotator> >("rotator")){};
 #endif
   Vector3<double> reversePosition(const Vector3<double> &pos) const override {
     return center + rotator->reverse(pos - center);

@@ -2,7 +2,7 @@
 #define _SOVOL_PARTICLE_HH 1
 
 #include "Field.hh"
-#include "Utils.hh"
+#include "utils.hh"
 
 enum ParticleType { normal, electron };
 
@@ -20,7 +20,7 @@ class Particle {
   Particle(Lua &lua);
   void luaPush(Lua &lua) const;
 #endif
-  void resetOpticalDepth() { optical_depth = -std::log(1. - Utils::random()); };
+  void resetOpticalDepth() { optical_depth = -std::log(1. - utils::random()); };
 };
 
 #endif

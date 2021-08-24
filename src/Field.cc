@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "FieldShifter.hh"
-#include "Utils.hh"
+#include "utils.hh"
 
 class CustomField : public Field {
 #ifdef __EMSCRIPTEN__
@@ -52,27 +52,18 @@ class FieldWithShifters : public Field {
       : field(_field), shifters(_shifters){};
 #ifdef __EMSCRIPTEN__
   FieldWithShifters(emscripten::val v)
-      : field(FieldFactory::createObject(v["field"])) {
+      : field(Field::createObject(v["field"])) {
     emscripten::val val_shifters = v["shifters"];
     int length = val_shifters["length"].as<int>();
     for (int i = 0; i < val_shifters["length"].as<int>(); i++) {
-      shifters.push_back(FieldShifterFactory::createObject(val_shifters[i]));
+      shifters.push_back(FieldShifter::createObject(val_shifters[i]));
     }
   };
 #else
-  FieldWithShifters(Lua &lua) {
-    lua.visitField("field");
-    field = FieldFactory::createObject(lua);
-    lua.leaveTable();
-    lua.visitField("shifters");
-    int i = 1;
-    while (lua.visitField(i++) != LUA_TNIL) {
-      shifters.push_back(FieldShifterFactory::createObject(lua));
-      lua.leaveTable();
-    }
-    lua.popNil();
-    lua.leaveTable();
-  };
+  FieldWithShifters(Lua &lua)
+      : field(lua.getField<std::shared_ptr<Field>>("field")),
+        shifters(lua.getField<std::vector<std::shared_ptr<FieldShifter>>>(
+            "shifters")){};
 #endif
   EMField<double> operator()(const Vector3<double> &_pos,
                              double t) const override {
@@ -102,20 +93,12 @@ class FieldCombiner : public Field {
     emscripten::val val_fields = v["fields"];
     int length = val_fields["length"].as<int>();
     for (int i = 0; i < val_fields["length"].as<int>(); i++) {
-      fields.push_back(FieldFactory::createObject(val_fields[i]));
+      fields.push_back(Field::createObject(val_fields[i]));
     }
   };
 #else
-  FieldCombiner(Lua &lua) {
-    lua.visitField("fields");
-    int i = 1;
-    while (lua.visitField(i++) != LUA_TNIL) {
-      fields.push_back(FieldFactory::createObject(lua));
-      lua.leaveTable();
-    }
-    lua.popNil();
-    lua.leaveTable();
-  };
+  FieldCombiner(Lua &lua)
+      : fields(lua.getField<std::vector<std::shared_ptr<Field>>>("fields")){};
 #endif
   EMField<double> operator()(const Vector3<double> &pos,
                              double t) const override {
@@ -155,7 +138,7 @@ class LaguerreGaussianPulseField : public Field {
     double psiz = (std::abs(l) + 2 * p + 1) * std::atan(z / zR);
     double item1 = l == 0 ? 1. : std::pow(std::sqrt(2. * r2) / wz, std::abs(l));
     double item2 = p == 0 ? 1.
-                          : Utils::generLaguePoly(std::abs(l), p,
+                          : utils::generLaguePoly(std::abs(l), p,
                                                   2. * r2 / std::pow(wz, 2));
     double extraPhase = l == 0 ? 0. : l * std::atan2(y, x);
     return a0 * (w0 / wz) * item1 * item2 * std::exp(-r2 / std::pow(wz, 2)) *
@@ -174,8 +157,8 @@ class LaguerreGaussianPulseField : public Field {
                              double _polar = 0., double _delay = 0., int _p = 0,
                              int _l = 0, double _iphase = 0., double _k = 1.,
                              double _h = 0.1)
-      : a0(std::fabs(_a0) * std::sqrt((double)Utils::factorial(_p) /
-                                      Utils::factorial(_p + std::abs(_l)))),
+      : a0(std::fabs(_a0) * std::sqrt((double)utils::factorial(_p) /
+                                      utils::factorial(_p + std::abs(_l)))),
         tau(std::fabs(_tau)),
         w0(std::fabs(_w0)),
         zR(0.5 * std::pow(w0, 2)),

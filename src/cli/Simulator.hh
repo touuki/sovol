@@ -6,7 +6,6 @@
 #include <vector>
 
 #include "Algorithm.hh"
-#include "Field.hh"
 #include "H5Cpp.h"
 
 class Simulator {
@@ -15,14 +14,15 @@ class Simulator {
   std::shared_ptr<Algorithm> algorithm;
   std::vector<hsize_t> timePoints;
   double timeStep;
+  uint16_t outputFlag;
 
  public:
-  Simulator(const std::shared_ptr<Field> _field,
-            const std::shared_ptr<Algorithm> _algorithm,
+  Simulator(const std::shared_ptr<Field> &_field,
+            const std::shared_ptr<Algorithm> &_algorithm,
+            const std::vector<std::string> &_outputItems,
             const std::vector<hsize_t> &_timePoints, double _timeStep);
-  ~Simulator();
   std::map<std::string, std::vector<double>> operator()(
-      std::shared_ptr<Particle> particle) const;
+      const std::shared_ptr<Particle> &particle) const;
 };
 
 #endif

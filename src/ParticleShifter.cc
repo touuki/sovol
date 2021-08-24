@@ -56,11 +56,7 @@ class ParticleTranslator : public ParticleShifter {
   ParticleTranslator(emscripten::val v) : displacement(v["displacement"]){};
 #else
   ParticleTranslator(Lua &lua)
-      : displacement(lua.getField<Vector3<double> >("displacement")) {
-    lua.visitField("displacement");
-    displacement = Vector3<double>(lua);
-    lua.leaveTable();
-  };
+      : displacement(lua.getField<Vector3<double> >("displacement")){};
 #endif
   void operator()(Particle &p) const override { p.position += displacement; };
 };
@@ -78,8 +74,7 @@ class ParticleRotator : public ParticleShifter {
  public:
   ParticleRotator(const Vector3<double> &_center,
                   const std::shared_ptr<Rotator> &_rotator,
-                  bool _affect_position = true,
-                  bool _affect_momentum = true,
+                  bool _affect_position = true, bool _affect_momentum = true,
                   bool _affect_polarization = true)
       : center(_center),
         rotator(_rotator),
@@ -92,24 +87,21 @@ class ParticleRotator : public ParticleShifter {
                                          : Vector3<double>(v["center"])),
         rotator(RotatorFactory::createObject(v["rotator"])),
         affect_position(v["affect_position"].isUndefined()
-                             ? true
-                             : v["affect_position"].as<bool>()),
+                            ? true
+                            : v["affect_position"].as<bool>()),
         affect_momentum(v["affect_momentum"].isUndefined()
-                             ? true
-                             : v["affect_momentum"].as<bool>()),
+                            ? true
+                            : v["affect_momentum"].as<bool>()),
         affect_polarization(v["affect_polarization"].isUndefined()
-                                 ? true
-                                 : v["affect_polarization"].as<bool>()){};
+                                ? true
+                                : v["affect_polarization"].as<bool>()){};
 #else
   ParticleRotator(Lua &lua)
       : center(lua.getField("center", Vector3<double>())),
+        rotator(lua.getField<std::shared_ptr<Rotator> >("rotator")),
         affect_position(lua.getField("affect_position", true)),
         affect_momentum(lua.getField("affect_momentum", true)),
-        affect_polarization(lua.getField("affect_polarization", true)) {
-    lua.visitField("rotator");
-    rotator = RotatorFactory::createObject(lua);
-    lua.leaveTable();
-  };
+        affect_polarization(lua.getField("affect_polarization", true)){};
 #endif
   void operator()(Particle &p) const override {
     if (affect_position) {
