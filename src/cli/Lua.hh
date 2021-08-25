@@ -2,10 +2,26 @@
 #define _SOVOL_LUA_HH 1
 
 #include <lua.hpp>
+#include <map>
 #include <memory>
 #include <sstream>
 #include <string>
 #include <vector>
+
+class convert_error : public std::runtime_error {
+ public:
+  explicit convert_error(const std::string& __arg) _GLIBCXX_TXN_SAFE
+      : std::runtime_error(__arg){};
+#if __cplusplus >= 201103L
+  explicit convert_error(const char* s) _GLIBCXX_TXN_SAFE
+      : std::runtime_error(s){};
+  convert_error(const convert_error&) = default;
+  convert_error& operator=(const convert_error&) = default;
+  convert_error(convert_error&&) = default;
+  convert_error& operator=(convert_error&&) = default;
+#endif
+  virtual ~convert_error() _GLIBCXX_NOTHROW{};
+};
 
 class Lua {
  private:
@@ -15,6 +31,31 @@ class Lua {
   void push(const char* s) { lua_pushstring(L, s); };
   void push(const std::string& s) { lua_pushstring(L, s.c_str()); };
   void push(bool b) { lua_pushboolean(L, b); };
+  template <
+      typename T,
+      std::enable_if_t<
+          std::is_same_v<
+              T, std::map<typename T::key_type, typename T::mapped_type,
+                          typename T::key_compare, typename T::allocator_type>>,
+          bool> = true>
+  void push(const T& map) {
+    createTable();
+    for (auto&& pair : map) {
+      setField(pair.first, pair.second);
+    }
+  };
+  template <typename T,
+            std::enable_if_t<
+                std::is_same_v<T, std::vector<typename T::value_type,
+                                              typename T::allocator_type>>,
+                bool> = true>
+  void push(const T& vector) {
+    size_t size = vector.size();
+    createTable(size, 0);
+    for (size_t i = 0; i < size; i++) {
+      setField(i + 1, vector[i]);
+    }
+  };
   template <typename T,
             std::enable_if_t<std::is_same_v<decltype(std::declval<T>().luaPush(
                                                 std::declval<Lua&>())),
@@ -36,6 +77,22 @@ class Lua {
     lua_pushnumber(L, v);
   };
 
+  template <
+      typename T,
+      std::enable_if_t<
+          std::is_same_v<
+              T, std::map<typename T::key_type, typename T::mapped_type,
+                          typename T::key_compare, typename T::allocator_type>>,
+          bool> = true>
+  T as() {
+    T map;
+    lua_pushnil(L);
+    while (lua_next(L, -2) != LUA_TNIL) {
+      typename T::mapped_type&& v = pop<typename T::mapped_type>();
+      map[as<typename T::key_type>()] = v;
+    }
+    lua_pop(L, 1);  // pop nil
+  };
   template <typename T,
             std::enable_if_t<
                 std::is_same_v<T, std::vector<typename T::value_type,
@@ -77,7 +134,7 @@ class Lua {
     int isnum;
     Integer r = lua_tointegerx(L, -1, &isnum);
     if (!isnum) {
-      throw std::runtime_error("Lua error: Can't convert to integral.");
+      throw convert_error("Can't convert to integral.");
     }
     return r;
   };
@@ -87,7 +144,7 @@ class Lua {
     int isnum;
     Floating r = lua_tonumberx(L, -1, &isnum);
     if (!isnum) {
-      throw std::runtime_error("Lua error: Can't convert to number.");
+      throw convert_error("Can't convert to number.");
     }
     return r;
   }
@@ -96,7 +153,7 @@ class Lua {
   std::string as() {
     const char* r = lua_tostring(L, -1);
     if (!r) {
-      throw std::runtime_error("Lua error: Can't convert to string.");
+      throw convert_error("Can't convert to string.");
     }
     return std::string(r);
   }
@@ -123,7 +180,7 @@ class Lua {
  public:
   Lua(const Lua&) = delete;
   Lua& operator=(const Lua&) = delete;
-  Lua(const std::string& _path);
+  Lua(const std::string& _path, const std::map<int, std::string>& _args);
   ~Lua() {
     if (L != nullptr) {
       lua_close(L);
@@ -154,6 +211,7 @@ class Lua {
       throw std::runtime_error(ss.str());
     }
   }
+
   template <typename Value, typename Key>
   void setField(const Key& key, const Value& value) {
     if (!lua_istable(L, -1)) {
@@ -166,29 +224,25 @@ class Lua {
   template <typename Value, typename Key>
   Value getField(const Key& key, const Value& defaultValue) {
     int type = visitField(key);
-    return pop<Value>(type, defaultValue);
+    try {
+      return pop<Value>(type, defaultValue);
+    } catch (const convert_error& e) {
+      std::stringstream ss;
+      ss << "Convert errot when get field [" << key << "]:" << e.what();
+      throw std::runtime_error(ss.str());
+    }
   };
   template <typename Value, typename Key>
   Value getField(const Key& key) {
     int type = visitField(key);
-    return pop<Value>(type);
-  };
-  template <typename Value>
-  Value getGlobal(const char* name, const Value& defaultValue) {
-    int type = visitGlobal(name);
-    return pop<Value>(type, defaultValue);
-  };
-  template <typename Value>
-  Value getGlobal(const char* name) {
-    int type = visitGlobal(name);
-    return pop<Value>(type);
-  };
-  int visitNext() {
-    if (!lua_istable(L, -2)) {
-      throw std::runtime_error("Input lua script error: Not a table");
+    try {
+      return pop<Value>(type);
+    } catch (const convert_error& e) {
+      std::stringstream ss;
+      ss << "Convert errot when get field [" << key << "]:" << e.what();
+      throw std::runtime_error(ss.str());
     }
-    return lua_next(L, -2);
-  }
+  };
   template <typename Key>
   int visitField(const Key& key) {
     if (!lua_istable(L, -1)) {
@@ -197,13 +251,36 @@ class Lua {
     push(key);
     return lua_gettable(L, -2);
   }
-  int visitGlobal(const char* name) { return lua_getglobal(L, name); }
-  void startTraverse() {
-    if (!lua_istable(L, -1)) {
-      throw std::runtime_error("Input lua script error: Not a table");
-    }
-    lua_pushnil(L);
+
+  template <typename Value>
+  void setGlobal(const char* name, const Value& value) {
+    push(value);
+    lua_setglobal(L, name);
   }
+  template <typename Value>
+  Value getGlobal(const char* name, const Value& defaultValue) {
+    int type = visitGlobal(name);
+    try {
+      return pop<Value>(type, defaultValue);
+    } catch (const convert_error& e) {
+      std::stringstream ss;
+      ss << "Convert errot when get global [" << name << "]:" << e.what();
+      throw std::runtime_error(ss.str());
+    }
+  };
+  template <typename Value>
+  Value getGlobal(const char* name) {
+    int type = visitGlobal(name);
+    try {
+      return pop<Value>(type);
+    } catch (const convert_error& e) {
+      std::stringstream ss;
+      ss << "Convert errot when get global [" << name << "]:" << e.what();
+      throw std::runtime_error(ss.str());
+    }
+  };
+  int visitGlobal(const char* name) { return lua_getglobal(L, name); }
+
   void createTable(int narr = 0, int nrec = 0) {
     lua_createtable(L, narr, nrec);
   }
@@ -213,9 +290,12 @@ class Lua {
     }
     lua_pop(L, 1);
   }
+
   static std::string path;
+  static std::map<int, std::string> args;
   static Lua& getInstance() {
-    thread_local std::unique_ptr<Lua> instance = std::make_unique<Lua>(path);
+    thread_local std::unique_ptr<Lua> instance =
+        std::make_unique<Lua>(path, args);
     return *instance;
   }
 };

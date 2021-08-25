@@ -6,6 +6,7 @@ beam_length = 3. * lambda
 kinetic_energy = 500
 energy_spread = 0.05
 angular_divergence = 0.01
+spin_kappa = 10
 
 function init_position()
     return {
@@ -36,7 +37,7 @@ function custom_particle_shifter(particle)
     return {
         position = init_position(),
         momentum = init_momentum(particle.mass),
-        polarization = C_fisher_distribution(10)
+        polarization = C_fisher_distribution(spin_kappa)
     }
 end
 
@@ -47,16 +48,16 @@ function custom_field(x,y,z,t)
     }
 end
 
-reference_frequency = 2 * math.pi * c / 800e-9,
+reference_frequency = 2 * math.pi * c / 800e-9
 
 control = {
     total_particle_number = 100,
     time_step = 0.001 * period,
-    data_start_time = 15. * period,
-    data_end_time = 45. * period,
+    data_start_time = 0. * period,
+    data_end_time = 1. * period,
     data_interval = 200,
     parallel_workers = 8,
-    output_filename = "todo_test_cli_args.h5"
+    output_filename = "test.h5",
     output_items = {"x","y","z","px","py","pz","sx","sy","sz","Ex","Ey","Ez","Bx","By","Bz","optical_depth"}
 }
 
@@ -69,6 +70,14 @@ field = {
                 name = "LaguerreGaussianPulseField",
                 a0 = 5,
                 tau = 12 * 2 * math.pi,
+                w0 = 6 * 2 * math.pi,
+                -- polar = 0.,
+                -- delay = 0.,
+                -- p = 0,
+                -- l = 0,
+                -- iphase = 0.,
+                -- k = 1.,
+                -- h = 0.1,
             },
             shifters = {
                 {

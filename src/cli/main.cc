@@ -14,8 +14,16 @@
 #define TIME_FORMAT_STRING "%Y-%m-%d %H:%M:%S"
 
 int main(int argc, char *const argv[]) {
+  if (argc <= 1) {
+    std::cout << "Need a lua script file as the first argument." << std::endl;
+    return 1;
+  }
   Lua::path = argv[1];
+  for (int i = 0; i < argc; i++) {
+    Lua::args[i - 1] = argv[i];
+  }
   Lua &lua = Lua::getInstance();
+
   lua.visitGlobal("control");
   int total_particle_number = lua.getField<int>("total_particle_number", 1);
   double time_step = lua.getField<double>("time_step");
@@ -109,6 +117,7 @@ int main(int argc, char *const argv[]) {
   particle_shifters = lua.getGlobal("particle_shifters", particle_shifters);
   for (int i = 0; i < total_particle_number; i++) {
     std::shared_ptr<Particle> p = std::make_shared<Particle>(particle);
+    p->resetOpticalDepth();
     for (auto &&shifter : particle_shifters) {
       shifter->operator()(*p);
     }

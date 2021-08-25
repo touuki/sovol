@@ -3,8 +3,9 @@
 #include "utils.hh"
 
 std::string Lua::path;
+std::map<int, std::string> Lua::args;
 
-Lua::Lua(const std::string& _path) {
+Lua::Lua(const std::string& _path, const std::map<int, std::string>& _args) {
   L = luaL_newstate();
   if (L == nullptr) {
     throw std::runtime_error("Lua error: Failed to new state.");
@@ -43,14 +44,14 @@ Lua::Lua(const std::string& _path) {
       throw std::invalid_argument(
           "C_fisher_distribution expect at least one argument.");
     }
-
     Vector3<double> r = utils::fisher_distribution(
-        lua_tonumber(L, 1), n > 0 ? lua_tonumber(L, 2) : 1.);
+        lua_tonumber(L, 1), n > 1 ? lua_tonumber(L, 2) : 1.);
     Lua lua(L);
     lua.push(r);
     lua.L = nullptr;
     return 1;
   });
+  setGlobal("arg", _args);
   int ret = luaL_loadfile(L, _path.c_str());
   if (ret) {
     std::stringstream ss;

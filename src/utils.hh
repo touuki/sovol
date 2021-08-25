@@ -5,6 +5,7 @@
 #include <random>
 #include <thread>
 
+#include "Table.hh"
 #include "Field.hh"
 
 namespace utils {
@@ -14,18 +15,39 @@ static std::normal_distribution<double> normal_dist;
 static thread_local std::mt19937 e(
     time(NULL) + std::hash<std::thread::id>{}(std::this_thread::get_id()));
 
+static std::shared_ptr<Table1d> anomalousMagneticMoment;
+static std::shared_ptr<Table1d> photonEmissionRate;
+static std::shared_ptr<Table1d> photonEmissionRateSpinCorrection;
+static std::shared_ptr<Table3d> photonParameter;
+static std::shared_ptr<Table1d> k13;
+static std::shared_ptr<Table1d> k23;
+static std::shared_ptr<Table1d> intK13;
+static std::shared_ptr<Table1d> f1;
+static std::shared_ptr<Table1d> f2;
+static std::shared_ptr<Table1d> f3;
+
 template <typename Integer,
           typename = std::enable_if_t<std::is_integral_v<Integer>>>
 inline Integer factorial(Integer n) {
-  if (n < 0) {
-    std::cerr << "ERROR:factorial n less than zero." << std::endl;
-  }
   Integer v = 1;
   for (Integer i = n; i > 0; i--) {
     v *= i;
   }
   return v;
 };
+inline double generLaguePoly(int alpha, int k, double value) {
+  if (k == 0) {
+    return 1.;
+  } else if (k == 1) {
+    return 1 + alpha - value;
+  } else if (k > 1) {
+    return ((2 * k - 1 + alpha - value) * generLaguePoly(alpha, k - 1, value) -
+            (k - 1 + alpha) * generLaguePoly(alpha, k - 2, value)) /
+           k;
+  }
+  return 0.;
+};
+
 inline double random(double min = 0., double max = 1.) {
   return uniform_dist(e) * (max - min) + min;
 };
@@ -67,18 +89,6 @@ inline Vector3<double> lorentzForce(double charge,
 };
 inline double kineticEnergy(const Vector3<double> &momentum, double mass) {
   return std::sqrt(std::pow(mass, 2) + momentum.square()) - mass;
-};
-inline double generLaguePoly(int alpha, int k, double value) {
-  if (k == 0) {
-    return 1.;
-  } else if (k == 1) {
-    return 1 + alpha - value;
-  } else if (k > 1) {
-    return ((2 * k - 1 + alpha - value) * generLaguePoly(alpha, k - 1, value) -
-            (k - 1 + alpha) * generLaguePoly(alpha, k - 2, value)) /
-           k;
-  }
-  return 0.;
 };
 
 };  // namespace utils
