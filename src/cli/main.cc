@@ -7,7 +7,7 @@
 #include <thread>
 
 #include "BoundedBuffer.hh"
-#include "ParticleShifter.hh"
+#include "ParticleProducer.hh"
 #include "Simulator.hh"
 #include "Storage.hh"
 
@@ -39,6 +39,7 @@ int main(int argc, char *const argv[]) {
       "x",  "y",  "z",  "px", "py", "pz", "sx", "sy",
       "sz", "Ex", "Ey", "Ez", "Bx", "By", "Bz", "optical_depth"};
   output_items = lua.getField("output_items", output_items);
+  utils::tables::init(lua.getField<std::string>("table_dirname"));
   lua.leaveTable();
 
   // auto data_interval for 0
@@ -99,29 +100,22 @@ int main(int argc, char *const argv[]) {
 
   std::vector<std::thread> simulator_threads;
   for (int i = 0; i < parallel_workers; i++) {
-    simulator_threads.push_back(std::thread([&particleBuffer, &resultBuffer,
-                                             &simulator] {
-      utils::e.seed(std::hash<std::thread::id>{}(std::this_thread::get_id()));
-      try {
-        while (true) {
-          resultBuffer.push(simulator(particleBuffer.pop()));
-        }
-      } catch (const NoProducerException &e) {
-      }
-      resultBuffer.producerQuit();
-    }));
+    simulator_threads.push_back(
+        std::thread([&particleBuffer, &resultBuffer, &simulator] {
+          try {
+            while (true) {
+              resultBuffer.push(simulator(particleBuffer.pop()));
+            }
+          } catch (const NoProducerException &e) {
+          }
+          resultBuffer.producerQuit();
+        }));
   }
 
-  Particle particle = lua.getGlobal<Particle>("particle");
-  std::vector<std::shared_ptr<ParticleShifter>> particle_shifters;
-  particle_shifters = lua.getGlobal("particle_shifters", particle_shifters);
+  ParticleProducer particle_producer =
+      lua.getGlobal<ParticleProducer>("particle_producer");
   for (int i = 0; i < total_particle_number; i++) {
-    std::shared_ptr<Particle> p = std::make_shared<Particle>(particle);
-    p->resetOpticalDepth();
-    for (auto &&shifter : particle_shifters) {
-      shifter->operator()(*p);
-    }
-    particleBuffer.push(p);
+    particleBuffer.push(std::make_shared<Particle>(particle_producer()));
   }
   particleBuffer.producerQuit();
 

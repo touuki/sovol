@@ -5,34 +5,38 @@
 #include <random>
 #include <thread>
 
-#include "Table.hh"
 #include "Field.hh"
+#include "Table.hh"
 
 namespace utils {
 
-static std::uniform_real_distribution<double> uniform_dist;
-static std::normal_distribution<double> normal_dist;
-static thread_local std::mt19937 e(
-    time(NULL) + std::hash<std::thread::id>{}(std::this_thread::get_id()));
+namespace tables {
+extern std::shared_ptr<Table1d> anomalousMagneticMoment;
+extern std::shared_ptr<Table1d> photonEmissionRate;
+extern std::shared_ptr<Table1d> photonEmissionRateSpinCorrection;
+extern std::shared_ptr<Table3d> photonParameter;
+extern std::shared_ptr<Table1d> k13;
+extern std::shared_ptr<Table1d> k23;
+extern std::shared_ptr<Table1d> intK13;
+extern std::shared_ptr<Table1d> f1;
+extern std::shared_ptr<Table1d> f2;
+extern std::shared_ptr<Table1d> f3;
+#ifdef __EMSCRIPTEN__
+void init(emscripten::val tables);
+#else
+void init(const std::string &table_dirname);
+#endif
+};  // namespace tables
 
-static std::shared_ptr<Table1d> anomalousMagneticMoment;
-static std::shared_ptr<Table1d> photonEmissionRate;
-static std::shared_ptr<Table1d> photonEmissionRateSpinCorrection;
-static std::shared_ptr<Table3d> photonParameter;
-static std::shared_ptr<Table1d> k13;
-static std::shared_ptr<Table1d> k23;
-static std::shared_ptr<Table1d> intK13;
-static std::shared_ptr<Table1d> f1;
-static std::shared_ptr<Table1d> f2;
-static std::shared_ptr<Table1d> f3;
+extern std::uniform_real_distribution<double> uniform_dist;
+extern std::normal_distribution<double> normal_dist;
+extern thread_local std::mt19937 e;
 
 template <typename Integer,
           typename = std::enable_if_t<std::is_integral_v<Integer>>>
 inline Integer factorial(Integer n) {
   Integer v = 1;
-  for (Integer i = n; i > 0; i--) {
-    v *= i;
-  }
+  for (Integer i = n; i > 0; i--) v *= i;
   return v;
 };
 inline double generLaguePoly(int alpha, int k, double value) {

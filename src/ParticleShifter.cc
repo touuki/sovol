@@ -83,9 +83,9 @@ class ParticleRotator : public ParticleShifter {
         affect_polarization(_affect_polarization){};
 #ifdef __EMSCRIPTEN__
   ParticleRotator(emscripten::val v)
-      : center(v["center"].isUndefined() ? Vector3<double>()
+      : center(v["center"].isUndefined() ? Vector3<double>::zero
                                          : Vector3<double>(v["center"])),
-        rotator(RotatorFactory::createObject(v["rotator"])),
+        rotator(Rotator::createObject(v["rotator"])),
         affect_position(v["affect_position"].isUndefined()
                             ? true
                             : v["affect_position"].as<bool>()),
@@ -97,7 +97,7 @@ class ParticleRotator : public ParticleShifter {
                                 : v["affect_polarization"].as<bool>()){};
 #else
   ParticleRotator(Lua &lua)
-      : center(lua.getField("center", Vector3<double>())),
+      : center(lua.getField("center", Vector3<double>::zero)),
         rotator(lua.getField<std::shared_ptr<Rotator> >("rotator")),
         affect_position(lua.getField("affect_position", true)),
         affect_momentum(lua.getField("affect_momentum", true)),

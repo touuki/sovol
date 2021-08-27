@@ -29,5 +29,6 @@ Makefile
 
 dist/
 
+/tables
 /sovol-cli
 *.h5

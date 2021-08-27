@@ -6,12 +6,12 @@ include_HEADERS = \
     src/cli/Simulator.hh \
     src/cli/Storage.hh \
     src/wasm/FactoryHelper.hh \
-    src/wasm/WasmSimulation.hh \
     src/Algorithm.hh \
     src/config.hh \
     src/Field.hh \
     src/FieldShifter.hh \
     src/Particle.hh \
+    src/ParticleProducer.hh \
     src/ParticleShifter.hh \
     src/Rotator.hh \
     src/Table.hh \
@@ -21,14 +21,16 @@ if WASM
 libsovol_wasmlibdir = $(libdir)
 libsovol_wasmlib_PROGRAMS = libsovol-wasm.so
 libsovol_wasm_so_SOURCES = \
+    src/wasm/main.cc \
     src/Algorithm.cc \
     src/Field.cc \
     src/FieldShifter.cc \
     src/Particle.cc \
     src/ParticleShifter.cc \
-    src/RealTimeRepeatSimulation.cc \
-    src/WasmSimulation.cc
-libsovol_wasm_so_CXXFLAGS = -std=c++17 -Wall --bind
+    src/Rotator.cc \
+    src/Table.cc \
+    src/utils.cc
+libsovol_wasm_so_CXXFLAGS = -I./src -std=c++17 -Wall --bind
 libsovol_wasm_so_LDFLAGS = -shared -fPIC
 else
 AM_CXXFLAGS = -I./src -std=c++17 -Wall $(HDF5_CPPFLAGS)
@@ -44,7 +46,8 @@ libsovol_a_SOURCES = \
     src/Particle.cc \
     src/ParticleShifter.cc \
     src/Rotator.cc \
-    src/Table.cc
+    src/Table.cc \
+    src/utils.cc
 noinst_PROGRAMS = sovol-cli
 sovol_cli_SOURCES = \
     src/cli/Lua.cc \
@@ -57,7 +60,8 @@ sovol_cli_SOURCES = \
     src/Particle.cc \
     src/ParticleShifter.cc \
     src/Rotator.cc \
-    src/Table.cc
+    src/Table.cc \
+    src/utils.cc
 sovol_cli_LDFLAGS = $(HDF5_LDFLAGS)
 sovol_cli_LDADD = -llua -ldl -lpthread -lhdf5_cpp $(HDF5_LIBS)
 endif

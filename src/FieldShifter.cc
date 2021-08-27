@@ -36,12 +36,12 @@ class FieldRotator : public FieldShifter {
       : center(_center), rotator(_rotator){};
 #ifdef __EMSCRIPTEN__
   FieldRotator(emscripten::val v)
-      : center(v["center"].isUndefined() ? Vector3<double>()
+      : center(v["center"].isUndefined() ? Vector3<double>::zero
                                          : Vector3<double>(v["center"])),
-        rotator(RotatorFactory::createObject(v["rotator"])){};
+        rotator(Rotator::createObject(v["rotator"])){};
 #else
   FieldRotator(Lua &lua)
-      : center(lua.getField("center", Vector3<double>())),
+      : center(lua.getField("center", Vector3<double>::zero)),
         rotator(lua.getField<std::shared_ptr<Rotator> >("rotator")){};
 #endif
   Vector3<double> reversePosition(const Vector3<double> &pos) const override {

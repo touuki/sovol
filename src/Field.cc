@@ -54,7 +54,6 @@ class FieldWithShifters : public Field {
   FieldWithShifters(emscripten::val v)
       : field(Field::createObject(v["field"])) {
     emscripten::val val_shifters = v["shifters"];
-    int length = val_shifters["length"].as<int>();
     for (int i = 0; i < val_shifters["length"].as<int>(); i++) {
       shifters.push_back(FieldShifter::createObject(val_shifters[i]));
     }
@@ -91,7 +90,6 @@ class FieldCombiner : public Field {
 #ifdef __EMSCRIPTEN__
   FieldCombiner(emscripten::val v) {
     emscripten::val val_fields = v["fields"];
-    int length = val_fields["length"].as<int>();
     for (int i = 0; i < val_fields["length"].as<int>(); i++) {
       fields.push_back(Field::createObject(val_fields[i]));
     }

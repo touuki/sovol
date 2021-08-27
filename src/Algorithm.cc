@@ -114,14 +114,16 @@ class ModifiedAMMLeapfrogAlgorithm : public LeapfrogAlgorithm,
                    std::sqrt((emField.E + beta.cross(emField.B)).square() -
                              std::pow(emField.E.dot(beta), 2)) /
                    criticalField;
-    return utils::anomalousMagneticMoment->operator()(std::log10(chi_e));
+    return utils::tables::anomalousMagneticMoment->operator()(
+        std::log10(chi_e));
   };
 
  public:
   ModifiedAMMLeapfrogAlgorithm(double _frequency);
 #ifdef __EMSCRIPTEN__
   ModifiedAMMLeapfrogAlgorithm(emscripten::val v)
-      : FrequencyHelper(v["reference_frequency"].as<double>()){};
+      : FrequencyHelper(
+            emscripten::val::global("reference_frequency").as<double>()){};
 #else
   ModifiedAMMLeapfrogAlgorithm(Lua &lua)
       : FrequencyHelper(lua.getGlobal<double>("reference_frequency")){};
@@ -169,12 +171,13 @@ class MonteCarloRadiativePolarizationAlgorithm : public RadiativeAlgorithm {
 
       if (disable_spin_effect) {
         double temp = emissionFactor * (chi_e / gamma) *
-                      utils::photonEmissionRate->operator()(log_chi_e);
+                      utils::tables::photonEmissionRate->operator()(log_chi_e);
         emissionTime = std::min(part.optical_depth / temp, dt - localTime);
         part.optical_depth -= emissionTime * temp;
         if (part.optical_depth <= 1e-100) {
-          double chi_gamma = std::pow(10, utils::photonParameter->operator()(
-                                              log_chi_e, 0., utils::random()));
+          double chi_gamma =
+              std::pow(10, utils::tables::photonParameter->operator()(
+                               log_chi_e, 0., utils::random()));
           double photonEnergy = (gamma - 1.) * chi_gamma / chi_e;
           Vector3<double> photonMomentum = photonEnergy * part.momentum.unit();
           // if (photonEnergy > minPhotonEnergy); // Produce photon
@@ -188,11 +191,13 @@ class MonteCarloRadiativePolarizationAlgorithm : public RadiativeAlgorithm {
         Vector3<double> zeta = b_RF.unit();
         double s_zeta = zeta.dot(part.polarization);
         double persc =
-            utils::photonEmissionRateSpinCorrection->operator()(log_chi_e);
+            utils::tables::photonEmissionRateSpinCorrection->operator()(
+                log_chi_e);
         double ef = emissionFactor * (chi_e / gamma);
 
-        double temp = ef * (utils::photonEmissionRate->operator()(log_chi_e) -
-                            s_zeta * persc);
+        double temp =
+            ef * (utils::tables::photonEmissionRate->operator()(log_chi_e) -
+                  s_zeta * persc);
         emissionTime = std::min(part.optical_depth / temp, dt - localTime);
         part.optical_depth -= emissionTime * temp;
 
@@ -201,8 +206,8 @@ class MonteCarloRadiativePolarizationAlgorithm : public RadiativeAlgorithm {
             (zeta - zeta.dot(part.polarization) * part.polarization);
         if (part.optical_depth <= 1e-100) {
           double chi_gamma =
-              std::pow(10, utils::photonParameter->operator()(log_chi_e, s_zeta,
-                                                              utils::random()));
+              std::pow(10, utils::tables::photonParameter->operator()(
+                               log_chi_e, s_zeta, utils::random()));
           double x = chi_gamma / chi_e;
           double photonEnergy = (gamma - 1.) * x;
           Vector3<double> photonMomentum = photonEnergy * part.momentum.unit();
@@ -213,13 +218,13 @@ class MonteCarloRadiativePolarizationAlgorithm : public RadiativeAlgorithm {
           double u = chi_gamma / (chi_e - chi_gamma);
           double u_p = (2. / 3.) * u / chi_e;
 #ifdef __EMSCRIPTEN__
-          double k13 = utils::k13->operator()(std::log10(u_p));
-          double k23 = utils::k23->operator()(std::log10(u_p));
+          double k13 = utils::tables::k13->operator()(std::log10(u_p));
+          double k23 = utils::tables::k23->operator()(std::log10(u_p));
 #else
           double k13 = std::cyl_bessel_k(1. / 3., u_p);
           double k23 = std::cyl_bessel_k(2. / 3., u_p);
 #endif
-          double intK13 = utils::intK13->operator()(std::log10(u_p));
+          double intK13 = utils::tables::intK13->operator()(std::log10(u_p));
 
           Vector3<double> e_RF =
               gamma * (em.E + beta.cross(em.B) -
@@ -265,8 +270,9 @@ class MonteCarloRadiativePolarizationAlgorithm : public RadiativeAlgorithm {
       bool _disable_spin_effect = false);
 #ifdef __EMSCRIPTEN__
   MonteCarloRadiativePolarizationAlgorithm(emscripten::val v)
-      : RadiativeAlgorithm(v["reference_frequency"].as<double>(),
-                           Algorithm::createObject(v["base_algorithm"])),
+      : RadiativeAlgorithm(
+            emscripten::val::global("reference_frequency").as<double>(),
+            Algorithm::createObject(v["base_algorithm"])),
         min_chi_e(v["min_chi_e"].isUndefined() ? 0.
                                                : v["min_chi_e"].as<double>()),
         disable_reaction(v["disable_reaction"].isUndefined()
@@ -319,9 +325,9 @@ class ContinuousRadiativePolarizationAlgorithm : public RadiativeAlgorithm {
       double s_eta = eta.dot(part.polarization);
       double s_kappa = kappa.dot(part.polarization);
 
-      double f1 = utils::f1->operator()(log_chi_e);
-      double f2 = utils::f2->operator()(log_chi_e);
-      double f3 = utils::f3->operator()(log_chi_e);
+      double f1 = utils::tables::f1->operator()(log_chi_e);
+      double f2 = utils::tables::f2->operator()(log_chi_e);
+      double f3 = utils::tables::f3->operator()(log_chi_e);
       double factor = emissionFactor * (chi_e / gamma) * dt;
 
       double d_spin_zeta = factor * (-s_zeta * f2 - f1);
@@ -344,8 +350,9 @@ class ContinuousRadiativePolarizationAlgorithm : public RadiativeAlgorithm {
       bool _disable_spin_effect = false);
 #ifdef __EMSCRIPTEN__
   ContinuousRadiativePolarizationAlgorithm(emscripten::val v)
-      : RadiativeAlgorithm(v["reference_frequency"].as<double>(),
-                           Algorithm::createObject(v["base_algorithm"])),
+      : RadiativeAlgorithm(
+            emscripten::val::global("reference_frequency").as<double>(),
+            Algorithm::createObject(v["base_algorithm"])),
         min_chi_e(v["min_chi_e"].isUndefined() ? 0.
                                                : v["min_chi_e"].as<double>()),
         disable_reaction(v["disable_reaction"].isUndefined()

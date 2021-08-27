@@ -30,82 +30,77 @@ Figure.variables = {
   x: {
     name: "x",
     unit: "c/ω",
-    processData: (data) => data.pos.x,
+    processData: (data) => data.particle.position.x,
   },
   y: {
     name: "y",
     unit: "c/ω",
-    processData: (data) => data.pos.y,
+    processData: (data) => data.particle.position.y,
   },
   z: {
     name: "z",
     unit: "c/ω",
-    processData: (data) => data.pos.z,
+    processData: (data) => data.particle.position.z,
   },
   px: {
     name: "px",
     unit: "m_e c",
-    processData: (data) => data.mom.x,
+    processData: (data) => data.particle.momentum.x,
   },
   py: {
     name: "py",
     unit: "m_e c",
-    processData: (data) => data.mom.y,
+    processData: (data) => data.particle.momentum.y,
   },
   pz: {
     name: "pz",
     unit: "m_e c",
-    processData: (data) => data.mom.z,
+    processData: (data) => data.particle.momentum.z,
   },
   Ex: {
     name: "Ex",
     unit: "m_e cω/e",
-    processData: (data) => data.E.x,
+    processData: (data) => data.particle.em_field.E.x,
   },
   Ey: {
     name: "Ey",
     unit: "m_e cω/e",
-    processData: (data) => data.E.y,
+    processData: (data) => data.particle.em_field.E.y,
   },
   Ez: {
     name: "Ez",
     unit: "m_e cω/e",
-    processData: (data) => data.E.z,
+    processData: (data) => data.particle.em_field.E.z,
   },
   Bx: {
     name: "Bx",
     unit: "m_e ω/e",
-    processData: (data) => data.B.x,
+    processData: (data) => data.particle.em_field.B.x,
   },
   By: {
     name: "By",
     unit: "m_e ω/e",
-    processData: (data) => data.B.y,
+    processData: (data) => data.particle.em_field.B.y,
   },
   Bz: {
     name: "Bz",
     unit: "m_e ω/e",
-    processData: (data) => data.B.z,
+    processData: (data) => data.particle.em_field.B.z,
   },
   Ek: {
     name: "Ek",
     unit: "m_e c2",
-    processData: (data) => data.Ek,
-  },
-  thetax: {
-    name: "θx",
-    unit: "m_e c",
-    processData: (data) => - data.mom.x/data.mom.z,
-  },
-  thetay: {
-    name: "θy",
-    unit: "m_e c",
-    processData: (data) => - data.mom.y/data.mom.z,
+    processData: (data) => Math.sqrt(
+      Math.pow(data.particle.mass, 2)
+      + Math.pow(data.particle.momentum.x, 2)
+      + Math.pow(data.particle.momentum.y, 2)
+      + Math.pow(data.particle.momentum.z, 2)
+    ) - data.particle.mass,
   },
   t: {
     name: "t",
     unit: "1/ω",
-    processData: (data) => data.t,
+    processData: (data) => data.time,
   }
 };
 
@@ -169,12 +164,15 @@ class Figure2dLine extends FigureLine {
   }
 
   addData(data) {
-    if (data.isNewParticle) {
+    if (data.type == "new_particle") {
       this.series.push(this.getSeriesElement());
+    } else if (data.type == "data") {
+      const x = this.x.processData(data.data);
+      const y = this.y.processData(data.data);
+      this.series[this.series.length - 1].data.push([x, y]);
+    } else if (data.type == "end_particle") {
+      this.updateFrame()
     }
-    const x = this.x.processData(data.data);
-    const y = this.y.processData(data.data);
-    this.series[this.series.length - 1].data.push([x, y]);
   }
 }
 
@@ -229,13 +227,16 @@ class Figure3dLine extends FigureLine {
   }
 
   addData(data) {
-    if (data.isNewParticle) {
+    if (data.type == "new_particle") {
       this.series.push(this.getSeriesElement());
+    } else if (data.type == "data") {
+      const x = this.x.processData(data);
+      const y = this.y.processData(data);
+      const z = this.z.processData(data);
+      this.series[this.series.length - 1].data.push([x, y, z]);
+    } else if (data.type == "end_particle") {
+      this.updateFrame()
     }
-    const x = this.x.processData(data.data);
-    const y = this.y.processData(data.data);
-    const z = this.z.processData(data.data);
-    this.series[this.series.length - 1].data.push([x, y, z]);
   }
 }
 
@@ -311,10 +312,10 @@ class Figure2dScatter extends FigureScatter {
   }
 
   addData(data) {
-    if (data.endtimeReached) {
-      const x = this.x.processData(data.data);
-      const y = this.y.processData(data.data);
-      const c = this.c.processData(data.data);
+    if (data.type == "end_particle") {
+      const x = this.x.processData(data);
+      const y = this.y.processData(data);
+      const c = this.c.processData(data);
       if (typeof this.max === 'undefined' || c > this.max) {
         this.max = c;
       }
@@ -322,6 +323,7 @@ class Figure2dScatter extends FigureScatter {
         this.min = c;
       }
       this.plot.appendData({ seriesIndex: 0, data: [[x, y, c]] })
+      this.updateFrame();
     }
   }
 }
@@ -384,11 +386,11 @@ class Figure3dScatter extends FigureScatter {
   }
 
   addData(data) {
-    if (data.endtimeReached) {
-      const x = this.x.processData(data.data);
-      const y = this.y.processData(data.data);
-      const z = this.z.processData(data.data);
-      const c = this.c.processData(data.data);
+    if (data.type == "end_particle") {
+      const x = this.x.processData(data);
+      const y = this.y.processData(data);
+      const z = this.z.processData(data);
+      const c = this.c.processData(data);
       if (typeof this.max === 'undefined' || c > this.max) {
         this.max = c;
       }
@@ -396,6 +398,7 @@ class Figure3dScatter extends FigureScatter {
         this.min = c;
       }
       this.plot.appendData({ seriesIndex: 0, data: [[x, y, z, c]] })
+      this.updateFrame();
     }
   }
 }

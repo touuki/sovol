@@ -57,6 +57,7 @@ control = {
     data_end_time = 1. * period,
     data_interval = 200,
     parallel_workers = 8,
+    table_dirname = "./tables",
     output_filename = "test.h5",
     output_items = {"x","y","z","px","py","pz","sx","sy","sz","Ex","Ey","Ez","Bx","By","Bz","optical_depth"}
 }
@@ -103,42 +104,44 @@ field = {
     }
 }
 
-particle = {
-    type = 1, -- 0: normal, 1: electron
-    -- mass = 1,
-    -- charge = -1,
-    position = {0.,0.,0.},
-    momentum = {0.,0.,0.}
-}
-
-particle_shifters = {
-    {
-        name = "CustomParticleShifter",
-        global_function_name = "custom_particle_shifter"
+particle_producer = {
+    particle = {
+        type = 1, -- 0: normal, 1: electron
+        -- mass = 1,
+        -- charge = -1,
+        position = {0.,0.,0.},
+        momentum = {0.,0.,0.}
     },
-    {
-        name = "ParticleTranslator",
-        displacement = {3, 0, 0}
-    },
-    {
-        name = "ParticleRotator",
-        -- center = {0,0,0},
-        rotator = {
-            name = "ExtrinsicRotator",
-            alpha = math.pi / 2,
-            beta = math.pi / 2,
-            gamma = 0,
+    shifters = {
+        {
+            name = "CustomParticleShifter",
+            global_function_name = "custom_particle_shifter"
         },
-        affect_position = false,
-        affect_momentum = false,
-        -- affect_polarization = true,
+        {
+            name = "ParticleTranslator",
+            displacement = {3, 0, 0}
+        },
+        {
+            name = "ParticleRotator",
+            -- center = {0,0,0},
+            rotator = {
+                name = "ExtrinsicRotator",
+                alpha = math.pi / 2,
+                beta = math.pi / 2,
+                gamma = 0,
+            },
+            affect_position = false,
+            affect_momentum = false,
+            -- affect_polarization = true,
+        }
     }
 }
 
+
 algorithm = {
-    name = "RadiativeElectronPolarizationAlgorithm",
+    name = "MonteCarloRadiativePolarizationAlgorithm",
     base_algorithm = {
-        name = "ModifiedSpinLeapfrogAlgorithm"
+        name = "ModifiedAMMLeapfrogAlgorithm"
     },
     min_chi_e = 1e-5,
     disable_reaction = true,

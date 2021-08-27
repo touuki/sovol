@@ -1,10 +1,72 @@
-const initSim = new ConditionalExecutor(() => Module && Module.getWasmSimulation, () => {
-  window.sim = Module.getWasmSimulation("WasmSimulation");
+const initSim = new ConditionalExecutor(() => {
+  if (!Module || !Module.initTables) {
+    return false;
+  }
+  for (const key in tables) {
+    if (!tables[key].ready) {
+      return false;
+    }
+  }
+  return true;
+}, () => {
+  Module.initTables(tables);
   document.getElementById("start").disabled = '';
 });
-const version = "1.2.0";
+const version = "2.0";
 const custom_function = {};
 const figures = {};
+
+const tables = {
+  anomalousMagneticMoment: {
+    url: "tables/anomalousMagneticMoment.data"
+  },
+  photonEmissionRate: {
+    url: "tables/photonEmissionRate.data"
+  },
+  photonEmissionRateSpinCorrection: {
+    url: "tables/photonEmissionRateSpinCorrection.data"
+  },
+  intK13: {
+    url: "tables/intK13.data"
+  },
+  k13: {
+    url: "tables/k13.data"
+  },
+  k23: {
+    url: "tables/k23.data"
+  },
+  photonParameter: {
+    url: "tables/photonParameter.data"
+  },
+  f1: {
+    url: "tables/f1.data"
+  },
+  f2: {
+    url: "tables/f2.data"
+  },
+  f3: {
+    url: "tables/f3.data"
+  },
+};
+
+for (const key in tables) {
+  $.ajax({
+    url: tables[key].url,
+    dataType: "binary",
+    ifModified: false,
+    processData: false,
+    responseType: 'arraybuffer',
+    success: (data) => {
+      tables[key].arraybuffer = data;
+      tables[key].ready = true;
+    },
+    error: (xhr, status, err) => {
+      console.error(xhr, status, err);
+    },
+  });
+};
+
+simulation_callback = (data) => Object.values(figures).forEach(e => e.addData(data))
 
 $(function () {
   window.$grid = $('.masonry').masonry({
@@ -16,74 +78,15 @@ $(function () {
   });
 
   $('#start').click(function () {
-    if (!sim || sim.isStart()) {
+    if (Module.isSimulationStart()) {
       return;
     } else {
       Object.values(figures).forEach(e => e.clear());
-      const perfix = 'SC_';
-      const obj = {};
-      $('.simulation-input').filter(':visible').each((i, e) =>
-        obj[`${perfix}${e.id}`] = $(e).hasClass('eval') ? eval(e.value).toString() : e.value.toString()
-      );
-      if (obj[`${perfix}FIELD_CLASSNAME`] == 'CustomField') {
-        const arguments_string = $('#arguments_table').children().map(function (i, e) {
-          return `var ${$(e).find('.customfield-argument-key').val()} = ${$(e).find('.customfield-argument-value').val()};`;
-        }).get().join('');
-        $('.customfield-func').each((i, e) => {
-          if (custom_function[e.id]) {
-            removeFunction(custom_function[e.id]);
-          }
-          custom_function[e.id] = addFunction(new Function('x', 'y', 'z', 't', `${arguments_string}${e.value}`), 'ddddd');
-          obj[`${perfix}${e.id}`] = custom_function[e.id].toString();
-        });
-      }
-
-      const rateControl = {
-        fps: $('#rateControl_fps').val(),
-        dpf: $('#rateControl_dpf').val(),
-      };
-      sim.init(obj);
-      nextFrame(sim.getId(), rateControl);
+      Module.startSimulation();
     }
   });
 
-  function nextFrame(id, rateControl) {
-    const updatetime = new Date().getTime() + 1000 / rateControl.fps;
-    for (let i = 0; i < rateControl.dpf;) {
-      const data = sim.runAndGetData(id);
-      if (data.aborted) {
-        return;
-      }
-      if (data.finished) {
-        Object.values(figures).forEach(e => e.updateFrame());
-        return;
-      }
-      if (data.data) {
-        Object.values(figures).forEach(e => e.addData(data))
-        i++
-      }
-    }
-    Object.values(figures).forEach(e => e.updateFrame());
-    const nowtime = new Date().getTime();
-    if (nowtime > updatetime) {
-      setTimeout(nextFrame, 0, id, rateControl);
-    } else {
-      setTimeout(nextFrame, updatetime - nowtime, id, rateControl);
-    }
-  }
-
-  $('#stop').click(() => {
-    sim && sim.stop();
-  });
-
-  $('#FIELD_CLASSNAME').change(function () {
-    const name = $('#FIELD_CLASSNAME > option:selected').val();
-    $('.field-args').css("display", "none");
-    $(`#${name}_args_div`).css("display", "");
-    $grid.masonry();
-  });
-
-  $('#FIELD_CLASSNAME').change();
+  $('#stop').click(() => Module.stopSimulation());
 
   $('#particles_plots_input select.axis').each((i, e) => {
     for (const key in Figure.variables) {
@@ -154,25 +157,6 @@ $(function () {
 
   $('#export_data').click(function () {
     funDownload(JSON.stringify({ version: version, data: sim.getStoredData() }), 'sovol_data.json');
-  });
-
-  $('#export_args').click(function () {
-    const obj = {};
-    obj.version = version;
-    obj.static_inputs = $('.static-input').map(function (i, e) {
-      return {
-        key: e.id,
-        value: e.value
-      };
-    }).get();
-    obj.customfield_arguments = $('#arguments_table').children().map(function (i, e) {
-      return {
-        key: $(e).find('.customfield-argument-key').val(),
-        value: $(e).find('.customfield-argument-value').val()
-      };
-    }).get();
-    obj.plot_figures = $('.figure').map((i, e) => e.dataset).get();
-    funDownload(JSON.stringify(obj), 'sovol_args.json');
   });
 
   $('#import_args').click(() => $('#import_args_file').click());
