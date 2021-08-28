@@ -30,71 +30,83 @@ Figure.variables = {
   x: {
     name: "x",
     unit: "c/ω",
-    processData: (data) => data.particle.position.x,
+    processData: (data) => data.particle.position[0],
   },
   y: {
     name: "y",
     unit: "c/ω",
-    processData: (data) => data.particle.position.y,
+    processData: (data) => data.particle.position[1],
   },
   z: {
     name: "z",
     unit: "c/ω",
-    processData: (data) => data.particle.position.z,
+    processData: (data) => data.particle.position[2],
   },
   px: {
     name: "px",
     unit: "m_e c",
-    processData: (data) => data.particle.momentum.x,
+    processData: (data) => data.particle.momentum[0],
   },
   py: {
     name: "py",
     unit: "m_e c",
-    processData: (data) => data.particle.momentum.y,
+    processData: (data) => data.particle.momentum[1],
   },
   pz: {
     name: "pz",
     unit: "m_e c",
-    processData: (data) => data.particle.momentum.z,
+    processData: (data) => data.particle.momentum[2],
+  },
+  sx: {
+    name: "sx",
+    processData: (data) => data.particle.polarization[0],
+  },
+  sy: {
+    name: "sy",
+    processData: (data) => data.particle.polarization[1],
+  },
+  sz: {
+    name: "sz",
+    processData: (data) => data.particle.polarization[2],
   },
   Ex: {
     name: "Ex",
     unit: "m_e cω/e",
-    processData: (data) => data.particle.em_field.E.x,
+    processData: (data) => data.particle.em_field.E[0],
   },
   Ey: {
     name: "Ey",
     unit: "m_e cω/e",
-    processData: (data) => data.particle.em_field.E.y,
+    processData: (data) => data.particle.em_field.E[1],
   },
   Ez: {
     name: "Ez",
     unit: "m_e cω/e",
-    processData: (data) => data.particle.em_field.E.z,
+    processData: (data) => data.particle.em_field.E[2],
   },
   Bx: {
     name: "Bx",
     unit: "m_e ω/e",
-    processData: (data) => data.particle.em_field.B.x,
+    processData: (data) => data.particle.em_field.B[0],
   },
   By: {
     name: "By",
     unit: "m_e ω/e",
-    processData: (data) => data.particle.em_field.B.y,
+    processData: (data) => data.particle.em_field.B[1],
   },
   Bz: {
     name: "Bz",
     unit: "m_e ω/e",
-    processData: (data) => data.particle.em_field.B.z,
+    processData: (data) => data.particle.em_field.B[2],
   },
   Ek: {
     name: "Ek",
     unit: "m_e c2",
     processData: (data) => Math.sqrt(
       Math.pow(data.particle.mass, 2)
-      + Math.pow(data.particle.momentum.x, 2)
-      + Math.pow(data.particle.momentum.y, 2)
-      + Math.pow(data.particle.momentum.z, 2)
+      + Math.pow(data.particle.momentum[0], 2)
+      + Math.pow(data.particle.momentum[1], 2)
+      + Math.pow(data.particle.momentum[2], 2)
     ) - data.particle.mass,
   },
   t: {
@@ -107,11 +119,11 @@ Figure.variables = {
 class FigureLine extends Figure {
   constructor(plot, id, options) {
     super(plot, id, options)
-    this.series = []
+    this.series = [];
   }
 
   updateFrame() {
-    this.plot.setOption({ series: this.series })
+    this.plot.setOption({ series: this.series });
   }
 
   clear() {
@@ -167,10 +179,10 @@ class Figure2dLine extends FigureLine {
     if (data.type == "new_particle") {
       this.series.push(this.getSeriesElement());
     } else if (data.type == "data") {
-      const x = this.x.processData(data.data);
-      const y = this.y.processData(data.data);
+      const x = this.x.processData(data);
+      const y = this.y.processData(data);
       this.series[this.series.length - 1].data.push([x, y]);
-    } else if (data.type == "end_particle") {
+    } else if (data.type == "end_particle" || data.type == "update_frame") {
       this.updateFrame()
     }
   }
@@ -234,7 +246,7 @@ class Figure3dLine extends FigureLine {
       const y = this.y.processData(data);
       const z = this.z.processData(data);
       this.series[this.series.length - 1].data.push([x, y, z]);
-    } else if (data.type == "end_particle") {
+    } else if (data.type == "end_particle" || data.type == "update_frame") {
       this.updateFrame()
     }
   }

@@ -11,8 +11,10 @@ class ParticleProducer {
 #ifdef __EMSCRIPTEN__
   ParticleProducer(emscripten::val v) : particle(v["particle"]) {
     emscripten::val val_shifters = v["shifters"];
-    for (int i = 0; i < val_shifters["length"].as<int>(); i++) {
-      shifters.push_back(ParticleShifter::createObject(val_shifters[i]));
+    if (!val_shifters.isUndefined()) {
+      for (int i = 0; i < val_shifters["length"].as<int>(); i++) {
+        shifters.push_back(ParticleShifter::createObject(val_shifters[i]));
+      }
     }
   };
 #else

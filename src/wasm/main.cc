@@ -20,11 +20,10 @@ class InterruptException : public std::exception {
 int simulation_id;
 bool is_start;
 
-std::chrono::steady_clock::time_point release_control(
-    int local_id, long sleep_millisecond = 0) {
+double release_control(int local_id, unsigned int sleep_millisecond = 0) {
   emscripten_sleep(sleep_millisecond);
   if (local_id != simulation_id || !is_start) throw InterruptException();
-  return std::chrono::steady_clock::now();
+  return val::global("Date").new_().call<double>("getTime");
 }
 
 void start_simulation() {
@@ -38,20 +37,25 @@ void start_simulation() {
   double time_step = control["time_step"].as<double>();
   double data_end_time = control["data_end_time"].as<double>();
   int total_particle_number = control["total_particle_number"].as<int>();
-  double data_interval = control["data_interval"].as<double>();
+  int data_interval = control["data_interval"].as<int>();
   double data_start_time = control["data_start_time"].as<double>();
+  int data_per_frame = control["data_per_frame"].as<int>();
+  int frames_per_second = control["frames_per_second"].as<int>();
   emscripten::val callback = val::global("simulation_callback");
+  // auto data_interval for 0
+  if (data_interval <= 0) {
+    data_interval = (data_end_time - data_start_time) / time_step;
+  }
 
-  std::chrono::steady_clock::time_point begin = release_control(local_id);
+  double begin = val::global("Date").new_().call<double>("getTime");
   try {
     for (int i = 0; i < total_particle_number; i++) {
       Particle particle = particle_producer();
       val result = val::object();
       result.set("type", "new_particle");
       callback(result);
-      begin = release_control(local_id);
 
-      double time = 0;
+      double time = 0, data_count = 0;
       for (double next_data_time = data_start_time; time < data_end_time;
            time += time_step) {
         if (time >= next_data_time) {
@@ -60,14 +64,20 @@ void start_simulation() {
           result.set("time", time);
           result.set("particle", particle.toEmscriptenVal());
           callback(result);
-          begin = release_control(local_id);
 
-          next_data_time =
-              std::max(next_data_time + data_interval, time + time_step);
-        } else if (std::chrono::duration_cast<std::chrono::microseconds>(
-                       std::chrono::steady_clock::now() - begin)
-                       .count() > 1000) {
-          begin = release_control(local_id);
+          data_count++;
+          next_data_time += data_interval * time_step;
+          if (data_count >= data_per_frame) {
+            data_count = 0;
+            result = val::object();
+            result.set("type", "update_frame");
+            callback(result);
+            double now = val::global("Date").new_().call<double>("getTime");
+            begin = release_control(
+                local_id, std::max(static_cast<int>(
+                                       begin + 1000 / frames_per_second - now),
+                                   0));
+          }
         }
         algorithm->operator()(particle, *field, time, time_step);
       }
