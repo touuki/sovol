@@ -57,6 +57,15 @@ Figure.variables = {
     unit: "m_e c",
     processData: (data) => data.particle.momentum[2],
   },
+  sl: {
+    name: "sl",
+    processData: (data) => (data.particle.polarization[0] * data.particle.momentum[0]
+      + data.particle.polarization[1] * data.particle.momentum[1]
+      + data.particle.polarization[2] * data.particle.momentum[2])
+      / Math.sqrt(Math.pow(data.particle.momentum[0], 2)
+        + Math.pow(data.particle.momentum[1], 2)
+        + Math.pow(data.particle.momentum[2], 2)),
+  },
   sx: {
     name: "sx",
     processData: (data) => data.particle.polarization[0],

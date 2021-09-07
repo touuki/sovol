@@ -36,9 +36,13 @@ void start_simulation() {
   val control = val::global("control");
   double time_step = control["time_step"].as<double>();
   double data_end_time = control["data_end_time"].as<double>();
-  int total_particle_number = control["total_particle_number"].as<int>();
+  int total_particle_number = control["total_particle_number"].isUndefined()
+                                  ? 1
+                                  : control["total_particle_number"].as<int>();
   int data_interval = control["data_interval"].as<int>();
-  double data_start_time = control["data_start_time"].as<double>();
+  double data_start_time = control["data_start_time"].isUndefined()
+                               ? 0
+                               : control["data_start_time"].as<double>();
   int data_per_frame = control["data_per_frame"].as<int>();
   int frames_per_second = control["frames_per_second"].as<int>();
   emscripten::val callback = val::global("simulation_callback");

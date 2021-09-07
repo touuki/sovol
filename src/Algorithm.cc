@@ -20,8 +20,10 @@ class FrequencyHelper {
 
 class NoneAlgorithm : public Algorithm {
  public:
-  void operator()(Particle &, const Field &, double time,
-                  double dt) const override{};
+  void operator()(Particle &part, const Field &field, double time,
+                  double dt) const override {
+    part.em_field = field(part.position, time);
+  };
 };
 
 REGISTER_SINGLETON(Algorithm, NoneAlgorithm)

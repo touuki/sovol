@@ -1,12 +1,10 @@
 c = 299792458.0
-mass = 1.
-charge = -1.
-synchronized = true
+mass = 1836.
+charge = 1.
 
 let U = 2000 / 0.511e6;
 let L = 0.0005;
 let delay = 0.25;
-let increasement = Math.abs(charge)*U/mass;
 
 // reference_frequency = 2 * Math.PI * c / 800e-9
 
@@ -23,9 +21,8 @@ control = {
 field = {
     name: "CustomField",
     func: (x,y,z,t) => {
-        let _t = synchronized ? 0.5/increasement*(Math.pow(1+4*increasement*t,0.5)-1) : t;
         return {
-            E:[x < L/2 && x > -L/2 ? U/L*Math.sin(2*Math.PI*(_t+delay)) : 0,0,0],
+            E:[x < L/2 && x > -L/2 ? U/L*Math.sin(2*Math.PI*(t+delay)) : 0,0,0],
             B:[0,0,2*Math.PI*mass/charge]
         }
     }
@@ -33,7 +30,8 @@ field = {
 
 particle_producer = {
     particle: {
-        type: 1,
+        mass: mass,
+        charge: charge,
         position: [0.,0.,0.],
         momentum: [0.,0.,0.]
     }

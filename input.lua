@@ -1,12 +1,12 @@
 lambda = 2. * math.pi
 period = 2. * math.pi
 c = 299792458.0
-beam_width = 1. * lambda
-beam_length = 3. * lambda
-kinetic_energy = 500
-energy_spread = 0.05
-angular_divergence = 0.01
-spin_kappa = 10
+beam_width = 1. * lambda -- 束流宽度，沿任意横向方向测量该宽度之内的粒子数为95%（4个标准差），正态分布
+beam_length = 3. * lambda -- 束流纵向长度，均匀分布
+kinetic_energy = 500 -- 粒子束平均动能
+energy_spread = 0.05 -- 粒子束能散，流强半高全宽定义下的能量分散程度，正态分布
+angular_divergence = 0.01 -- 粒子束角度发散，沿任意横向方向测量，该角度之内的粒子数为95%（仅限小角度，即可做近似tanθ=θ的情况），正态分布
+spin_kappa = 10 -- 球面Fisher分布中的kappa系数，越小则分布越集中于[0,0,1]
 
 function init_position()
     return {
