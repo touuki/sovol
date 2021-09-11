@@ -9,7 +9,6 @@
 class H5Storage {
  private:
   H5::H5File file;
-  std::vector<std::string> storageItems;
   std::map<std::string, H5::DataSet> data_sets;
   hsize_t currentSize[2];
   hsize_t singleRowSize[2];

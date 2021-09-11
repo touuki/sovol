@@ -4,7 +4,6 @@ H5Storage::H5Storage(const std::string &_fileName,
                      const std::vector<std::string> &_storageItems,
                      hsize_t length)
     : file(_fileName, H5F_ACC_TRUNC),
-      storageItems(_storageItems),
       currentSize{0, 0},
       singleRowSize{1, 0} {
   currentSize[1] = length;
@@ -16,7 +15,7 @@ H5Storage::H5Storage(const std::string &_fileName,
   H5::DSetCreatPropList prop;
   prop.setChunk(2, singleRowSize);
   prop.setDeflate(6);
-  for (auto &&key : storageItems) {
+  for (auto &&key : _storageItems) {
     data_sets.insert({key, file.createDataSet(key, H5::PredType::IEEE_F64LE,
                                               dataspace, prop)});
   }

@@ -85,7 +85,8 @@ Simulator::Simulator(const std::shared_ptr<Field> &_field,
     : field(_field),
       algorithm(_algorithm),
       timePoints(_timePoints),
-      timeStep(_timeStep) {
+      timeStep(_timeStep),
+      outputFlag(0) {
   for (auto &&item : _outputItems) {
     outputFlag |= convertToFlag(item);
   }
