@@ -24,6 +24,24 @@
 
 这种归一化好处是可以减少公式的计算量，并且不用考虑SI单位制与高斯单位制的区别。
 
+### 编译运行步骤
+#### CLI版本
+1. 安装autotools工具（[autoconf](https://www.gnu.org/software/autoconf/)、[automake](https://www.gnu.org/software/automake/)、[autoconf-archive](https://www.gnu.org/software/autoconf-archive/)等）
+2. 编译并安装[HDF5](https://www.hdfgroup.org/downloads/hdf5/)
+3. 将本仓库下载或克隆到本地`git clone https://github.com/touuki/sovol`
+4. 进入项目文件夹中运行下列命令生成Makefile
+```shell
+aclocal
+autoconf
+automake --add-missing
+./configure
+```
+5. 运行`make`命令进行编译
+6. 使用编译生成的可执行文件进行模拟`./sovol-cli <your-input.lua> <parameters-to-lua>...`
+
+#### WASM版本
+TODO
+
 ### 参数设置
 #### 参考频率 `reference_frequency`
 　当使用到辐射相关Algorithm时需要。
